@@ -230,6 +230,20 @@
    "writes": []
   },
   {
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "IPerpBook (declared in CauldronBase.sol)",
+   "file": "cauldron/CauldronBase.sol",
+   "kind": "function",
+   "line": 61,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "requoteBook",
+   "semantics": "missing",
+   "signature": "function requoteBook(address rotator) external",
+   "visibility": "external"
+  },
+  {
    "authority": "anyone (public state-variable getter on the implementation)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [],
@@ -238,7 +252,7 @@
    "edges": [],
    "file": "cauldron/CauldronBase.sol",
    "kind": "function",
-   "line": 59,
+   "line": 65,
    "modifiers": [],
    "mutability": "view",
    "name": "totalEntitled",
@@ -260,7 +274,7 @@
    "edges": [],
    "file": "cauldron/CauldronBase.sol",
    "kind": "function",
-   "line": 67,
+   "line": 73,
    "modifiers": [],
    "mutability": "payable",
    "name": "modifyLiquidities",
@@ -282,7 +296,7 @@
    "edges": [],
    "file": "cauldron/CauldronBase.sol",
    "kind": "function",
-   "line": 68,
+   "line": 74,
    "modifiers": [],
    "mutability": "view",
    "name": "nextTokenId",
@@ -304,7 +318,7 @@
    "edges": [],
    "file": "cauldron/CauldronBase.sol",
    "kind": "function",
-   "line": 69,
+   "line": 75,
    "modifiers": [],
    "mutability": "view",
    "name": "getPositionLiquidity",
@@ -321,15 +335,15 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    455,
-    472
+    461,
+    478
    ],
    "body_sha1": "6c8a01d3cba8115e730d53b058f0744b2127b3bf",
    "contract": "CauldronBase",
    "edges": [],
    "file": "cauldron/CauldronBase.sol",
    "kind": "function",
-   "line": 455,
+   "line": 461,
    "modifiers": [],
    "mutability": "view",
    "name": "floorPerFren",
@@ -349,15 +363,15 @@
    "authority": "internal (callers: RedemptionExt.redeemOgFren, RedemptionExt.buyOgFren, CauldronRegistry.recycleCollectionNFT)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    478,
-    480
+    484,
+    486
    ],
    "body_sha1": "2ae7b87f5d3fe6a716d3e94e78b9d94601df9dca",
    "contract": "CauldronBase",
    "edges": [],
    "file": "cauldron/CauldronBase.sol",
    "kind": "function",
-   "line": 478,
+   "line": 484,
    "modifiers": [],
    "mutability": "view",
    "name": "_redeemBlocked",
@@ -377,15 +391,15 @@
    "authority": "deployer",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    482,
-    482
+    488,
+    488
    ],
    "body_sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
    "contract": "CauldronBase",
    "edges": [],
    "file": "cauldron/CauldronBase.sol",
    "kind": "constructor",
-   "line": 482,
+   "line": 488,
    "modifiers": [
     "Ownable(msg.sender)"
    ],
@@ -404,15 +418,15 @@
    "authority": "owner",
    "authority_gate_quote": "onlyOwner (CauldronBase.sol:464)",
    "body_lines": [
-    509,
-    511
+    515,
+    517
    ],
    "body_sha1": "05b5a97cde9034b25da9601e40bee80c6e76a89d",
    "contract": "CauldronBase",
    "edges": [],
    "file": "cauldron/CauldronBase.sol",
    "kind": "function",
-   "line": 509,
+   "line": 515,
    "modifiers": [
     "onlyOwner"
    ],

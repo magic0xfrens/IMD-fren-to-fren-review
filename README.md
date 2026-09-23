@@ -24,20 +24,21 @@ The contracts here are an exact, pinned copy of
 
 | job | who | what comes back |
 |---|---|---|
-| 🔍 **HUNT** | hundreds of seats, each alone, full scope | new findings with PoCs, and a verdict per cluster: solid / suspect / exploitable |
+| 🔍 **HUNT** | hundreds of seats, each alone: full scope, plus one deep focus | new findings with PoCs, a verdict per cluster (solid / suspect / exploitable), and leads |
 | 🧪 **PROVE** | one seat per ledger issue | a PoC test in `test/fren-review/<ID>/`: reproduced, or refuted |
 | 🔧 **FIX** | one seat per proven issue | the smallest fix plus a regression test |
 
 Workers cannot see each other while they work, so the ledger is the memory between rounds:
 `tools/aggregate.mjs` pulls every accepted job from IMD's public API into `ledger/`, grouping
 reports that land in the same function. Independent seats finding the same bug are confirmations,
-not waste. The next round's hunters read the ledger and confirm or refute instead of re-reporting.
+not waste. The next round's hunters read the ledger and confirm or refute instead of re-reporting, and
+start digging from the leads earlier seats suspected but could not prove.
 
 ## What is in here
 
 | path | what |
 |---|---|
-| `SKILL.md` | the skill every job follows — lore, rules, scope, trust model, HUNT / PROVE / FIX |
+| `SKILL.md` | the skill every job follows — rules, trust model, invariants, attack playbook, proof standard, HUNT / PROVE / FIX |
 | `MAP.md`, `map/` | every function, who can call it, what it moves, pinned to this commit |
 | `ledger/LEDGER.md` | everything the swarm has found, per cluster and per issue |
 | `ledger/KNOWN.md` | issues known before the swarm arrived |

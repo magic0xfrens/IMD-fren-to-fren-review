@@ -921,9 +921,9 @@
    "authority_gate_quote": "UNGATED",
    "body_lines": [
     1479,
-    1624
+    1628
    ],
-   "body_sha1": "00d4abc021bb1657f7d5c1742253b338baa0e00b",
+   "body_sha1": "604e153fa8ad5819989046567134de6591b95275",
    "contract": "CauldronHook",
    "edges": [
     "IFeeRouter.route (CauldronHook.sol:1466), UNTRUSTED, out-of-cluster",
@@ -961,7 +961,7 @@
     "vault (line 1528)",
     "legacyRegistry (line 1532)"
    ],
-   "semantics": "fresh",
+   "semantics": "stale",
    "signature": "function _routeEthFee(uint256 feeAmount) private",
    "value": "no direct transfer; the guild and floor shares leave through the delegatecalled `routeSplit` (line 1550) and everything undelivered is booked by `_creditReserve` (line 1549)",
    "visibility": "private",
@@ -977,8 +977,8 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    1632,
-    1641
+    1636,
+    1645
    ],
    "body_sha1": "6179fce6e06b026ec4ec0d366e13a1e9c1036efa",
    "contract": "CauldronHook",
@@ -987,7 +987,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 1632,
+   "line": 1636,
    "modifiers": [],
    "mutability": "view",
    "name": "snipeSurtaxBps",
@@ -1012,8 +1012,8 @@
    "authority": "internal (callers: CauldronHook._beforeSwap, CauldronHook._afterSwap)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    1657,
-    1703
+    1661,
+    1707
    ],
    "body_sha1": "fc0bb10ab9b4827ee189a3f308dc70f5fece6f5c",
    "contract": "CauldronHook",
@@ -1029,7 +1029,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 1651,
+   "line": 1655,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "_takeEthFee",
@@ -1052,15 +1052,15 @@
    "authority": "owner",
    "authority_gate_quote": "external onlyOwner (CauldronHook.sol:1634)",
    "body_lines": [
-    1706,
-    1710
+    1710,
+    1714
    ],
    "body_sha1": "0a1966d0c4593857179e255048811bf736461d5e",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 1706,
+   "line": 1710,
    "modifiers": [
     "onlyOwner"
    ],
@@ -1084,8 +1084,8 @@
    "authority": "internal (caller: CauldronHook._afterSwap)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    1716,
-    1747
+    1720,
+    1751
    ],
    "body_sha1": "7a149563b0ed3bb9b20c34d465c14b04ecd98e17",
    "contract": "CauldronHook",
@@ -1094,7 +1094,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 1716,
+   "line": 1720,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "_recordVolume",
@@ -1123,15 +1123,15 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    1749,
-    1763
+    1753,
+    1767
    ],
    "body_sha1": "f113302ae2f03cce4c1fd26895064bc6e87743ad",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 1749,
+   "line": 1753,
    "modifiers": [],
    "mutability": "view",
    "name": "getVolume24h",
@@ -1154,8 +1154,8 @@
    "authority": "registry",
    "authority_gate_quote": "if (msg.sender != registry) revert OnlyRegistry(); (CauldronHook.sol:1725)",
    "body_lines": [
-    1796,
-    1841
+    1800,
+    1845
    ],
    "body_sha1": "71fd47c0f640bff569e417a48738e91dc73cb8b4",
    "contract": "CauldronHook",
@@ -1168,7 +1168,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 1796,
+   "line": 1800,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "linkVolume",
@@ -1191,15 +1191,15 @@
    "authority": "internal (caller: CauldronHook.linkVolume)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    1845,
-    1852
+    1849,
+    1856
    ],
    "body_sha1": "f8d62f8eb26857a7710a4cf484c2a703ba07bab7",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 1845,
+   "line": 1849,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "_addSibling",
@@ -1221,8 +1221,8 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    1863,
-    1883
+    1867,
+    1887
    ],
    "body_sha1": "93951bf9ed9e2686b153ea7fbba2fb075a9ef85b",
    "contract": "CauldronHook",
@@ -1233,7 +1233,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 1863,
+   "line": 1867,
    "modifiers": [],
    "mutability": "view",
    "name": "isDead",
@@ -1257,15 +1257,15 @@
    "authority": "internal (callers: CauldronHook._recordVolume)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    1885,
-    1887
+    1889,
+    1891
    ],
    "body_sha1": "044d34cc77755ead04ed76359bd9c19afd3c0706",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 1885,
+   "line": 1889,
    "modifiers": [],
    "mutability": "view",
    "name": "_getCurrentBucket",
@@ -1285,8 +1285,8 @@
    "authority": "internal (caller: CauldronHook._takeEthFee)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    1893,
-    1904
+    1897,
+    1908
    ],
    "body_sha1": "0e0e016aca6fa06a152fc7170a8bdfcb7f1ff794",
    "contract": "CauldronHook",
@@ -1295,7 +1295,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 1893,
+   "line": 1897,
    "modifiers": [],
    "mutability": "view",
    "name": "_getHolderTaxRate",
@@ -1318,15 +1318,15 @@
    "authority": "owner",
    "authority_gate_quote": "external onlyOwner (CauldronHook.sol:1836)",
    "body_lines": [
-    1908,
-    1912
+    1912,
+    1916
    ],
    "body_sha1": "fd93667f14d2060ac614e532fd2e41b107dc3bc9",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 1908,
+   "line": 1912,
    "modifiers": [
     "onlyOwner"
    ],
@@ -1349,8 +1349,8 @@
    "authority": "registry",
    "authority_gate_quote": "if (msg.sender != registry) revert OnlyRegistry(); (CauldronHook.sol:1852)",
    "body_lines": [
-    1923,
-    1935
+    1927,
+    1939
    ],
    "body_sha1": "fe26d6100bc9403da86008ed5c08d47308628cbe",
    "contract": "CauldronHook",
@@ -1359,7 +1359,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 1923,
+   "line": 1927,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "releaseRelaunchETH",
@@ -1381,8 +1381,8 @@
    "authority": "registry",
    "authority_gate_quote": "if (msg.sender != registry) revert OnlyRegistry(); (CauldronHook.sol:1880)",
    "body_lines": [
-    1951,
-    1961
+    1955,
+    1965
    ],
    "body_sha1": "db5a9021d453ee0388d1e6c19b0e0134d4f85d70",
    "contract": "CauldronHook",
@@ -1391,7 +1391,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 1951,
+   "line": 1955,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "releaseRelaunchAsset",
@@ -1413,15 +1413,15 @@
    "authority": "owner only, and it reverts for the owner too",
    "authority_gate_quote": "public view override onlyOwner (CauldronHook.sol:1913)",
    "body_lines": [
-    1985,
-    1987
+    1989,
+    1991
    ],
    "body_sha1": "05b5a97cde9034b25da9601e40bee80c6e76a89d",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 1985,
+   "line": 1989,
    "modifiers": [
     "onlyOwner"
    ],
@@ -1440,15 +1440,15 @@
    "authority": "owner",
    "authority_gate_quote": "external onlyOwner (CauldronHook.sol:1967)",
    "body_lines": [
-    2039,
-    2048
+    2043,
+    2052
    ],
    "body_sha1": "8026927a68f5b1a02e573cfcfcfbbc500cf066c3",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2033,
+   "line": 2037,
    "modifiers": [
     "onlyOwner"
    ],
@@ -1473,8 +1473,8 @@
    "authority": "registry",
    "authority_gate_quote": "if (msg.sender != registry) revert OnlyRegistry(); (CauldronHook.sol:1985)",
    "body_lines": [
-    2056,
-    2088
+    2060,
+    2092
    ],
    "body_sha1": "d57ed2210a6be28a72263c3d51845454e3e00414",
    "contract": "CauldronHook",
@@ -1484,7 +1484,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2056,
+   "line": 2060,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "forceClosePerps",
@@ -1504,15 +1504,15 @@
    "authority": "registry",
    "authority_gate_quote": "if (msg.sender != registry) revert OnlyRegistry(); (CauldronHook.sol:2047)",
    "body_lines": [
-    2118,
-    2122
+    2122,
+    2126
    ],
    "body_sha1": "a7d512a66fdd415f2ffedc7c274e328a855800e4",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2118,
+   "line": 2122,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "setLiveKey",
@@ -1533,15 +1533,15 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2125,
-    2127
+    2129,
+    2131
    ],
    "body_sha1": "03474adb2d83decd6dbe095dbbe8787d142f8f3c",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2125,
+   "line": 2129,
    "modifiers": [],
    "mutability": "view",
    "name": "liveKey",
@@ -1560,8 +1560,8 @@
    "authority": "owner or registry",
    "authority_gate_quote": "if (msg.sender != registry && msg.sender != owner()) revert OnlyRegistry(); (CauldronHook.sol:2060)",
    "body_lines": [
-    2132,
-    2139
+    2136,
+    2143
    ],
    "body_sha1": "64dfe3fb089175adaae0a03c2cc332f7ebf57608",
    "contract": "CauldronHook",
@@ -1570,7 +1570,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2132,
+   "line": 2136,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "setLegacyBuyback",
@@ -1592,14 +1592,14 @@
   },
   {
    "body_lines": [
-    2146,
-    2172
+    2150,
+    2190
    ],
-   "body_sha1": "710fbd9c284713a684fbf00959063c1ba6462636",
+   "body_sha1": "5ccf2ecf57d06efd693e9bf02d7ff1c3d3d9f1c9",
    "contract": "CauldronHook",
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2146,
+   "line": 2150,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "_cacheLegacyThreshold",
@@ -1611,8 +1611,8 @@
    "authority": "owner or registry",
    "authority_gate_quote": "if (msg.sender != registry && msg.sender != owner()) revert OnlyRegistry(); (CauldronHook.sol:2074)",
    "body_lines": [
-    2180,
-    2184
+    2198,
+    2202
    ],
    "body_sha1": "99849e0603cb1ed7102e2d1fab4494d8fd43940f",
    "contract": "CauldronHook",
@@ -1621,7 +1621,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2180,
+   "line": 2198,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "setDeathChecker",
@@ -1642,8 +1642,8 @@
    "authority": "owner or registry",
    "authority_gate_quote": "if (msg.sender != registry && msg.sender != owner()) revert OnlyRegistry(); (CauldronHook.sol:2084)",
    "body_lines": [
-    2190,
-    2196
+    2208,
+    2214
    ],
    "body_sha1": "31da35d431557c1c027ea715b31571a5154eb9b4",
    "contract": "CauldronHook",
@@ -1652,7 +1652,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2190,
+   "line": 2208,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "setPolicies",
@@ -1675,8 +1675,8 @@
    "authority": "owner or registry",
    "authority_gate_quote": "if (msg.sender != registry && msg.sender != owner()) revert OnlyRegistry(); (CauldronHook.sol:2096)",
    "body_lines": [
-    2202,
-    2206
+    2220,
+    2224
    ],
    "body_sha1": "1375c52e78664b778b3e218452ea8061fb729559",
    "contract": "CauldronHook",
@@ -1685,7 +1685,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2202,
+   "line": 2220,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "setFeeRouter",
@@ -1706,15 +1706,15 @@
    "authority": "owner",
    "authority_gate_quote": "external onlyOwner (CauldronHook.sol:2101)",
    "body_lines": [
-    2208,
-    2210
+    2226,
+    2228
    ],
    "body_sha1": "4f42c2d4c6dc609e442b09d6f4e27e2bd3da9240",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2208,
+   "line": 2226,
    "modifiers": [
     "onlyOwner"
    ],
@@ -1735,15 +1735,15 @@
    "authority": "owner",
    "authority_gate_quote": "external onlyOwner (CauldronHook.sol:2114)",
    "body_lines": [
-    2221,
-    2225
+    2239,
+    2243
    ],
    "body_sha1": "9089e77a581624638f4dade071c0543f47a8023a",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2221,
+   "line": 2239,
    "modifiers": [
     "onlyOwner"
    ],
@@ -1766,15 +1766,15 @@
    "authority": "owner",
    "authority_gate_quote": "external onlyOwner (CauldronHook.sol:2130)",
    "body_lines": [
-    2237,
-    2242
+    2255,
+    2260
    ],
    "body_sha1": "af9fd298c244c81077709a2e5deefb714187490c",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2237,
+   "line": 2255,
    "modifiers": [
     "onlyOwner"
    ],
@@ -1796,15 +1796,15 @@
    "authority": "owner",
    "authority_gate_quote": "external onlyOwner (CauldronHook.sol:2139)",
    "body_lines": [
-    2246,
-    2250
+    2264,
+    2268
    ],
    "body_sha1": "2846168a2dd569eaef3aaa62d0ba826e30f46656",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2246,
+   "line": 2264,
    "modifiers": [
     "onlyOwner"
    ],
@@ -1826,8 +1826,8 @@
    "authority": "owner",
    "authority_gate_quote": "external onlyOwner (CauldronHook.sol:2150)",
    "body_lines": [
-    2257,
-    2271
+    2275,
+    2289
    ],
    "body_sha1": "95f08dad8b4716913f9c5572d0c742aa04299902",
    "contract": "CauldronHook",
@@ -1836,7 +1836,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2257,
+   "line": 2275,
    "modifiers": [
     "onlyOwner"
    ],
@@ -1866,8 +1866,8 @@
    "authority": "registry",
    "authority_gate_quote": "if (msg.sender != registry) revert OnlyRegistry(); (CauldronHook.sol:2183)",
    "body_lines": [
-    2289,
-    2302
+    2307,
+    2320
    ],
    "body_sha1": "479be36b30a7574c4523f36d6f951ace1713cbe7",
    "contract": "CauldronHook",
@@ -1877,7 +1877,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2289,
+   "line": 2307,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "setCollection",
@@ -1900,8 +1900,8 @@
    "authority": "internal (callers: CauldronHook.setCollection, CauldronHook.setPerpEngine)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2311,
-    2314
+    2329,
+    2332
    ],
    "body_sha1": "7e837fe8724c6684b475bc7b4d75203b8775d0bc",
    "contract": "CauldronHook",
@@ -1910,7 +1910,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2311,
+   "line": 2329,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "_wireLiquidator",
@@ -1930,15 +1930,15 @@
    "authority": "registry",
    "authority_gate_quote": "if (msg.sender != registry) revert OnlyRegistry(); (CauldronHook.sol:2211)",
    "body_lines": [
-    2317,
-    2320
+    2335,
+    2338
    ],
    "body_sha1": "83c7a231e6ddeac23212ee3d5c9afcb6c39f6adb",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2317,
+   "line": 2335,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "setVault",
@@ -1959,8 +1959,8 @@
    "authority": "owner or registry",
    "authority_gate_quote": "if (msg.sender != registry && msg.sender != owner()) revert OnlyRegistry(); (CauldronHook.sol:2217)",
    "body_lines": [
-    2323,
-    2326
+    2341,
+    2344
    ],
    "body_sha1": "1ebb3bee0ac4d15e8c948dd9d87e8603fc30726b",
    "contract": "CauldronHook",
@@ -1969,7 +1969,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2323,
+   "line": 2341,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "setQuest",
@@ -1990,8 +1990,8 @@
    "authority": "owner or registry",
    "authority_gate_quote": "if (msg.sender != registry && msg.sender != owner()) revert OnlyRegistry(); (CauldronHook.sol:2226)",
    "body_lines": [
-    2332,
-    2335
+    2350,
+    2353
    ],
    "body_sha1": "e3bd6520f43e523ca3479dbf473754b347b6c655",
    "contract": "CauldronHook",
@@ -2000,7 +2000,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2332,
+   "line": 2350,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "setSeeder",
@@ -2021,8 +2021,8 @@
    "authority": "owner or registry",
    "authority_gate_quote": "if (msg.sender != registry && msg.sender != owner()) revert OnlyRegistry(); (CauldronHook.sol:2234)",
    "body_lines": [
-    2340,
-    2346
+    2358,
+    2364
    ],
    "body_sha1": "b504fa9c89328b2f41bc69fb675114d618d5f12c",
    "contract": "CauldronHook",
@@ -2032,7 +2032,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2340,
+   "line": 2358,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "setPerpEngine",
@@ -2054,15 +2054,15 @@
    "authority": "owner",
    "authority_gate_quote": "external onlyOwner (CauldronHook.sol:2242)",
    "body_lines": [
-    2349,
-    2352
+    2367,
+    2370
    ],
    "body_sha1": "fc232776fc681d78c9b489dc2a7d20dff9e1a381",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2349,
+   "line": 2367,
    "modifiers": [
     "onlyOwner"
    ],
@@ -2085,8 +2085,8 @@
    "authority": "owner or registry",
    "authority_gate_quote": "if (msg.sender != registry && msg.sender != owner()) revert OnlyRegistry(); (CauldronHook.sol:2250)",
    "body_lines": [
-    2356,
-    2360
+    2374,
+    2378
    ],
    "body_sha1": "f8b7e84c4e3be133e0b4b82802c41c5a7ca3fe61",
    "contract": "CauldronHook",
@@ -2095,7 +2095,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2356,
+   "line": 2374,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "setGuild",
@@ -2117,15 +2117,15 @@
    "authority": "owner",
    "authority_gate_quote": "external onlyOwner (CauldronHook.sol:2261)",
    "body_lines": [
-    2368,
-    2371
+    2386,
+    2389
    ],
    "body_sha1": "84286d3fa3fbe0d7d4d34ed19e5654e822d523a9",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2368,
+   "line": 2386,
    "modifiers": [
     "onlyOwner"
    ],
@@ -2146,8 +2146,8 @@
    "authority": "owner or registry",
    "authority_gate_quote": "if (msg.sender != registry && msg.sender != owner()) revert OnlyRegistry(); (CauldronHook.sol:2270)",
    "body_lines": [
-    2376,
-    2380
+    2394,
+    2398
    ],
    "body_sha1": "66103e31c8064f05a2be7615093520dc787a1a5f",
    "contract": "CauldronHook",
@@ -2156,7 +2156,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2376,
+   "line": 2394,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "setActiveProposer",
@@ -2177,15 +2177,15 @@
    "authority": "owner",
    "authority_gate_quote": "external onlyOwner (CauldronHook.sol:2276)",
    "body_lines": [
-    2383,
-    2386
+    2401,
+    2404
    ],
    "body_sha1": "b50a27df364278711c8d34e01d58ac4bfc40ea43",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2383,
+   "line": 2401,
    "modifiers": [
     "onlyOwner"
    ],
@@ -2208,8 +2208,8 @@
    "authority": "anyone (each caller can only claim their own accrued balance)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2391,
-    2398
+    2409,
+    2416
    ],
    "body_sha1": "52a9c2c49b45f01a5f011052f0719a507019dc5b",
    "contract": "CauldronHook",
@@ -2218,7 +2218,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2391,
+   "line": 2409,
    "modifiers": [
     "nonReentrant"
    ],
@@ -2241,15 +2241,15 @@
    "authority": "owner",
    "authority_gate_quote": "external onlyOwner (CauldronHook.sol:2294)",
    "body_lines": [
-    2401,
-    2405
+    2419,
+    2423
    ],
    "body_sha1": "377fecd9ad6b8b4837e91fe11dae640824a1f43c",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2401,
+   "line": 2419,
    "modifiers": [
     "onlyOwner"
    ],
@@ -2271,15 +2271,15 @@
    "authority": "owner",
    "authority_gate_quote": "external onlyOwner (CauldronHook.sol:2300)",
    "body_lines": [
-    2407,
-    2407
+    2425,
+    2425
    ],
    "body_sha1": "63dbbabea1d007da4be91cb892411cb727aec55a",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2407,
+   "line": 2425,
    "modifiers": [
     "onlyOwner"
    ],
@@ -2300,15 +2300,15 @@
    "authority": "registry",
    "authority_gate_quote": "if (msg.sender != registry) revert OnlyRegistry(); (CauldronHook.sol:2308)",
    "body_lines": [
-    2414,
-    2419
+    2432,
+    2437
    ],
    "body_sha1": "57127bd15715f6fb87538435488e911dd67192df",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2414,
+   "line": 2432,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "setNftCurveFrom",
@@ -2330,8 +2330,8 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2422,
-    2431
+    2440,
+    2449
    ],
    "body_sha1": "2e99dff880c7158f1f0d9c24e5ad9d63bce63e47",
    "contract": "CauldronHook",
@@ -2340,7 +2340,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2422,
+   "line": 2440,
    "modifiers": [],
    "mutability": "view",
    "name": "nftPriceAt",
@@ -2363,15 +2363,15 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2434,
-    2436
+    2452,
+    2454
    ],
    "body_sha1": "33532772442a520955d1acdffc340d57e3c6020c",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2434,
+   "line": 2452,
    "modifiers": [],
    "mutability": "view",
    "name": "creditOf",
@@ -2391,8 +2391,8 @@
    "authority": "internal (callers: CauldronHook.crystalsReady, CauldronHook.costOfNextCrystals, CauldronHook.progress)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2442,
-    2445
+    2460,
+    2463
    ],
    "body_sha1": "9fdb6f241e5413cec54be64fa99c85adea579a98",
    "contract": "CauldronHook",
@@ -2401,7 +2401,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2442,
+   "line": 2460,
    "modifiers": [],
    "mutability": "view",
    "name": "_curvePos",
@@ -2423,8 +2423,8 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2448,
-    2459
+    2466,
+    2477
    ],
    "body_sha1": "99751b79841e39eb81f9e603c492ab49f85057f3",
    "contract": "CauldronHook",
@@ -2434,7 +2434,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2448,
+   "line": 2466,
    "modifiers": [],
    "mutability": "view",
    "name": "crystalsReady",
@@ -2456,8 +2456,8 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2462,
-    2466
+    2480,
+    2484
    ],
    "body_sha1": "a2b558025358024beffd6978b6b149dd5ecd6664",
    "contract": "CauldronHook",
@@ -2467,7 +2467,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2462,
+   "line": 2480,
    "modifiers": [],
    "mutability": "view",
    "name": "costOfNextCrystals",
@@ -2486,8 +2486,8 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2471,
-    2482
+    2489,
+    2500
    ],
    "body_sha1": "76fae8d852d0101095abccde420f836ff6a99bb0",
    "contract": "CauldronHook",
@@ -2496,7 +2496,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2471,
+   "line": 2489,
    "modifiers": [],
    "mutability": "view",
    "name": "oddsForPlay",
@@ -2522,15 +2522,15 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2485,
-    2487
+    2503,
+    2505
    ],
    "body_sha1": "9c252ea470576fd04571ccd0f0c22f9c6401aabc",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2485,
+   "line": 2503,
    "modifiers": [],
    "mutability": "view",
    "name": "outstandingTickets",
@@ -2549,8 +2549,8 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2490,
-    2494
+    2508,
+    2512
    ],
    "body_sha1": "8d5bf8c5d8b0bc3f89384e448eb9abeacb3603db",
    "contract": "CauldronHook",
@@ -2560,7 +2560,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2490,
+   "line": 2508,
    "modifiers": [],
    "mutability": "view",
    "name": "mintedOut",
@@ -2581,8 +2581,8 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2504,
-    2517
+    2522,
+    2535
    ],
    "body_sha1": "47c154c922ed6ba57d4cf51d208f91dfc35bcd92",
    "contract": "CauldronHook",
@@ -2594,7 +2594,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2500,
+   "line": 2518,
    "modifiers": [],
    "mutability": "view",
    "name": "progress",
@@ -2616,8 +2616,8 @@
    "authority": "opener (an address flagged in isOpener)",
    "authority_gate_quote": "if (!isOpener[msg.sender]) revert NotOpener(); (CauldronHook.sol:2425)",
    "body_lines": [
-    2531,
-    2542
+    2549,
+    2560
    ],
    "body_sha1": "c853d965bd3f9229a2e300e57deb785402e56d2f",
    "contract": "CauldronHook",
@@ -2626,7 +2626,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2527,
+   "line": 2545,
    "modifiers": [
     "nonReentrant"
    ],
@@ -2647,8 +2647,8 @@
    "authority": "internal (callers: CauldronHook.commitCrystals and CauldronHook.nativeGachaStep)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2550,
-    2596
+    2568,
+    2614
    ],
    "body_sha1": "a12307ddca62cc0ebf52c41b6df122755616f5eb",
    "contract": "CauldronHook",
@@ -2660,7 +2660,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2547,
+   "line": 2565,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "_commitCrystals",
@@ -2691,8 +2691,8 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2611,
-    2613
+    2629,
+    2631
    ],
    "body_sha1": "b36cf57fdfc86db1eb9c88161b8da02d4a63ba38",
    "contract": "CauldronHook",
@@ -2701,7 +2701,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2607,
+   "line": 2625,
    "modifiers": [
     "nonReentrant"
    ],
@@ -2720,8 +2720,8 @@
    "authority": "internal (callers: CauldronHook.resolveTickets and CauldronHook.nativeGachaStep)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2622,
-    2629
+    2640,
+    2647
    ],
    "body_sha1": "2943c6a5a259c010f4cc35a1f18aa18b2e213b51",
    "contract": "CauldronHook",
@@ -2730,7 +2730,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2619,
+   "line": 2637,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "_resolveTickets",
@@ -2762,8 +2762,8 @@
    "authority": "hook itself (self-call only)",
    "authority_gate_quote": "if (msg.sender != address(this)) revert OnlySelf(); (CauldronHook.sol:2531)",
    "body_lines": [
-    2637,
-    2641
+    2655,
+    2659
    ],
    "body_sha1": "2a17c527f6141940fb3f76eec4a41d37fa32b2b8",
    "contract": "CauldronHook",
@@ -2773,7 +2773,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2637,
+   "line": 2655,
    "modifiers": [
     "nonReentrant"
    ],
@@ -2795,8 +2795,8 @@
    "authority": "owner or registry",
    "authority_gate_quote": "if (msg.sender != registry && msg.sender != owner()) revert OnlyRegistry(); (CauldronHook.sol:2540)",
    "body_lines": [
-    2646,
-    2650
+    2664,
+    2668
    ],
    "body_sha1": "d29775ce6337baf3f83602014c5ccd75e2d5dd83",
    "contract": "CauldronHook",
@@ -2805,7 +2805,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2646,
+   "line": 2664,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "setOpener",
@@ -2826,8 +2826,8 @@
    "authority": "owner or registry",
    "authority_gate_quote": "if (msg.sender != registry && msg.sender != owner()) revert OnlyRegistry(); (CauldronHook.sol:2550)",
    "body_lines": [
-    2656,
-    2659
+    2674,
+    2677
    ],
    "body_sha1": "b697d2426d55f6e2cb0fdc77c1a3204874ec7905",
    "contract": "CauldronHook",
@@ -2836,7 +2836,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2656,
+   "line": 2674,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "setTaxExempt",
@@ -2857,8 +2857,8 @@
    "authority": "internal (callers: CauldronHook._beforeSwap, CauldronHook._afterSwap)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2670,
-    2672
+    2688,
+    2690
    ],
    "body_sha1": "d6c969a3bf450e40d43d3f85f1a99c2c85c21331",
    "contract": "CauldronHook",
@@ -2867,7 +2867,7 @@
    ],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2670,
+   "line": 2688,
    "modifiers": [],
    "mutability": "view",
    "name": "_isExemptPlayer",
@@ -2887,15 +2887,15 @@
    "authority": "internal (callers: CauldronHook._isExemptPlayer, CauldronHook._takeEthFee)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2678,
-    2682
+    2696,
+    2700
    ],
    "body_sha1": "e3a216dde5c4d928a22f65f7539d1d647d1aeba4",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2678,
+   "line": 2696,
    "modifiers": [],
    "mutability": "view",
    "name": "_taxedPlayer",
@@ -2914,15 +2914,15 @@
    "authority": "owner",
    "authority_gate_quote": "external onlyOwner (CauldronHook.sol:2579)",
    "body_lines": [
-    2686,
-    2689
+    2704,
+    2707
    ],
    "body_sha1": "b93ec7f7514e5c4778a2c94d8f80afe0e5941b4d",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2686,
+   "line": 2704,
    "modifiers": [
     "onlyOwner"
    ],
@@ -2944,15 +2944,15 @@
    "authority": "owner",
    "authority_gate_quote": "external onlyOwner (CauldronHook.sol:2586)",
    "body_lines": [
-    2693,
-    2696
+    2711,
+    2714
    ],
    "body_sha1": "5858fc64b27780a9387f80e956120eff5b091555",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2693,
+   "line": 2711,
    "modifiers": [
     "onlyOwner"
    ],
@@ -2975,15 +2975,15 @@
    "authority": "owner",
    "authority_gate_quote": "external onlyOwner (CauldronHook.sol:2592)",
    "body_lines": [
-    2699,
-    2703
+    2717,
+    2721
    ],
    "body_sha1": "1d8fc4a9ffc3841509306786befb1ded34460643",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "function",
-   "line": 2699,
+   "line": 2717,
    "modifiers": [
     "onlyOwner"
    ],
@@ -3007,15 +3007,15 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    2754,
-    2754
+    2772,
+    2772
    ],
    "body_sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
    "contract": "CauldronHook",
    "edges": [],
    "file": "CauldronHook.sol",
    "kind": "receive",
-   "line": 2754,
+   "line": 2772,
    "modifiers": [],
    "mutability": "payable",
    "name": "",

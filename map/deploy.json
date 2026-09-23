@@ -174,10 +174,10 @@
    "authority": "caller satisfying the in-body msg.sender check",
    "authority_gate_quote": "address deployer = pk != 0 ? vm.addr(pk) : msg.sender; (DeployLaunchpad.s.sol:108)",
    "body_lines": [
-    110,
-    671
+    114,
+    708
    ],
-   "body_sha1": "b4de0c48e3c186e46dc0391ed3a4251f4fda3fb4",
+   "body_sha1": "4a5a898cae4957d7845211cb2ca46c38956ad509",
    "contract": "DeployLaunchpad (declared in DeployLaunchpad.s.sol)",
    "edges": [
     "HookMiner.find (DeployLaunchpad.s.sol:161), TRUSTED, out-of-cluster",
@@ -228,7 +228,7 @@
    ],
    "file": "deploy/DeployLaunchpad.s.sol",
    "kind": "function",
-   "line": 110,
+   "line": 114,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "run",
@@ -243,14 +243,14 @@
   },
   {
    "body_lines": [
-    701,
-    722
+    738,
+    759
    ],
    "body_sha1": "800a8204d4bd5bd2f44dbc7cb1ffcebef0151e7d",
    "contract": "DeployLaunchpad (declared in DeployLaunchpad.s.sol)",
    "file": "deploy/DeployLaunchpad.s.sol",
    "kind": "function",
-   "line": 701,
+   "line": 738,
    "modifiers": [],
    "mutability": "view",
    "name": "_preflightQuoteStack",
@@ -260,14 +260,14 @@
   },
   {
    "body_lines": [
-    729,
-    764
+    766,
+    801
    ],
    "body_sha1": "03ea66f774d257ae758ea50b7bb5ea0e34e2b76f",
    "contract": "DeployLaunchpad (declared in DeployLaunchpad.s.sol)",
    "file": "deploy/DeployLaunchpad.s.sol",
    "kind": "function",
-   "line": 727,
+   "line": 764,
    "modifiers": [],
    "mutability": "view",
    "name": "_requireUsableFeed",
@@ -276,45 +276,38 @@
    "visibility": "internal"
   },
   {
-   "authority": "internal (callers are paths that reference this function)",
-   "authority_gate_quote": "UNGATED",
    "body_lines": [
-    783,
-    975
+    807,
+    852
    ],
-   "body_sha1": "c83c14e55f2322e5524845e50051936a2b97d174",
+   "body_sha1": "54e091767166b7aed289bb51f5541002961eefa8",
    "contract": "DeployLaunchpad (declared in DeployLaunchpad.s.sol)",
-   "edges": [
-    "oracle.setPegged (DeployLaunchpad.s.sol:691), UNTRUSTED, out-of-cluster",
-    "oracle.setFeed (DeployLaunchpad.s.sol:693), UNTRUSTED, out-of-cluster",
-    "oracle.setBounds (DeployLaunchpad.s.sol:694), UNTRUSTED, out-of-cluster",
-    "oracle.setPegged (DeployLaunchpad.s.sol:713), UNTRUSTED, out-of-cluster",
-    "oracle.setFeed (DeployLaunchpad.s.sol:715), UNTRUSTED, out-of-cluster",
-    "rotator.setArbParams (DeployLaunchpad.s.sol:717), UNTRUSTED, out-of-cluster",
-    "rotator.setRotationSlipBps (DeployLaunchpad.s.sol:730), UNTRUSTED, out-of-cluster",
-    "registry.setAllowedQuote (DeployLaunchpad.s.sol:733), UNTRUSTED, out-of-cluster",
-    "oracle.usdPerRawUnit (DeployLaunchpad.s.sol:757), UNTRUSTED, out-of-cluster",
-    "oracle.usdPerRawUnit (DeployLaunchpad.s.sol:758), UNTRUSTED, out-of-cluster",
-    "usdg.mint (DeployLaunchpad.s.sol:773), UNTRUSTED, out-of-cluster",
-    "vs.seed (DeployLaunchpad.s.sol:791), UNTRUSTED, out-of-cluster",
-    "vs.seedBand (DeployLaunchpad.s.sol:796), UNTRUSTED, out-of-cluster",
-    "rotator.setVenue (DeployLaunchpad.s.sol:803), UNTRUSTED, out-of-cluster",
-    "hook.commitCrystals (DeployLaunchpad.s.sol:821), UNTRUSTED, out-of-cluster"
-   ],
    "file": "deploy/DeployLaunchpad.s.sol",
    "kind": "function",
-   "line": 777,
+   "line": 807,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "_deployQuoteOracle",
+   "semantics": "missing",
+   "signature": "function _deployQuoteOracle(address deployer) internal returns (QuoteOracle oracle)",
+   "visibility": "internal"
+  },
+  {
+   "body_lines": [
+    871,
+    1025
+   ],
+   "body_sha1": "2dc527eeb7db0db0b628bd6ad1f941ebb7e7a53b",
+   "contract": "DeployLaunchpad (declared in DeployLaunchpad.s.sol)",
+   "file": "deploy/DeployLaunchpad.s.sol",
+   "kind": "function",
+   "line": 865,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "_deployRotationStack",
-   "observations": [],
-   "reachability": "`_deployRotationStack` is declared at DeployLaunchpad.s.sol:637; internal (callers are paths that reference this function).",
-   "reads": [],
-   "semantics": "stale",
-   "signature": "function _deployRotationStack( CauldronRegistry registry, QuoteRotator rotator, address poolManager, address positionManager, address deployer ) internal",
-   "value": "NONE",
-   "visibility": "internal",
-   "writes": []
+   "semantics": "missing",
+   "signature": "function _deployRotationStack( CauldronRegistry registry, QuoteRotator rotator, address poolManager, address positionManager, QuoteOracle oracle ) internal",
+   "visibility": "internal"
   },
   {
    "authority": "implementation-defined caller through this interface",
