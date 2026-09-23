@@ -99,18 +99,26 @@
    "writes": []
   },
   {
+   "authority": "declaration only; implementation authority is outside this node",
+   "authority_gate_quote": "UNGATED",
    "body_lines": [],
    "body_sha1": "",
    "contract": "ILegacyFloorHook (declared in CauldronVault.sol)",
+   "edges": [],
    "file": "cauldron/CauldronVault.sol",
    "kind": "function",
    "line": 18,
    "modifiers": [],
    "mutability": "view",
    "name": "vault",
-   "semantics": "missing",
+   "observations": [],
+   "reachability": "Declaration only: the vault asks the collection's minter (the hook) which vault it funds, via a raw static call (`vault` CauldronVault.sol:186).",
+   "reads": [],
+   "semantics": "fresh",
    "signature": "function vault() external view returns (address)",
-   "visibility": "external"
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
   },
   {
    "authority": "anyone",
@@ -122,9 +130,8 @@
    "body_sha1": "0d646e0906c5012ba7bf40d629873d99737c5b17",
    "contract": "CauldronVault",
    "edges": [
-    "CauldronVault.outstanding (CauldronVault.sol:60), TRUSTED, in-cluster",
-    "CauldronVault.returns (CauldronVault.sol:60), TRUSTED, out-of-cluster",
-    "collection.totalMinted (CauldronVault.sol:61), UNTRUSTED, in-cluster"
+    "CauldronVault.outstanding (CauldronVault.sol:64), TRUSTED, in-cluster",
+    "IBurnableCollection.totalMinted (CauldronVault.sol:65), UNTRUSTED, in-cluster"
    ],
    "file": "cauldron/CauldronVault.sol",
    "kind": "function",
@@ -133,11 +140,11 @@
    "mutability": "view",
    "name": "outstanding",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `outstanding` (CauldronVault.sol:60) is a public node with 3 direct storage/immutable reads, 0 direct writes, and 3 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `outstanding` (CauldronVault.sol:64) is a public node with 3 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
    "reads": [
-    "collection (line 61)",
-    "floorOffset (line 62)",
-    "redeemed (line 63)"
+    "collection (line 65)",
+    "floorOffset (line 66)",
+    "redeemed (line 67)"
    ],
    "semantics": "fresh",
    "signature": "function outstanding() public view returns (uint256)",
@@ -162,21 +169,21 @@
    "mutability": "nonpayable",
    "name": "",
    "observations": [],
-   "reachability": "DERIVED from the current body: deployer (constructor executes once); `constructor` (CauldronVault.sol:106) is a constructor node with 0 direct storage/immutable reads, 3 direct writes, and 0 resolved call edges.",
+   "reachability": "DERIVED from the current body: deployer (constructor executes once); `constructor` (CauldronVault.sol:110) is a constructor node with 0 direct storage/immutable reads, 3 direct writes, and 0 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "constructor(address _collection, address _registry, uint256 _floorOffset)",
    "value": "NONE",
    "visibility": "",
    "writes": [
-    "collection (line 107)",
-    "floorOffset (line 109)",
-    "registry (line 108)"
+    "collection (line 111)",
+    "floorOffset (line 113)",
+    "registry (line 112)"
    ]
   },
   {
    "authority": "caller restricted by explicit msg.sender check",
-   "authority_gate_quote": "if (msg.sender == registry || msg.sender == _minter()) { (CauldronVault.sol:118)",
+   "authority_gate_quote": "if (msg.sender == registry || msg.sender == _minter()) { (CauldronVault.sol:122)",
    "body_lines": [
     121,
     126
@@ -184,7 +191,7 @@
    "body_sha1": "872de4ec538e0e5dad137eab6e5aaa912a85b07a",
    "contract": "CauldronVault",
    "edges": [
-    "CauldronVault._minter (CauldronVault.sol:118), TRUSTED, in-cluster"
+    "CauldronVault._minter (CauldronVault.sol:122), TRUSTED, in-cluster"
    ],
    "file": "cauldron/CauldronVault.sol",
    "kind": "receive",
@@ -193,13 +200,13 @@
    "mutability": "payable",
    "name": "",
    "observations": [],
-   "reachability": "DERIVED from the current body: caller restricted by explicit msg.sender check; `receive` (CauldronVault.sol:117) is a receive node with 1 direct storage/immutable reads, 0 direct writes, and 1 resolved call edges.",
+   "reachability": "DERIVED from the current body: caller restricted by explicit msg.sender check; `receive` (CauldronVault.sol:121) is a receive node with 1 direct storage/immutable reads, 0 direct writes, and 1 resolved call edges.",
    "reads": [
-    "registry (line 118)"
+    "registry (line 122)"
    ],
    "semantics": "fresh",
    "signature": "receive() external payable",
-   "value": "receives or validates `msg.value` (line 119)",
+   "value": "receives or validates `msg.value` (line 123)",
    "visibility": "",
    "writes": []
   },
@@ -213,8 +220,7 @@
    "body_sha1": "1e5655e8ee55db6736368f9ec77441e5d8bbc4bc",
    "contract": "CauldronVault",
    "edges": [
-    "CauldronVault._minter (CauldronVault.sol:130), TRUSTED, in-cluster",
-    "CauldronVault.returns (CauldronVault.sol:130), TRUSTED, out-of-cluster"
+    "CauldronVault._minter (CauldronVault.sol:134), TRUSTED, in-cluster"
    ],
    "file": "cauldron/CauldronVault.sol",
    "kind": "function",
@@ -223,9 +229,9 @@
    "mutability": "view",
    "name": "_minter",
    "observations": [],
-   "reachability": "DERIVED from the current body: private; reachable only through Solidity callers; `_minter` (CauldronVault.sol:130) is a private node with 1 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
+   "reachability": "DERIVED from the current body: private; reachable only through Solidity callers; `_minter` (CauldronVault.sol:134) is a private node with 1 direct storage/immutable reads, 0 direct writes, and 1 resolved call edges.",
    "reads": [
-    "collection (line 131)"
+    "collection (line 135)"
    ],
    "semantics": "fresh",
    "signature": "function _minter() private view returns (address m)",
@@ -234,7 +240,7 @@
    "writes": []
   },
   {
-   "authority": "anyone",
+   "authority": "anyone (view)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
     142,
@@ -243,9 +249,8 @@
    "body_sha1": "d80125e0caa856de000583f55bb14cd6c33698af",
    "contract": "CauldronVault",
    "edges": [
-    "CauldronVault.floorPerNFT (CauldronVault.sol:138), TRUSTED, in-cluster",
-    "CauldronVault.returns (CauldronVault.sol:138), TRUSTED, out-of-cluster",
-    "CauldronVault.outstanding (CauldronVault.sol:139), TRUSTED, in-cluster"
+    "CauldronVault._legacyFloorActive (CauldronVault.sol:143), TRUSTED, in-cluster",
+    "CauldronVault.outstanding (CauldronVault.sol:144), TRUSTED, in-cluster"
    ],
    "file": "cauldron/CauldronVault.sol",
    "kind": "function",
@@ -254,30 +259,31 @@
    "mutability": "view",
    "name": "floorPerNFT",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `floorPerNFT` (CauldronVault.sol:138) is a public node with 0 direct storage/immutable reads, 0 direct writes, and 3 resolved call edges.",
-   "reads": [],
-   "semantics": "stale",
+   "reachability": "Floor per eligible NFT: zero once closed or while the unified floor is in force (`_legacyFloorActive` CauldronVault.sol:143), otherwise the vault balance divided by eligible outstanding NFTs (`n` CauldronVault.sol:146), floor-rounded.",
+   "reads": [
+    "closed (line 143)"
+   ],
+   "semantics": "fresh",
    "signature": "function floorPerNFT() public view returns (uint256)",
    "value": "NONE",
    "visibility": "public",
    "writes": []
   },
   {
-   "authority": "caller restricted by explicit msg.sender check",
-   "authority_gate_quote": "if (collection.ownerOf(tokenId) != msg.sender) revert NotOwner(); (CauldronVault.sol:158)",
+   "authority": "NFT owner of an eligible art id",
+   "authority_gate_quote": "if (collection.ownerOf(tokenId) != msg.sender) revert NotOwner(); (CauldronVault.sol:164)",
    "body_lines": [
     161,
-    177
+    179
    ],
-   "body_sha1": "eff3dae1e3dc0def5016b564bef9229ba6179e91",
+   "body_sha1": "1e6d8db419fa82d4a044242af0fdf1f2388dd915",
    "contract": "CauldronVault",
    "edges": [
-    "CauldronVault.redeem (CauldronVault.sol:155), TRUSTED, in-cluster",
-    "CauldronVault.returns (CauldronVault.sol:155), TRUSTED, out-of-cluster",
-    "collection.ownerOf (CauldronVault.sol:158), UNTRUSTED, in-cluster",
-    "CauldronVault.outstanding (CauldronVault.sol:160), TRUSTED, in-cluster",
-    "collection.burnFromVault (CauldronVault.sol:168), UNTRUSTED, in-cluster",
-    "sender.call (CauldronVault.sol:170), TRUSTED, out-of-cluster"
+    "IBurnableCollection.ownerOf (CauldronVault.sol:164), TRUSTED, in-cluster",
+    "IBurnableCollection.totalMinted (CauldronVault.sol:166), TRUSTED, in-cluster",
+    "CauldronVault._legacyFloorActive (CauldronVault.sol:167), TRUSTED, in-cluster",
+    "CauldronVault.outstanding (CauldronVault.sol:169), TRUSTED, in-cluster",
+    "IBurnableCollection.burnFromVault (CauldronVault.sol:174), TRUSTED, in-cluster"
    ],
    "file": "cauldron/CauldronVault.sol",
    "kind": "function",
@@ -288,70 +294,78 @@
    "mutability": "nonpayable",
    "name": "redeem",
    "observations": [],
-   "reachability": "DERIVED from the current body: caller restricted by explicit msg.sender check; `redeem` (CauldronVault.sol:155) is a external node with 3 direct storage/immutable reads, 1 direct writes, and 6 resolved call edges.",
+   "reachability": "Legacy per-collection floor redemption. Refused once closed, for the genesis tranche (`floorOffset` CauldronVault.sol:163), for non-owners, for ids above the art count so liquidation badges cannot draw the art floor (`totalMinted` CauldronVault.sol:166), and while the unified floor is active (`UnifiedFloorActive` CauldronVault.sol:167). The redeemed counter moves before the burn and the payment (`redeemed` CauldronVault.sol:173); a failed burn or payment reverts everything. Reentrancy-guarded.",
    "reads": [
-    "closed (line 156)",
-    "collection (line 158)",
-    "floorOffset (line 157)"
+    "closed (line 162)",
+    "floorOffset (line 163, immutable)",
+    "collection (line 164, immutable)"
    ],
-   "semantics": "stale",
+   "semantics": "fresh",
    "signature": "function redeem(uint256 tokenId) external nonReentrant returns (uint256 amount)",
-   "value": "sends native through `value` (line 170)",
+   "value": "Burns the NFT through the collection (`burnFromVault` CauldronVault.sol:174) and sends one floor share of native to the caller (`call` CauldronVault.sol:176).",
    "visibility": "external",
    "writes": [
-    "redeemed (line 167)"
+    "redeemed (line 173)"
    ]
   },
   {
+   "authority": "internal (callers: floorPerNFT, redeem)",
+   "authority_gate_quote": "UNGATED",
    "body_lines": [
-    181,
-    186
+    183,
+    188
    ],
    "body_sha1": "87dc1ce02f0ee7a267fc3200463989f3055fbe35",
    "contract": "CauldronVault",
+   "edges": [
+    "CauldronVault._minter (CauldronVault.sol:186), TRUSTED, in-cluster"
+   ],
    "file": "cauldron/CauldronVault.sol",
    "kind": "function",
-   "line": 181,
+   "line": 183,
    "modifiers": [],
    "mutability": "view",
    "name": "_legacyFloorActive",
-   "semantics": "missing",
+   "observations": [],
+   "reachability": "True only when the collection's minter answers `vault()` with exactly one word equal to this vault (`r` CauldronVault.sol:187); a wrong, short or reverting answer means the unified floor is active and legacy redemption is off.",
+   "reads": [],
+   "semantics": "fresh",
    "signature": "function _legacyFloorActive() private view returns (bool)",
-   "visibility": "private"
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
   },
   {
    "authority": "caller restricted by explicit msg.sender check",
-   "authority_gate_quote": "if (msg.sender != registry) revert NotRegistry(); (CauldronVault.sol:185)",
+   "authority_gate_quote": "if (msg.sender != registry) revert NotRegistry(); (CauldronVault.sol:200)",
    "body_lines": [
-    197,
-    209
+    199,
+    211
    ],
    "body_sha1": "4282a763ff54116dac6480f253df064e1710ad16",
    "contract": "CauldronVault",
    "edges": [
-    "CauldronVault.close (CauldronVault.sol:184), TRUSTED, in-cluster",
-    "CauldronVault.returns (CauldronVault.sol:184), TRUSTED, out-of-cluster",
-    "registry.call (CauldronVault.sol:191), UNTRUSTED, out-of-cluster"
+    "CauldronVault.close (CauldronVault.sol:199), TRUSTED, in-cluster"
    ],
    "file": "cauldron/CauldronVault.sol",
    "kind": "function",
-   "line": 197,
+   "line": 199,
    "modifiers": [
     "nonReentrant"
    ],
    "mutability": "nonpayable",
    "name": "close",
    "observations": [],
-   "reachability": "DERIVED from the current body: caller restricted by explicit msg.sender check; `close` (CauldronVault.sol:184) is a external node with 1 direct storage/immutable reads, 1 direct writes, and 3 resolved call edges.",
+   "reachability": "DERIVED from the current body: caller restricted by explicit msg.sender check; `close` (CauldronVault.sol:199) is a external node with 1 direct storage/immutable reads, 1 direct writes, and 1 resolved call edges.",
    "reads": [
-    "registry (line 185)"
+    "registry (line 200)"
    ],
    "semantics": "fresh",
    "signature": "function close() external nonReentrant returns (uint256 swept)",
-   "value": "sends native through `value` (line 191)",
+   "value": "sends native through `value` (line 206)",
    "visibility": "external",
    "writes": [
-    "closed (line 186)"
+    "closed (line 201)"
    ]
   },
   {
@@ -606,8 +620,7 @@
    "body_sha1": "ab51d70be60d35cb72c28b1c5d1bbe8bdb227645",
    "contract": "MockQuoteToken",
    "edges": [
-    "MockQuoteToken.decimals (MockQuoteToken.sol:24), TRUSTED, in-cluster",
-    "MockQuoteToken.returns (MockQuoteToken.sol:24), TRUSTED, out-of-cluster"
+    "MockQuoteToken.decimals (MockQuoteToken.sol:24), TRUSTED, in-cluster"
    ],
    "file": "cauldron/MockQuoteToken.sol",
    "kind": "function",
@@ -616,7 +629,7 @@
    "mutability": "view",
    "name": "decimals",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `decimals` (MockQuoteToken.sol:24) is a public node with 1 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `decimals` (MockQuoteToken.sol:24) is a public node with 1 direct storage/immutable reads, 0 direct writes, and 1 resolved call edges.",
    "reads": [
     "_decimals (line 24)"
    ],
@@ -636,8 +649,7 @@
    "body_sha1": "8cfddcead2898ea5bf3e7029e15bf202af53fb6f",
    "contract": "MockQuoteToken",
    "edges": [
-    "MockQuoteToken.mint (MockQuoteToken.sol:27), TRUSTED, in-cluster",
-    "MockQuoteToken._mint (MockQuoteToken.sol:27), TRUSTED, out-of-cluster"
+    "MockQuoteToken.mint (MockQuoteToken.sol:27), TRUSTED, in-cluster"
    ],
    "file": "cauldron/MockQuoteToken.sol",
    "kind": "function",
@@ -646,7 +658,7 @@
    "mutability": "nonpayable",
    "name": "mint",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `mint` (MockQuoteToken.sol:27) is a external node with 0 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `mint` (MockQuoteToken.sol:27) is a external node with 0 direct storage/immutable reads, 0 direct writes, and 1 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function mint(address to, uint256 amount) external",
@@ -692,9 +704,8 @@
    "contract": "NativeQuoteZap",
    "edges": [
     "NativeQuoteZap.zap (NativeQuoteZap.sol:101), TRUSTED, in-cluster",
-    "NativeQuoteZap.returns (NativeQuoteZap.sol:101), TRUSTED, out-of-cluster",
-    "poolManager.unlock (NativeQuoteZap.sol:107), TRUSTED, out-of-cluster",
-    "quote.call (NativeQuoteZap.sol:118), UNTRUSTED, out-of-cluster"
+    "IPoolManager.unlock (NativeQuoteZap.sol:107), TRUSTED, out-of-cluster",
+    "IERC20.transfer (NativeQuoteZap.sol:118), UNTRUSTED, out-of-cluster"
    ],
    "file": "cauldron/NativeQuoteZap.sol",
    "kind": "function",
@@ -703,7 +714,7 @@
    "mutability": "payable",
    "name": "zap",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `zap` (NativeQuoteZap.sol:101) is a external node with 1 direct storage/immutable reads, 0 direct writes, and 4 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `zap` (NativeQuoteZap.sol:101) is a external node with 1 direct storage/immutable reads, 0 direct writes, and 3 resolved call edges.",
    "reads": [
     "poolManager (line 107)"
    ],
@@ -724,12 +735,10 @@
    "contract": "NativeQuoteZap",
    "edges": [
     "NativeQuoteZap.unlockCallback (NativeQuoteZap.sol:123), TRUSTED, in-cluster",
-    "NativeQuoteZap.returns (NativeQuoteZap.sol:123), TRUSTED, out-of-cluster",
-    "poolManager.swap (NativeQuoteZap.sol:132), TRUSTED, out-of-cluster",
-    "poolManager.sync (NativeQuoteZap.sol:146), TRUSTED, out-of-cluster",
-    "poolManager.settle (NativeQuoteZap.sol:147), TRUSTED, out-of-cluster",
-    "poolManager.take (NativeQuoteZap.sol:148), TRUSTED, out-of-cluster",
-    "payer.call (NativeQuoteZap.sol:169), UNTRUSTED, out-of-cluster"
+    "IPoolManager.swap (NativeQuoteZap.sol:132), TRUSTED, out-of-cluster",
+    "IPoolManager.sync (NativeQuoteZap.sol:146), TRUSTED, out-of-cluster",
+    "IPoolManager.settle (NativeQuoteZap.sol:147), TRUSTED, out-of-cluster",
+    "IPoolManager.take (NativeQuoteZap.sol:148), TRUSTED, out-of-cluster"
    ],
    "file": "cauldron/NativeQuoteZap.sol",
    "kind": "function",
@@ -738,7 +747,7 @@
    "mutability": "nonpayable",
    "name": "unlockCallback",
    "observations": [],
-   "reachability": "DERIVED from the current body: caller restricted by explicit msg.sender check; `unlockCallback` (NativeQuoteZap.sol:123) is a external node with 1 direct storage/immutable reads, 0 direct writes, and 7 resolved call edges.",
+   "reachability": "DERIVED from the current body: caller restricted by explicit msg.sender check; `unlockCallback` (NativeQuoteZap.sol:123) is a external node with 1 direct storage/immutable reads, 0 direct writes, and 5 resolved call edges.",
    "reads": [
     "poolManager (line 124)"
    ],
@@ -1025,22 +1034,18 @@
    ]
   },
   {
-   "authority": "anyone",
+   "authority": "anyone (view)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
     202,
-    278
+    279
    ],
-   "body_sha1": "0f59720908f9bab9418aa26cf1475b2c4b1da4da",
+   "body_sha1": "d9d02150ba2fd62ab4302387039ab60851a3c087",
    "contract": "QuoteOracle",
    "edges": [
-    "QuoteOracle.usdPerRawUnit (QuoteOracle.sol:202), TRUSTED, in-cluster",
-    "QuoteOracle.returns (QuoteOracle.sol:202), TRUSTED, out-of-cluster",
-    "QuoteOracle._sequencerOk (QuoteOracle.sol:209), TRUSTED, in-cluster",
-    "aggregator.latestRoundData (QuoteOracle.sol:231), TRUSTED, in-cluster",
-    "QuoteOracle.returns (QuoteOracle.sol:231), TRUSTED, out-of-cluster",
-    "aggregator.decimals (QuoteOracle.sol:249), TRUSTED, in-cluster",
-    "QuoteOracle.returns (QuoteOracle.sol:249), TRUSTED, out-of-cluster"
+    "QuoteOracle._sequencerOk (QuoteOracle.sol:212), TRUSTED, in-cluster",
+    "QuoteOracle._readRound (QuoteOracle.sol:232), TRUSTED, in-cluster",
+    "QuoteOracle._readWords (QuoteOracle.sol:243), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteOracle.sol",
    "kind": "function",
@@ -1049,7 +1054,7 @@
    "mutability": "view",
    "name": "usdPerRawUnit",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `usdPerRawUnit` (QuoteOracle.sol:202) is a external node with 1 direct storage/immutable reads, 0 direct writes, and 7 resolved call edges.",
+   "reachability": "USD value of one raw unit of `quote`, scaled 1e18, or zero for cannot-judge. Pegged assets return one dollar per whole token (`pegged` QuoteOracle.sol:210), unset feeds and a down sequencer return zero (`_sequencerOk` QuoteOracle.sol:212). The round is read through a bounded fixed-width decoder (`_readRound` QuoteOracle.sol:232); non-positive, stale or future answers return zero (`heartbeat` QuoteOracle.sol:241), feed decimals are read the same bounded way (`_readWords` QuoteOracle.sol:243), and any scaling that cannot be represented returns zero instead of reverting (`perWhole` QuoteOracle.sol:277). Owner bounds filter out-of-band prices (`minUsd` QuoteOracle.sol:267).",
    "reads": [
     "feeds (line 203)"
    ],
@@ -1063,27 +1068,26 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    334,
-    342
+    335,
+    343
    ],
    "body_sha1": "fccb8c99b0637432e33556637a617d703b8bbd1a",
    "contract": "QuoteOracle",
    "edges": [
-    "QuoteOracle.cachedUsdPerRawUnit (QuoteOracle.sol:334), TRUSTED, in-cluster",
-    "QuoteOracle.returns (QuoteOracle.sol:334), TRUSTED, out-of-cluster",
-    "this.usdPerRawUnit (QuoteOracle.sol:339), TRUSTED, in-cluster"
+    "QuoteOracle.cachedUsdPerRawUnit (QuoteOracle.sol:335), TRUSTED, in-cluster",
+    "QuoteOracle.usdPerRawUnit (QuoteOracle.sol:340), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteOracle.sol",
    "kind": "function",
-   "line": 334,
+   "line": 335,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "cachedUsdPerRawUnit",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `cachedUsdPerRawUnit` (QuoteOracle.sol:334) is a external node with 2 direct storage/immutable reads, 0 direct writes, and 3 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `cachedUsdPerRawUnit` (QuoteOracle.sol:335) is a external node with 2 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
    "reads": [
-    "TTL (line 336)",
-    "cache (line 335)"
+    "TTL (line 337)",
+    "cache (line 336)"
    ],
    "semantics": "fresh",
    "signature": "function cachedUsdPerRawUnit(address quote) external returns (uint256)",
@@ -1095,24 +1099,23 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    346,
-    348
+    347,
+    349
    ],
    "body_sha1": "cbf040f37bb4c9e0d6b28b6ef0467439bd598362",
    "contract": "QuoteOracle",
    "edges": [
-    "QuoteOracle.priceable (QuoteOracle.sol:346), TRUSTED, in-cluster",
-    "QuoteOracle.returns (QuoteOracle.sol:346), TRUSTED, out-of-cluster",
-    "this.usdPerRawUnit (QuoteOracle.sol:347), TRUSTED, in-cluster"
+    "QuoteOracle.priceable (QuoteOracle.sol:347), TRUSTED, in-cluster",
+    "QuoteOracle.usdPerRawUnit (QuoteOracle.sol:348), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteOracle.sol",
    "kind": "function",
-   "line": 346,
+   "line": 347,
    "modifiers": [],
    "mutability": "view",
    "name": "priceable",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `priceable` (QuoteOracle.sol:346) is a external node with 0 direct storage/immutable reads, 0 direct writes, and 3 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `priceable` (QuoteOracle.sol:347) is a external node with 0 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function priceable(address quote) external view returns (bool)",
@@ -1121,36 +1124,85 @@
    "writes": []
   },
   {
-   "authority": "internal; reachable only through Solidity callers",
+   "authority": "internal (callers: usdPerRawUnit)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    350,
-    372
+    351,
+    363
    ],
-   "body_sha1": "58c04a8cd4f7b3363c0726114574316d1aa3986e",
+   "body_sha1": "3e5cfde73ab231961492dccf73db4de693af8583",
    "contract": "QuoteOracle",
    "edges": [
-    "QuoteOracle._sequencerOk (QuoteOracle.sol:350), TRUSTED, in-cluster",
-    "QuoteOracle.returns (QuoteOracle.sol:350), TRUSTED, out-of-cluster",
-    "s.latestRoundData (QuoteOracle.sol:358), TRUSTED, in-cluster",
-    "QuoteOracle.returns (QuoteOracle.sol:358), TRUSTED, out-of-cluster"
+    "QuoteOracle._readRound (QuoteOracle.sol:359), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteOracle.sol",
    "kind": "function",
-   "line": 350,
+   "line": 351,
    "modifiers": [],
    "mutability": "view",
    "name": "_sequencerOk",
    "observations": [],
-   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_sequencerOk` (QuoteOracle.sol:350) is a internal node with 2 direct storage/immutable reads, 0 direct writes, and 4 resolved call edges.",
+   "reachability": "No sequencer feed means true (`s` QuoteOracle.sol:353). Otherwise the uptime round is read through the bounded decoder (`_readRound` QuoteOracle.sol:359); invalid data, a down flag, a zero or future start, or an unexpired grace period all return false (`gracePeriod` QuoteOracle.sol:362).",
    "reads": [
-    "gracePeriod (line 368)",
-    "sequencerUptime (line 351)"
+    "sequencerUptime (line 352)",
+    "gracePeriod (line 362)"
    ],
    "semantics": "fresh",
    "signature": "function _sequencerOk() internal view returns (bool)",
    "value": "NONE",
    "visibility": "internal",
+   "writes": []
+  },
+  {
+   "authority": "internal (callers: usdPerRawUnit, _sequencerOk)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    367,
+    374
+   ],
+   "body_sha1": "4b662bee9e4d9fa81909b0c700612adfa30b2470",
+   "contract": "QuoteOracle",
+   "edges": [
+    "QuoteOracle._readWords (QuoteOracle.sol:368), TRUSTED, in-cluster"
+   ],
+   "file": "cauldron/QuoteOracle.sol",
+   "kind": "function",
+   "line": 367,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "_readRound",
+   "observations": [],
+   "reachability": "Reads latestRoundData as exactly five words (`_readWords` QuoteOracle.sol:368) and rejects round ids that do not fit uint80 (`answeredInRound` QuoteOracle.sol:372), so a malformed reply is reported invalid instead of reverting the caller.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _readRound(address feed) private view returns (bool, int256, uint256, uint256)",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal (callers: _readRound, usdPerRawUnit)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    381,
+    388
+   ],
+   "body_sha1": "64235aa1aa935949a7b93a46cb83a73816a5f33d",
+   "contract": "QuoteOracle",
+   "edges": [],
+   "file": "cauldron/QuoteOracle.sol",
+   "kind": "function",
+   "line": 379,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "_readWords",
+   "observations": [],
+   "reachability": "Bounded STATICCALL: allocates exactly the expected number of words (`result` QuoteOracle.sol:383), copies at most that much return data and succeeds only if the target returned at least that many bytes (`ok` QuoteOracle.sol:386).",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _readWords(address target, bytes4 selector, uint256 words) private view returns (bool ok, bytes memory result)",
+   "value": "NONE",
+   "visibility": "private",
    "writes": []
   },
   {
@@ -1183,8 +1235,8 @@
    ]
   },
   {
-   "authority": "internal; reachable only through Solidity callers",
-   "authority_gate_quote": "UNGATED",
+   "authority": "the registry or the registry's live perp engine",
+   "authority_gate_quote": "if (msg.sender != registry && msg.sender != _liveEngine()) revert NotOwner(); (QuoteRotator.sol:135)",
    "body_lines": [
     134,
     137
@@ -1192,7 +1244,7 @@
    "body_sha1": "6de964ee50dd2919df823fd82d5ac3ec85f2252f",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator.onlyRegistry (QuoteRotator.sol:125), TRUSTED, in-cluster"
+    "QuoteRotator._liveEngine (QuoteRotator.sol:135), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "modifier",
@@ -1201,32 +1253,42 @@
    "mutability": "nonpayable",
    "name": "onlyRegistry",
    "observations": [],
-   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `onlyRegistry` (QuoteRotator.sol:125) is a modifier node with 1 direct storage/immutable reads, 0 direct writes, and 1 resolved call edges.",
+   "reachability": "Admits the registry or whatever engine the registry's hook currently points to (`_liveEngine` QuoteRotator.sol:135); anyone else reverts.",
    "reads": [
-    "registry (line 126)"
+    "registry (line 135, immutable)"
    ],
-   "semantics": "stale",
+   "semantics": "fresh",
    "signature": "modifier onlyRegistry()",
    "value": "NONE",
    "visibility": "",
    "writes": []
   },
   {
+   "authority": "internal (callers: onlyRegistry, withdraw)",
+   "authority_gate_quote": "UNGATED",
    "body_lines": [
     140,
     148
    ],
    "body_sha1": "814655a1988fe16ba23d147276e8b8dbe1b464b1",
    "contract": "QuoteRotator",
+   "edges": [],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
    "line": 140,
    "modifiers": [],
    "mutability": "view",
    "name": "_liveEngine",
-   "semantics": "missing",
+   "observations": [],
+   "reachability": "Resolves the live engine by two static reads, registry `hook()` then hook `perpEngine()` (`h` QuoteRotator.sol:145); a failed or short reply yields the zero address, which matches no caller.",
+   "reads": [
+    "registry (line 141, immutable)"
+   ],
+   "semantics": "fresh",
    "signature": "function _liveEngine() internal view returns (address e)",
-   "visibility": "internal"
+   "value": "NONE",
+   "visibility": "internal",
+   "writes": []
   },
   {
    "authority": "internal; reachable only through Solidity callers",
@@ -1238,7 +1300,7 @@
    "body_sha1": "b117783558df125470ebdea18998e748e06075b4",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator.onlyOwner (QuoteRotator.sol:130), TRUSTED, in-cluster"
+    "QuoteRotator.onlyOwner (QuoteRotator.sol:150), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "modifier",
@@ -1247,9 +1309,9 @@
    "mutability": "nonpayable",
    "name": "onlyOwner",
    "observations": [],
-   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `onlyOwner` (QuoteRotator.sol:130) is a modifier node with 1 direct storage/immutable reads, 0 direct writes, and 1 resolved call edges.",
+   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `onlyOwner` (QuoteRotator.sol:150) is a modifier node with 1 direct storage/immutable reads, 0 direct writes, and 1 resolved call edges.",
    "reads": [
-    "owner (line 131)"
+    "owner (line 151)"
    ],
    "semantics": "fresh",
    "signature": "modifier onlyOwner()",
@@ -1259,7 +1321,7 @@
   },
   {
    "authority": "owner via onlyOwner",
-   "authority_gate_quote": "onlyOwner (QuoteRotator.sol:135)",
+   "authority_gate_quote": "onlyOwner (QuoteRotator.sol:155)",
    "body_lines": [
     155,
     155
@@ -1267,7 +1329,7 @@
    "body_sha1": "9238f865e66ff8e7edd7717566cbf462d9572f60",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator.transferOwnership (QuoteRotator.sol:135), TRUSTED, in-cluster"
+    "QuoteRotator.transferOwnership (QuoteRotator.sol:155), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1278,19 +1340,19 @@
    "mutability": "nonpayable",
    "name": "transferOwnership",
    "observations": [],
-   "reachability": "DERIVED from the current body: owner via onlyOwner; `transferOwnership` (QuoteRotator.sol:135) is a external node with 0 direct storage/immutable reads, 1 direct writes, and 1 resolved call edges.",
+   "reachability": "DERIVED from the current body: owner via onlyOwner; `transferOwnership` (QuoteRotator.sol:155) is a external node with 0 direct storage/immutable reads, 1 direct writes, and 1 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function transferOwnership(address to) external onlyOwner",
    "value": "NONE",
    "visibility": "external",
    "writes": [
-    "owner (line 135)"
+    "owner (line 155)"
    ]
   },
   {
-   "authority": "owner via onlyOwner",
-   "authority_gate_quote": "onlyOwner (QuoteRotator.sol:190)",
+   "authority": "owner",
+   "authority_gate_quote": "function setVenue(PoolKey calldata route, bool allowed) external onlyOwner { (QuoteRotator.sol:210)",
    "body_lines": [
     210,
     223
@@ -1298,7 +1360,7 @@
    "body_sha1": "dad439ca93517fabef1754af9d906214cb83bccf",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator.setVenue (QuoteRotator.sol:190), TRUSTED, in-cluster"
+    "QuoteRotator._pairKey (QuoteRotator.sol:216), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1309,49 +1371,74 @@
    "mutability": "nonpayable",
    "name": "setVenue",
    "observations": [],
-   "reachability": "DERIVED from the current body: owner via onlyOwner; `setVenue` (QuoteRotator.sol:190) is a external node with 0 direct storage/immutable reads, 1 direct writes, and 1 resolved call edges.",
-   "reads": [],
-   "semantics": "stale",
+   "reachability": "Owner curation of exact pool ids (`allowedVenue` QuoteRotator.sol:212) and of the one route kept per currency pair (`_pairVenue` QuoteRotator.sol:218); revoking the id that is the pair's route also clears the route (`_pairVenue` QuoteRotator.sol:220).",
+   "reads": [
+    "_pairVenue (line 219)"
+   ],
+   "semantics": "fresh",
    "signature": "function setVenue(PoolKey calldata route, bool allowed) external onlyOwner",
    "value": "NONE",
    "visibility": "external",
    "writes": [
-    "allowedVenue (line 192)"
+    "allowedVenue (line 212)",
+    "_pairVenue (line 218)",
+    "_pairVenue (line 220)"
    ]
   },
   {
+   "authority": "internal (callers: setVenue, venueFor)",
+   "authority_gate_quote": "UNGATED",
    "body_lines": [
     227,
     229
    ],
    "body_sha1": "06d49ecb3a5518bb92bba66adf3cff9dbaf1be4c",
    "contract": "QuoteRotator",
+   "edges": [],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
    "line": 227,
    "modifiers": [],
    "mutability": "pure",
    "name": "_pairKey",
-   "semantics": "missing",
+   "observations": [],
+   "reachability": "Order-independent pair identity: hash of the two addresses sorted ascending (`a` QuoteRotator.sol:228).",
+   "reads": [],
+   "semantics": "fresh",
    "signature": "function _pairKey(address a, address b) internal pure returns (bytes32)",
-   "visibility": "internal"
+   "value": "NONE",
+   "visibility": "internal",
+   "writes": []
   },
   {
+   "authority": "anyone (view)",
+   "authority_gate_quote": "UNGATED",
    "body_lines": [
     235,
     241
    ],
    "body_sha1": "be2e54956034c5f5d5789aebc9c54f8d01a11549",
    "contract": "QuoteRotator",
+   "edges": [
+    "QuoteRotator._pairKey (QuoteRotator.sol:236), TRUSTED, in-cluster"
+   ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
    "line": 235,
    "modifiers": [],
    "mutability": "view",
    "name": "venueFor",
-   "semantics": "missing",
+   "observations": [],
+   "reachability": "Returns the pair's curated route and whether it is usable: nonzero tick spacing, still allowlisted and exactly the requested currencies in either order (`ok` QuoteRotator.sol:239). Used by the perp requote to find its conversion venue.",
+   "reads": [
+    "_pairVenue (line 236)",
+    "allowedVenue (line 239)"
+   ],
+   "semantics": "fresh",
    "signature": "function venueFor(address a, address b) external view returns (PoolKey memory route, bool ok)",
-   "visibility": "external"
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
   },
   {
    "authority": "anyone",
@@ -1363,8 +1450,7 @@
    "body_sha1": "d0a398226f7c3cac16d95ebefa357300bca72b41",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator.isVenueAllowed (QuoteRotator.sol:197), TRUSTED, in-cluster",
-    "QuoteRotator.returns (QuoteRotator.sol:197), TRUSTED, out-of-cluster"
+    "QuoteRotator.isVenueAllowed (QuoteRotator.sol:244), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1373,9 +1459,9 @@
    "mutability": "view",
    "name": "isVenueAllowed",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `isVenueAllowed` (QuoteRotator.sol:197) is a external node with 1 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `isVenueAllowed` (QuoteRotator.sol:244) is a external node with 1 direct storage/immutable reads, 0 direct writes, and 1 resolved call edges.",
    "reads": [
-    "allowedVenue (line 198)"
+    "allowedVenue (line 245)"
    ],
    "semantics": "fresh",
    "signature": "function isVenueAllowed(PoolKey calldata route) external view returns (bool)",
@@ -1385,7 +1471,7 @@
   },
   {
    "authority": "owner via onlyOwner",
-   "authority_gate_quote": "onlyOwner (QuoteRotator.sol:223)",
+   "authority_gate_quote": "onlyOwner (QuoteRotator.sol:270)",
    "body_lines": [
     270,
     290
@@ -1393,7 +1479,7 @@
    "body_sha1": "116a5be534e3045b8795b3309c79cc3fc9b39cf2",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator._allowed (QuoteRotator.sol:229), TRUSTED, in-cluster"
+    "QuoteRotator._allowed (QuoteRotator.sol:276), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1404,19 +1490,19 @@
    "mutability": "nonpayable",
    "name": "setPlan",
    "observations": [],
-   "reachability": "DERIVED from the current body: owner via onlyOwner; `setPlan` (QuoteRotator.sol:216) is a external node with 0 direct storage/immutable reads, 1 direct writes, and 1 resolved call edges.",
+   "reachability": "DERIVED from the current body: owner via onlyOwner; `setPlan` (QuoteRotator.sol:263) is a external node with 0 direct storage/immutable reads, 1 direct writes, and 1 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function setPlan( address from, address to, uint128 totalIn, uint128 sliceIn, uint256 minRate, uint32 interval ) external onlyOwner",
    "value": "NONE",
    "visibility": "external",
    "writes": [
-    "plan (line 231)"
+    "plan (line 278)"
    ]
   },
   {
    "authority": "owner via onlyOwner",
-   "authority_gate_quote": "onlyOwner (QuoteRotator.sol:248)",
+   "authority_gate_quote": "onlyOwner (QuoteRotator.sol:295)",
    "body_lines": [
     295,
     298
@@ -1424,7 +1510,7 @@
    "body_sha1": "cdb80c9bcda8248c0a109d9666af64b26897149c",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator.cancelPlan (QuoteRotator.sol:248), TRUSTED, in-cluster"
+    "QuoteRotator.cancelPlan (QuoteRotator.sol:295), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1435,19 +1521,19 @@
    "mutability": "nonpayable",
    "name": "cancelPlan",
    "observations": [],
-   "reachability": "DERIVED from the current body: owner via onlyOwner; `cancelPlan` (QuoteRotator.sol:248) is a external node with 0 direct storage/immutable reads, 1 direct writes, and 1 resolved call edges.",
+   "reachability": "DERIVED from the current body: owner via onlyOwner; `cancelPlan` (QuoteRotator.sol:295) is a external node with 0 direct storage/immutable reads, 1 direct writes, and 1 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function cancelPlan() external onlyOwner",
    "value": "NONE",
    "visibility": "external",
    "writes": [
-    "plan (line 249)"
+    "plan (line 296)"
    ]
   },
   {
    "authority": "owner via onlyOwner",
-   "authority_gate_quote": "onlyOwner (QuoteRotator.sol:253)",
+   "authority_gate_quote": "onlyOwner (QuoteRotator.sol:300)",
    "body_lines": [
     300,
     303
@@ -1455,7 +1541,7 @@
    "body_sha1": "432c8ced91491e7c550662ac4747375692065060",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator.setKeeperBps (QuoteRotator.sol:253), TRUSTED, in-cluster"
+    "QuoteRotator.setKeeperBps (QuoteRotator.sol:300), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1466,14 +1552,14 @@
    "mutability": "nonpayable",
    "name": "setKeeperBps",
    "observations": [],
-   "reachability": "DERIVED from the current body: owner via onlyOwner; `setKeeperBps` (QuoteRotator.sol:253) is a external node with 0 direct storage/immutable reads, 1 direct writes, and 1 resolved call edges.",
+   "reachability": "DERIVED from the current body: owner via onlyOwner; `setKeeperBps` (QuoteRotator.sol:300) is a external node with 0 direct storage/immutable reads, 1 direct writes, and 1 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function setKeeperBps(uint16 bps) external onlyOwner",
    "value": "NONE",
    "visibility": "external",
    "writes": [
-    "keeperBps (line 255)"
+    "keeperBps (line 302)"
    ]
   },
   {
@@ -1486,9 +1572,8 @@
    "body_sha1": "7fc6c6dc998716374cca2d212d527f9ae81713a3",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator.nextSliceSize (QuoteRotator.sol:263), TRUSTED, in-cluster",
-    "QuoteRotator.returns (QuoteRotator.sol:263), TRUSTED, out-of-cluster",
-    "QuoteRotator._balanceOf (QuoteRotator.sol:273), TRUSTED, in-cluster"
+    "QuoteRotator.nextSliceSize (QuoteRotator.sol:310), TRUSTED, in-cluster",
+    "QuoteRotator._balanceOf (QuoteRotator.sol:320), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1497,9 +1582,9 @@
    "mutability": "view",
    "name": "nextSliceSize",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `nextSliceSize` (QuoteRotator.sol:263) is a public node with 1 direct storage/immutable reads, 0 direct writes, and 3 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `nextSliceSize` (QuoteRotator.sol:310) is a public node with 1 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
    "reads": [
-    "plan (line 264)"
+    "plan (line 311)"
    ],
    "semantics": "fresh",
    "signature": "function nextSliceSize() public view returns (uint256)",
@@ -1517,13 +1602,12 @@
    "body_sha1": "4c406345d7f6978ae58cd6b7d8722a0a90d0a7cb",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator.rotateStep (QuoteRotator.sol:284), TRUSTED, in-cluster",
-    "QuoteRotator.returns (QuoteRotator.sol:284), TRUSTED, out-of-cluster",
-    "QuoteRotator.nextSliceSize (QuoteRotator.sol:288), TRUSTED, in-cluster",
-    "QuoteRotator._allowed (QuoteRotator.sol:290), TRUSTED, in-cluster",
-    "QuoteRotator._routeMatches (QuoteRotator.sol:291), TRUSTED, in-cluster",
-    "QuoteRotator._swap (QuoteRotator.sol:307), TRUSTED, in-cluster",
-    "QuoteRotator._send (QuoteRotator.sol:317), TRUSTED, in-cluster"
+    "QuoteRotator.rotateStep (QuoteRotator.sol:331), TRUSTED, in-cluster",
+    "QuoteRotator.nextSliceSize (QuoteRotator.sol:335), TRUSTED, in-cluster",
+    "QuoteRotator._allowed (QuoteRotator.sol:337), TRUSTED, in-cluster",
+    "QuoteRotator._routeMatches (QuoteRotator.sol:338), TRUSTED, in-cluster",
+    "QuoteRotator._swap (QuoteRotator.sol:354), TRUSTED, in-cluster",
+    "QuoteRotator._send (QuoteRotator.sol:364), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1532,13 +1616,13 @@
    "mutability": "nonpayable",
    "name": "rotateStep",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `rotateStep` (QuoteRotator.sol:284) is a external node with 5 direct storage/immutable reads, 0 direct writes, and 7 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `rotateStep` (QuoteRotator.sol:331) is a external node with 5 direct storage/immutable reads, 0 direct writes, and 6 resolved call edges.",
    "reads": [
-    "BPS (line 316)",
-    "WAD (line 310)",
-    "allowedVenue (line 299)",
-    "keeperBps (line 316)",
-    "plan (line 285)"
+    "BPS (line 363)",
+    "WAD (line 357)",
+    "allowedVenue (line 346)",
+    "keeperBps (line 363)",
+    "plan (line 332)"
    ],
    "semantics": "fresh",
    "signature": "function rotateStep(PoolKey calldata route) external returns (uint256 out)",
@@ -1547,8 +1631,8 @@
    "writes": []
   },
   {
-   "authority": "anyone",
-   "authority_gate_quote": "UNGATED",
+   "authority": "the registry or the live perp engine",
+   "authority_gate_quote": ") external onlyRegistry returns (uint256 out) { (QuoteRotator.sol:388)",
    "body_lines": [
     388,
     441
@@ -1556,11 +1640,10 @@
    "body_sha1": "48b1129e79ec3c2b1b09e3ea7206bd684b041bb2",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator.returns (QuoteRotator.sol:341), TRUSTED, out-of-cluster",
-    "QuoteRotator._allowed (QuoteRotator.sol:343), TRUSTED, in-cluster",
-    "QuoteRotator._routeMatches (QuoteRotator.sol:344), TRUSTED, in-cluster",
-    "QuoteRotator._oracleFloor (QuoteRotator.sol:372), TRUSTED, in-cluster",
-    "QuoteRotator._swap (QuoteRotator.sol:392), TRUSTED, in-cluster"
+    "QuoteRotator._allowed (QuoteRotator.sol:390), TRUSTED, in-cluster",
+    "QuoteRotator._routeMatches (QuoteRotator.sol:391), TRUSTED, in-cluster",
+    "QuoteRotator._oracleFloor (QuoteRotator.sol:419), TRUSTED, in-cluster",
+    "QuoteRotator._swap (QuoteRotator.sol:438), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1571,20 +1654,19 @@
    "mutability": "nonpayable",
    "name": "swapOnce",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `swapOnce` (QuoteRotator.sol:335) is a external node with 2 direct storage/immutable reads, 0 direct writes, and 5 resolved call edges.",
+   "reachability": "Registry or live engine only (`onlyRegistry` QuoteRotator.sol:388). Requires a nonzero size, an allowlisted destination (`_allowed` QuoteRotator.sol:390), a route matching the pair (`_routeMatches` QuoteRotator.sol:391) and a curated pool id (`allowedVenue` QuoteRotator.sol:406). A live oracle floor is mandatory (`NotPriceable` QuoteRotator.sol:436) and the output must meet the larger of the caller's minimum and that floor (`SlippageTooHigh` QuoteRotator.sol:439).",
    "reads": [
-    "allowedVenue (line 359)",
-    "quoteOracle (line 390)"
+    "allowedVenue (line 406)"
    ],
-   "semantics": "stale",
+   "semantics": "fresh",
    "signature": "function swapOnce( PoolKey calldata route, address from, address to, uint256 amountIn, uint256 minOut ) external onlyRegistry returns (uint256 out)",
-   "value": "NONE",
+   "value": "Swaps `amountIn` of `from` held by the rotator into `to` through the curated pool (`_swap` QuoteRotator.sol:438); proceeds stay in the rotator for the caller to withdraw.",
    "visibility": "external",
    "writes": []
   },
   {
    "authority": "owner via onlyOwner",
-   "authority_gate_quote": "onlyOwner (QuoteRotator.sol:405)",
+   "authority_gate_quote": "onlyOwner (QuoteRotator.sol:451)",
    "body_lines": [
     451,
     454
@@ -1592,7 +1674,7 @@
    "body_sha1": "fc16675eba117013a5b97d7068b1bcdc10358ea2",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator.setRotationSlipBps (QuoteRotator.sol:405), TRUSTED, in-cluster"
+    "QuoteRotator.setRotationSlipBps (QuoteRotator.sol:451), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1603,14 +1685,14 @@
    "mutability": "nonpayable",
    "name": "setRotationSlipBps",
    "observations": [],
-   "reachability": "DERIVED from the current body: owner via onlyOwner; `setRotationSlipBps` (QuoteRotator.sol:405) is a external node with 0 direct storage/immutable reads, 1 direct writes, and 1 resolved call edges.",
+   "reachability": "DERIVED from the current body: owner via onlyOwner; `setRotationSlipBps` (QuoteRotator.sol:451) is a external node with 0 direct storage/immutable reads, 1 direct writes, and 1 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function setRotationSlipBps(uint16 bps) external onlyOwner",
    "value": "NONE",
    "visibility": "external",
    "writes": [
-    "rotationSlipBps (line 407)"
+    "rotationSlipBps (line 453)"
    ]
   },
   {
@@ -1623,8 +1705,8 @@
    "body_sha1": "c728012bc96cfa4302f2c251281eb8974d96b877",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator._usdLive (QuoteRotator.sol:439), TRUSTED, in-cluster",
-    "QuoteRotator._usdLive (QuoteRotator.sol:441), TRUSTED, in-cluster"
+    "QuoteRotator._usdLive (QuoteRotator.sol:483), TRUSTED, in-cluster",
+    "QuoteRotator._usdLive (QuoteRotator.sol:485), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1633,10 +1715,10 @@
    "mutability": "nonpayable",
    "name": "_oracleFloor",
    "observations": [],
-   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_oracleFloor` (QuoteRotator.sol:425) is a internal node with 2 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
+   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_oracleFloor` (QuoteRotator.sol:469) is a internal node with 2 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
    "reads": [
-    "BPS (line 444)",
-    "rotationSlipBps (line 444)"
+    "BPS (line 488)",
+    "rotationSlipBps (line 488)"
    ],
    "semantics": "fresh",
    "signature": "function _oracleFloor(address from, address to, uint256 amountIn) internal returns (uint256)",
@@ -1646,7 +1728,7 @@
   },
   {
    "authority": "owner via onlyOwner",
-   "authority_gate_quote": "onlyOwner (QuoteRotator.sol:485)",
+   "authority_gate_quote": "onlyOwner (QuoteRotator.sol:529)",
    "body_lines": [
     529,
     534
@@ -1654,7 +1736,7 @@
    "body_sha1": "1aad41925b0bf89d9294d646688ee0974210e637",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator.setArbParams (QuoteRotator.sol:485), TRUSTED, in-cluster"
+    "QuoteRotator.setArbParams (QuoteRotator.sol:529), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1665,23 +1747,23 @@
    "mutability": "nonpayable",
    "name": "setArbParams",
    "observations": [],
-   "reachability": "DERIVED from the current body: owner via onlyOwner; `setArbParams` (QuoteRotator.sol:485) is a external node with 1 direct storage/immutable reads, 3 direct writes, and 1 resolved call edges.",
+   "reachability": "DERIVED from the current body: owner via onlyOwner; `setArbParams` (QuoteRotator.sol:529) is a external node with 1 direct storage/immutable reads, 3 direct writes, and 1 resolved call edges.",
    "reads": [
-    "keeperBps (line 485)"
+    "keeperBps (line 529)"
    ],
    "semantics": "fresh",
    "signature": "function setArbParams(address oracle, uint16 keeperBps, uint256 minProfitUsd) external onlyOwner",
    "value": "NONE",
    "visibility": "external",
    "writes": [
-    "arbKeeperBps (line 488)",
-    "minArbProfitUsd (line 489)",
-    "quoteOracle (line 487)"
+    "arbKeeperBps (line 532)",
+    "minArbProfitUsd (line 533)",
+    "quoteOracle (line 531)"
    ]
   },
   {
    "authority": "owner via onlyOwner",
-   "authority_gate_quote": "onlyOwner (QuoteRotator.sol:495)",
+   "authority_gate_quote": "onlyOwner (QuoteRotator.sol:539)",
    "body_lines": [
     539,
     541
@@ -1689,7 +1771,7 @@
    "body_sha1": "4122b0064ff4ef699d07f167d98a795c9d996ed8",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator.setMaxArbNotionalUsd (QuoteRotator.sol:495), TRUSTED, in-cluster"
+    "QuoteRotator.setMaxArbNotionalUsd (QuoteRotator.sol:539), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1700,14 +1782,14 @@
    "mutability": "nonpayable",
    "name": "setMaxArbNotionalUsd",
    "observations": [],
-   "reachability": "DERIVED from the current body: owner via onlyOwner; `setMaxArbNotionalUsd` (QuoteRotator.sol:495) is a external node with 0 direct storage/immutable reads, 1 direct writes, and 1 resolved call edges.",
+   "reachability": "DERIVED from the current body: owner via onlyOwner; `setMaxArbNotionalUsd` (QuoteRotator.sol:539) is a external node with 0 direct storage/immutable reads, 1 direct writes, and 1 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function setMaxArbNotionalUsd(uint256 maxNotionalUsd) external onlyOwner",
    "value": "NONE",
    "visibility": "external",
    "writes": [
-    "maxArbNotionalUsd (line 496)"
+    "maxArbNotionalUsd (line 540)"
    ]
   },
   {
@@ -1720,12 +1802,12 @@
    "body_sha1": "8532272fb7cc3e864251b6421d6f11169dfaf100",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator._allowed (QuoteRotator.sol:560), TRUSTED, in-cluster",
-    "QuoteRotator._usdLive (QuoteRotator.sol:574), TRUSTED, in-cluster",
-    "poolManager.unlock (QuoteRotator.sol:577), TRUSTED, out-of-cluster",
-    "QuoteRotator._usdLive (QuoteRotator.sol:585), TRUSTED, in-cluster",
-    "QuoteRotator._usdLive (QuoteRotator.sol:586), TRUSTED, in-cluster",
-    "QuoteRotator._send (QuoteRotator.sol:613), TRUSTED, in-cluster"
+    "QuoteRotator._allowed (QuoteRotator.sol:604), TRUSTED, in-cluster",
+    "QuoteRotator._usdLive (QuoteRotator.sol:618), TRUSTED, in-cluster",
+    "IPoolManager.unlock (QuoteRotator.sol:621), TRUSTED, out-of-cluster",
+    "QuoteRotator._usdLive (QuoteRotator.sol:629), TRUSTED, in-cluster",
+    "QuoteRotator._usdLive (QuoteRotator.sol:630), TRUSTED, in-cluster",
+    "QuoteRotator._send (QuoteRotator.sol:657), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1734,22 +1816,22 @@
    "mutability": "nonpayable",
    "name": "arbStep",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `arbStep` (QuoteRotator.sol:533) is a external node with 6 direct storage/immutable reads, 2 direct writes, and 6 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `arbStep` (QuoteRotator.sol:577) is a external node with 6 direct storage/immutable reads, 2 direct writes, and 6 resolved call edges.",
    "reads": [
-    "BPS (line 612)",
-    "allowedVenue (line 553)",
-    "arbKeeperBps (line 612)",
-    "maxArbNotionalUsd (line 598)",
-    "minArbProfitUsd (line 607)",
-    "poolManager (line 577)"
+    "BPS (line 656)",
+    "allowedVenue (line 597)",
+    "arbKeeperBps (line 656)",
+    "maxArbNotionalUsd (line 642)",
+    "minArbProfitUsd (line 651)",
+    "poolManager (line 621)"
    ],
    "semantics": "fresh",
    "signature": "function arbStep(PoolKey calldata cheap, PoolKey calldata dear, uint256 amountIn) external returns (uint256 profitUsd)",
    "value": "NONE",
    "visibility": "external",
    "writes": [
-    "arbBlock (line 599)",
-    "arbUsdThisBlock (line 599)"
+    "arbBlock (line 643)",
+    "arbUsdThisBlock (line 643)"
    ]
   },
   {
@@ -1762,10 +1844,8 @@
    "body_sha1": "38c88b03f15df1d917b3ac5615962294bce9292e",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator._usdLive (QuoteRotator.sol:622), TRUSTED, in-cluster",
-    "QuoteRotator.returns (QuoteRotator.sol:622), TRUSTED, out-of-cluster",
-    "o.staticcall (QuoteRotator.sol:625), TRUSTED, out-of-cluster",
-    "QuoteRotator.usdPerRawUnit (QuoteRotator.sol:626), TRUSTED, in-cluster"
+    "QuoteRotator._usdLive (QuoteRotator.sol:666), TRUSTED, in-cluster",
+    "QuoteOracle.usdPerRawUnit (QuoteRotator.sol:670), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1774,9 +1854,9 @@
    "mutability": "view",
    "name": "_usdLive",
    "observations": [],
-   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_usdLive` (QuoteRotator.sol:622) is a internal node with 1 direct storage/immutable reads, 0 direct writes, and 4 resolved call edges.",
+   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_usdLive` (QuoteRotator.sol:666) is a internal node with 1 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
    "reads": [
-    "quoteOracle (line 623)"
+    "quoteOracle (line 667)"
    ],
    "semantics": "fresh",
    "signature": "function _usdLive(address quote, uint256 raw) internal view returns (uint256)",
@@ -1785,8 +1865,8 @@
    "writes": []
   },
   {
-   "authority": "caller restricted by explicit msg.sender check",
-   "authority_gate_quote": "if (msg.sender != registry && msg.sender != owner) revert NotOwner(); (QuoteRotator.sol:654)",
+   "authority": "registry or owner to any recipient; the live engine only to itself",
+   "authority_gate_quote": "if (msg.sender != registry && msg.sender != owner) { (QuoteRotator.sol:700)",
    "body_lines": [
     697,
     709
@@ -1794,8 +1874,8 @@
    "body_sha1": "6b1b328164869985c47ab11d54a61a411959b2f4",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator.withdraw (QuoteRotator.sol:653), TRUSTED, in-cluster",
-    "QuoteRotator._send (QuoteRotator.sol:656), TRUSTED, in-cluster"
+    "QuoteRotator._liveEngine (QuoteRotator.sol:704), TRUSTED, in-cluster",
+    "QuoteRotator._send (QuoteRotator.sol:707), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1804,14 +1884,14 @@
    "mutability": "nonpayable",
    "name": "withdraw",
    "observations": [],
-   "reachability": "DERIVED from the current body: caller restricted by explicit msg.sender check; `withdraw` (QuoteRotator.sol:653) is a external node with 2 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
+   "reachability": "Registry and owner may withdraw to any nonzero recipient (`to` QuoteRotator.sol:706); the live engine may withdraw only to itself (`_liveEngine` QuoteRotator.sol:704).",
    "reads": [
-    "owner (line 654)",
-    "registry (line 654)"
+    "registry (line 700, immutable)",
+    "owner (line 700)"
    ],
-   "semantics": "stale",
+   "semantics": "fresh",
    "signature": "function withdraw(address asset, address to, uint256 amount) external",
-   "value": "NONE",
+   "value": "Sends `amount` of `asset` from the rotator to `to` (`_send` QuoteRotator.sol:707).",
    "visibility": "external",
    "writes": []
   },
@@ -1825,7 +1905,7 @@
    "body_sha1": "f34a1eb452cff668f90ad920e8e0709b56d7ad9e",
    "contract": "QuoteRotator",
    "edges": [
-    "poolManager.unlock (QuoteRotator.sol:669), TRUSTED, out-of-cluster"
+    "IPoolManager.unlock (QuoteRotator.sol:720), TRUSTED, out-of-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1834,9 +1914,9 @@
    "mutability": "nonpayable",
    "name": "_swap",
    "observations": [],
-   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_swap` (QuoteRotator.sol:664) is a internal node with 1 direct storage/immutable reads, 0 direct writes, and 1 resolved call edges.",
+   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_swap` (QuoteRotator.sol:715) is a internal node with 1 direct storage/immutable reads, 0 direct writes, and 1 resolved call edges.",
    "reads": [
-    "poolManager (line 669)"
+    "poolManager (line 720)"
    ],
    "semantics": "fresh",
    "signature": "function _swap(PoolKey calldata route, address from, address to, uint256 size) internal returns (uint256 out)",
@@ -1846,7 +1926,7 @@
   },
   {
    "authority": "caller restricted by explicit msg.sender check",
-   "authority_gate_quote": "if (msg.sender != address(poolManager)) revert NotOwner(); (QuoteRotator.sol:674)",
+   "authority_gate_quote": "if (msg.sender != address(poolManager)) revert NotOwner(); (QuoteRotator.sol:725)",
    "body_lines": [
     724,
     749
@@ -1854,12 +1934,11 @@
    "body_sha1": "14d51a88ced1f9d71dead37634c26f9fe22e0f92",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator.unlockCallback (QuoteRotator.sol:673), TRUSTED, in-cluster",
-    "QuoteRotator.returns (QuoteRotator.sol:673), TRUSTED, out-of-cluster",
-    "QuoteRotator._arbCallback (QuoteRotator.sol:679), TRUSTED, in-cluster",
-    "poolManager.swap (QuoteRotator.sol:684), TRUSTED, out-of-cluster",
-    "QuoteRotator._settle (QuoteRotator.sol:695), TRUSTED, in-cluster",
-    "poolManager.take (QuoteRotator.sol:696), TRUSTED, out-of-cluster"
+    "QuoteRotator.unlockCallback (QuoteRotator.sol:724), TRUSTED, in-cluster",
+    "QuoteRotator._arbCallback (QuoteRotator.sol:730), TRUSTED, in-cluster",
+    "IPoolManager.swap (QuoteRotator.sol:735), TRUSTED, out-of-cluster",
+    "QuoteRotator._settle (QuoteRotator.sol:746), TRUSTED, in-cluster",
+    "IPoolManager.take (QuoteRotator.sol:747), TRUSTED, out-of-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1868,9 +1947,9 @@
    "mutability": "nonpayable",
    "name": "unlockCallback",
    "observations": [],
-   "reachability": "DERIVED from the current body: caller restricted by explicit msg.sender check; `unlockCallback` (QuoteRotator.sol:673) is a external node with 1 direct storage/immutable reads, 0 direct writes, and 6 resolved call edges.",
+   "reachability": "DERIVED from the current body: caller restricted by explicit msg.sender check; `unlockCallback` (QuoteRotator.sol:724) is a external node with 1 direct storage/immutable reads, 0 direct writes, and 5 resolved call edges.",
    "reads": [
-    "poolManager (line 674)"
+    "poolManager (line 725)"
    ],
    "semantics": "fresh",
    "signature": "function unlockCallback(bytes calldata data) external returns (bytes memory)",
@@ -1888,12 +1967,11 @@
    "body_sha1": "ada8027e6ecd2f033797af5e85fdbad8e463de9a",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator._arbCallback (QuoteRotator.sol:705), TRUSTED, in-cluster",
-    "QuoteRotator.returns (QuoteRotator.sol:705), TRUSTED, out-of-cluster",
-    "poolManager.swap (QuoteRotator.sol:710), TRUSTED, out-of-cluster",
-    "poolManager.swap (QuoteRotator.sol:720), TRUSTED, out-of-cluster",
-    "QuoteRotator._settle (QuoteRotator.sol:727), TRUSTED, in-cluster",
-    "poolManager.take (QuoteRotator.sol:728), TRUSTED, out-of-cluster"
+    "QuoteRotator._arbCallback (QuoteRotator.sol:756), TRUSTED, in-cluster",
+    "IPoolManager.swap (QuoteRotator.sol:761), TRUSTED, out-of-cluster",
+    "IPoolManager.swap (QuoteRotator.sol:771), TRUSTED, out-of-cluster",
+    "QuoteRotator._settle (QuoteRotator.sol:778), TRUSTED, in-cluster",
+    "IPoolManager.take (QuoteRotator.sol:779), TRUSTED, out-of-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1902,9 +1980,9 @@
    "mutability": "nonpayable",
    "name": "_arbCallback",
    "observations": [],
-   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_arbCallback` (QuoteRotator.sol:705) is a internal node with 1 direct storage/immutable reads, 0 direct writes, and 6 resolved call edges.",
+   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_arbCallback` (QuoteRotator.sol:756) is a internal node with 1 direct storage/immutable reads, 0 direct writes, and 5 resolved call edges.",
    "reads": [
-    "poolManager (line 710)"
+    "poolManager (line 761)"
    ],
    "semantics": "fresh",
    "signature": "function _arbCallback(bytes calldata data) internal returns (bytes memory)",
@@ -1922,11 +2000,11 @@
    "body_sha1": "2a326bf188290320115041c684c56e4a17c654ce",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator._settle (QuoteRotator.sol:732), TRUSTED, in-cluster",
-    "poolManager.settle (QuoteRotator.sol:734), TRUSTED, out-of-cluster",
-    "poolManager.sync (QuoteRotator.sol:736), TRUSTED, out-of-cluster",
-    "QuoteRotator._safeTransfer (QuoteRotator.sol:737), TRUSTED, in-cluster",
-    "poolManager.settle (QuoteRotator.sol:738), TRUSTED, out-of-cluster"
+    "QuoteRotator._settle (QuoteRotator.sol:783), TRUSTED, in-cluster",
+    "IPoolManager.settle (QuoteRotator.sol:785), TRUSTED, out-of-cluster",
+    "IPoolManager.sync (QuoteRotator.sol:787), TRUSTED, out-of-cluster",
+    "QuoteRotator._safeTransfer (QuoteRotator.sol:788), TRUSTED, in-cluster",
+    "IPoolManager.settle (QuoteRotator.sol:789), TRUSTED, out-of-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1935,13 +2013,13 @@
    "mutability": "nonpayable",
    "name": "_settle",
    "observations": [],
-   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_settle` (QuoteRotator.sol:732) is a internal node with 1 direct storage/immutable reads, 0 direct writes, and 5 resolved call edges.",
+   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_settle` (QuoteRotator.sol:783) is a internal node with 1 direct storage/immutable reads, 0 direct writes, and 5 resolved call edges.",
    "reads": [
-    "poolManager (line 734)"
+    "poolManager (line 785)"
    ],
    "semantics": "fresh",
    "signature": "function _settle(address cur, uint256 amount) internal",
-   "value": "sends native through `value` (line 734)",
+   "value": "sends native through `value` (line 785)",
    "visibility": "internal",
    "writes": []
   },
@@ -1955,9 +2033,8 @@
    "body_sha1": "3c23397744ecbea6198e4aed3c906354a81599ea",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator._send (QuoteRotator.sol:742), TRUSTED, in-cluster",
-    "to.call (QuoteRotator.sol:745), UNTRUSTED, out-of-cluster",
-    "QuoteRotator._safeTransfer (QuoteRotator.sol:748), TRUSTED, in-cluster"
+    "QuoteRotator._send (QuoteRotator.sol:793), TRUSTED, in-cluster",
+    "QuoteRotator._safeTransfer (QuoteRotator.sol:799), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1966,11 +2043,11 @@
    "mutability": "nonpayable",
    "name": "_send",
    "observations": [],
-   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_send` (QuoteRotator.sol:742) is a internal node with 0 direct storage/immutable reads, 0 direct writes, and 3 resolved call edges.",
+   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_send` (QuoteRotator.sol:793) is a internal node with 0 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function _send(address cur, address to, uint256 amount) internal",
-   "value": "sends native through `value` (line 745)",
+   "value": "sends native through `value` (line 796)",
    "visibility": "internal",
    "writes": []
   },
@@ -1984,8 +2061,8 @@
    "body_sha1": "80094dbc033c5ca17a56f92433159ef520fb6349",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator._safeTransfer (QuoteRotator.sol:755), TRUSTED, in-cluster",
-    "token.call (QuoteRotator.sol:764), UNTRUSTED, out-of-cluster"
+    "QuoteRotator._safeTransfer (QuoteRotator.sol:806), TRUSTED, in-cluster",
+    "IERC20.transfer (QuoteRotator.sol:815), UNTRUSTED, out-of-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -1994,7 +2071,7 @@
    "mutability": "nonpayable",
    "name": "_safeTransfer",
    "observations": [],
-   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_safeTransfer` (QuoteRotator.sol:755) is a internal node with 0 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
+   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_safeTransfer` (QuoteRotator.sol:806) is a internal node with 0 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function _safeTransfer(address token, address to, uint256 amount) internal",
@@ -2019,7 +2096,7 @@
    "mutability": "pure",
    "name": "_routeMatches",
    "observations": [],
-   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_routeMatches` (QuoteRotator.sol:768) is a internal node with 0 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
+   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_routeMatches` (QuoteRotator.sol:819) is a internal node with 0 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function _routeMatches(PoolKey calldata route, address from, address to) internal pure returns (bool)",
@@ -2037,8 +2114,7 @@
    "body_sha1": "f57b621ffd3e3bef07d74d33057c77936ba20efe",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator._balanceOf (QuoteRotator.sol:778), TRUSTED, in-cluster",
-    "QuoteRotator.returns (QuoteRotator.sol:778), TRUSTED, out-of-cluster"
+    "QuoteRotator._balanceOf (QuoteRotator.sol:829), TRUSTED, in-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -2047,7 +2123,7 @@
    "mutability": "view",
    "name": "_balanceOf",
    "observations": [],
-   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_balanceOf` (QuoteRotator.sol:778) is a internal node with 0 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
+   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_balanceOf` (QuoteRotator.sol:829) is a internal node with 0 direct storage/immutable reads, 0 direct writes, and 1 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function _balanceOf(address asset) internal view returns (uint256)",
@@ -2065,10 +2141,8 @@
    "body_sha1": "61dc8300311e03ee3db62fc77e6866b1bb5a6752",
    "contract": "QuoteRotator",
    "edges": [
-    "QuoteRotator._allowed (QuoteRotator.sol:782), TRUSTED, in-cluster",
-    "QuoteRotator.returns (QuoteRotator.sol:782), TRUSTED, out-of-cluster",
-    "registry.staticcall (QuoteRotator.sol:785), UNTRUSTED, out-of-cluster",
-    "QuoteRotator.allowedQuote (QuoteRotator.sol:785), TRUSTED, out-of-cluster"
+    "QuoteRotator._allowed (QuoteRotator.sol:833), TRUSTED, in-cluster",
+    "CauldronRegistry.allowedQuote (QuoteRotator.sol:836), TRUSTED, out-of-cluster"
    ],
    "file": "cauldron/QuoteRotator.sol",
    "kind": "function",
@@ -2077,9 +2151,9 @@
    "mutability": "view",
    "name": "_allowed",
    "observations": [],
-   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_allowed` (QuoteRotator.sol:782) is a internal node with 1 direct storage/immutable reads, 0 direct writes, and 4 resolved call edges.",
+   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_allowed` (QuoteRotator.sol:833) is a internal node with 1 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
    "reads": [
-    "registry (line 785)"
+    "registry (line 836)"
    ],
    "semantics": "fresh",
    "signature": "function _allowed(address quote) internal view returns (bool)",
@@ -2104,7 +2178,7 @@
    "mutability": "payable",
    "name": "",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `receive` (QuoteRotator.sol:789) is a receive node with 0 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `receive` (QuoteRotator.sol:840) is a receive node with 0 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "receive() external payable",
@@ -2121,12 +2195,12 @@
    "edges": [],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 45,
+   "line": 46,
    "modifiers": [],
    "mutability": "view",
    "name": "allowance",
    "observations": [],
-   "reachability": "DERIVED from the current body: declaration only; implementation authority is outside this node; `allowance` (RedemptionExt.sol:45) is a declaration-only node with 0 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
+   "reachability": "DERIVED from the current body: declaration only; implementation authority is outside this node; `allowance` (RedemptionExt.sol:46) is a declaration-only node with 0 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function allowance() external view returns (address quote, uint16 remainingBps)",
@@ -2143,12 +2217,12 @@
    "edges": [],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 46,
+   "line": 47,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "consume",
    "observations": [],
-   "reachability": "DERIVED from the current body: declaration only; implementation authority is outside this node; `consume` (RedemptionExt.sol:46) is a declaration-only node with 0 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
+   "reachability": "DERIVED from the current body: declaration only; implementation authority is outside this node; `consume` (RedemptionExt.sol:47) is a declaration-only node with 0 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function consume(uint16 bps, bool fromPrimary) external",
@@ -2165,12 +2239,12 @@
    "edges": [],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 49,
+   "line": 50,
    "modifiers": [],
    "mutability": "view",
    "name": "migrationMandateSpent",
    "observations": [],
-   "reachability": "DERIVED from the current body: declaration only; implementation authority is outside this node; `migrationMandateSpent` (RedemptionExt.sol:49) is a declaration-only node with 0 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
+   "reachability": "DERIVED from the current body: declaration only; implementation authority is outside this node; `migrationMandateSpent` (RedemptionExt.sol:50) is a declaration-only node with 0 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function migrationMandateSpent() external view returns (bool)",
@@ -2187,12 +2261,12 @@
    "edges": [],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 53,
+   "line": 54,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "swapOnce",
    "observations": [],
-   "reachability": "DERIVED from the current body: declaration only; implementation authority is outside this node; `swapOnce` (RedemptionExt.sol:53) is a declaration-only node with 0 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
+   "reachability": "DERIVED from the current body: declaration only; implementation authority is outside this node; `swapOnce` (RedemptionExt.sol:54) is a declaration-only node with 0 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function swapOnce(PoolKey calldata route, address from, address to, uint256 amountIn, uint256 minOut) external returns (uint256)",
@@ -2209,12 +2283,12 @@
    "edges": [],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 55,
+   "line": 56,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "withdraw",
    "observations": [],
-   "reachability": "DERIVED from the current body: declaration only; implementation authority is outside this node; `withdraw` (RedemptionExt.sol:55) is a declaration-only node with 0 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
+   "reachability": "DERIVED from the current body: declaration only; implementation authority is outside this node; `withdraw` (RedemptionExt.sol:56) is a declaration-only node with 0 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function withdraw(address asset, address to, uint256 amount) external",
@@ -2231,12 +2305,12 @@
    "edges": [],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 59,
+   "line": 60,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "linkVolume",
    "observations": [],
-   "reachability": "DERIVED from the current body: declaration only; implementation authority is outside this node; `linkVolume` (RedemptionExt.sol:59) is a declaration-only node with 0 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
+   "reachability": "DERIVED from the current body: declaration only; implementation authority is outside this node; `linkVolume` (RedemptionExt.sol:60) is a declaration-only node with 0 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function linkVolume(PoolId primary, PoolId secondary) external",
@@ -2245,112 +2319,110 @@
    "writes": []
   },
   {
-   "authority": "caller restricted by explicit msg.sender check",
-   "authority_gate_quote": "if (IERC721(mifrens).ownerOf(mifrenTokenId) != msg.sender) revert NotOwnerOf(); (RedemptionExt.sol:84)",
+   "authority": "anyone holding a genesis (OG) MiFren",
+   "authority_gate_quote": "if (IERC721(mifrens).ownerOf(mifrenTokenId) != msg.sender) revert NotOwnerOf(); (RedemptionExt.sol:87)",
    "body_lines": [
-    80,
-    112
+    81,
+    113
    ],
    "body_sha1": "f9060bbce531885af3c9f1826860431c55cf9d58",
    "contract": "RedemptionExt",
    "edges": [
-    "RedemptionExt.redeemOgFren (RedemptionExt.sol:78), TRUSTED, in-cluster",
-    "RedemptionExt.returns (RedemptionExt.sol:78), TRUSTED, out-of-cluster",
-    "RedemptionExt._redeemBlocked (RedemptionExt.sol:79), TRUSTED, out-of-cluster",
-    "RedemptionExt.floorPerFren (RedemptionExt.sol:86), TRUSTED, out-of-cluster",
-    "PoolOps.claimFromReserve (RedemptionExt.sol:95), TRUSTED, out-of-cluster"
+    "CauldronBase._redeemBlocked (RedemptionExt.sol:82), TRUSTED, out-of-cluster",
+    "CauldronBase.floorPerFren (RedemptionExt.sol:89), TRUSTED, out-of-cluster",
+    "IMiFrensContinuable.custodyTransfer (RedemptionExt.sol:99), TRUSTED, out-of-cluster",
+    "PoolOps.claimFromReserve (RedemptionExt.sol:102), TRUSTED, library"
    ],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 80,
+   "line": 81,
    "modifiers": [
     "nonReentrant"
    ],
    "mutability": "nonpayable",
    "name": "redeemOgFren",
    "observations": [],
-   "reachability": "DERIVED from the current body: caller restricted by explicit msg.sender check; `redeemOgFren` (RedemptionExt.sol:78) is a external node with 9 direct storage/immutable reads, 1 direct writes, and 5 resolved call edges.",
+   "reachability": "Runs in the registry's storage by delegatecall. Blocked only by the emergency-aware pause (`_redeemBlocked` RedemptionExt.sol:82); OG ids only (`genesisShares` RedemptionExt.sol:86); caller must own the fren. Debits outstanding and counts the fren as treasury-held before custody and the reserve pull (`treasuryHeldOg` RedemptionExt.sol:98), so redemption is floor-neutral for remaining holders; a short reserve beyond the dust tolerance reverts everything (`NoBalance` RedemptionExt.sol:111). Reentrancy-guarded.",
    "reads": [
-    "currentGeneration (line 94)",
-    "generationPoolKey (line 97)",
-    "generationReservePositionId (line 97)",
-    "genesisShares (line 83)",
-    "mifrens (line 84)",
-    "positionManager (line 96)",
-    "reserveTickLower (line 98)",
-    "reserveTickUpper (line 98)",
-    "summoned (line 80)"
+    "summoned (line 83)",
+    "genesisShares (line 86)",
+    "mifrens (line 87)",
+    "genesisReserveOutstanding (line 94)",
+    "currentGeneration (line 101)",
+    "generationReservePositionId (line 104)"
    ],
-   "semantics": "stale",
+   "semantics": "fresh",
    "signature": "function redeemOgFren(uint256 mifrenTokenId) external nonReentrant returns (uint256 amount)",
-   "value": "NONE",
+   "value": "Moves the OG NFT into registry custody (`custodyTransfer` RedemptionExt.sol:99) and pays the live floor from the reserve position to the caller (`claimFromReserve` RedemptionExt.sol:102).",
    "visibility": "external",
    "writes": [
-    "genesisReserveOutstanding (line 91)"
+    "genesisReserveOutstanding (line 94)",
+    "treasuryHeldOg (line 98)"
    ]
   },
   {
-   "authority": "anyone",
+   "authority": "anyone (buyer)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    121,
-    138
+    122,
+    139
    ],
    "body_sha1": "34d9acad1ef681636c643a84263159a6bcb3161c",
    "contract": "RedemptionExt",
    "edges": [
-    "RedemptionExt.buyTreasuryOgFren (RedemptionExt.sol:115), TRUSTED, in-cluster",
-    "RedemptionExt.returns (RedemptionExt.sol:115), TRUSTED, out-of-cluster",
-    "RedemptionExt.floorPerFren (RedemptionExt.sol:121), TRUSTED, out-of-cluster",
-    "RedemptionExt._pullGrow (RedemptionExt.sol:124), TRUSTED, in-cluster"
+    "CauldronBase.floorPerFren (RedemptionExt.sol:128), TRUSTED, out-of-cluster",
+    "RedemptionExt._pullGrow (RedemptionExt.sol:136), TRUSTED, in-cluster",
+    "IMiFrensContinuable.custodyTransfer (RedemptionExt.sol:137), TRUSTED, out-of-cluster"
    ],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 121,
+   "line": 122,
    "modifiers": [
     "nonReentrant"
    ],
    "mutability": "nonpayable",
    "name": "buyTreasuryOgFren",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `buyTreasuryOgFren` (RedemptionExt.sol:115) is a external node with 4 direct storage/immutable reads, 0 direct writes, and 4 resolved call edges.",
+   "reachability": "Only for a genesis fren the registry holds (`NotOwnerOf` RedemptionExt.sol:126). Prices at twice the live floor while the fren is still outside the divisor (`paid` RedemptionExt.sol:128), returns it to the active set, grows the reserve with the payment and releases custody. Reentrancy-guarded.",
    "reads": [
-    "currentGeneration (line 126)",
-    "genesisShares (line 117)",
-    "mifrens (line 119)",
-    "summoned (line 116)"
+    "summoned (line 123)",
+    "genesisShares (line 124)",
+    "mifrens (line 126)",
+    "treasuryHeldOg (line 135)"
    ],
-   "semantics": "stale",
+   "semantics": "fresh",
    "signature": "function buyTreasuryOgFren(uint256 mifrenTokenId) external nonReentrant returns (uint256 paid)",
-   "value": "NONE",
+   "value": "Pulls twice the floor in the live token from the buyer into the reserve (`_pullGrow` RedemptionExt.sol:136) and releases the fren from registry custody to the buyer (`custodyTransfer` RedemptionExt.sol:137).",
    "visibility": "external",
-   "writes": []
+   "writes": [
+    "treasuryHeldOg (line 135)"
+   ]
   },
   {
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    147,
-    151
+    148,
+    152
    ],
    "body_sha1": "7e56d9d17184310d43f2964e30d1dfd7cd87413e",
    "contract": "RedemptionExt",
    "edges": [
-    "RedemptionExt.donateToReserve (RedemptionExt.sol:136), TRUSTED, in-cluster",
-    "RedemptionExt._pullGrow (RedemptionExt.sol:139), TRUSTED, in-cluster"
+    "RedemptionExt.donateToReserve (RedemptionExt.sol:148), TRUSTED, in-cluster",
+    "RedemptionExt._pullGrow (RedemptionExt.sol:151), TRUSTED, in-cluster"
    ],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 147,
+   "line": 148,
    "modifiers": [
     "nonReentrant"
    ],
    "mutability": "nonpayable",
    "name": "donateToReserve",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `donateToReserve` (RedemptionExt.sol:136) is a external node with 1 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `donateToReserve` (RedemptionExt.sol:148) is a external node with 1 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
    "reads": [
-    "summoned (line 137)"
+    "summoned (line 149)"
    ],
    "semantics": "fresh",
    "signature": "function donateToReserve(uint256 amount) external nonReentrant",
@@ -2362,143 +2434,135 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    158,
-    186
+    159,
+    187
    ],
    "body_sha1": "8926d6d1a64c92de86ce82c345ac179a1381ace9",
    "contract": "RedemptionExt",
    "edges": [
-    "RedemptionExt.materializeLegacyReserve (RedemptionExt.sol:147), TRUSTED, in-cluster",
-    "RedemptionExt.returns (RedemptionExt.sol:147), TRUSTED, out-of-cluster",
-    "PoolOps.materializeLegacy (RedemptionExt.sol:151), TRUSTED, out-of-cluster"
+    "PoolOps.materializeLegacy (RedemptionExt.sol:163), TRUSTED, library"
    ],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 158,
+   "line": 159,
    "modifiers": [
     "nonReentrant"
    ],
    "mutability": "nonpayable",
    "name": "materializeLegacyReserve",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `materializeLegacyReserve` (RedemptionExt.sol:147) is a external node with 13 direct storage/immutable reads, 1 direct writes, and 3 resolved call edges.",
+   "reachability": "Permissionless keeper step: moves live buyback tokens into the reserve and credits the collection ledger by the measured amount, with the genesis share credited to OG holders at once (`genesisReserveOutstanding` RedemptionExt.sol:185). Reentrancy-guarded.",
    "reads": [
-    "collectionLedger (line 153)",
-    "currentGeneration (line 149)",
-    "generationCollection (line 153)",
-    "generationPoolKey (line 155)",
-    "generationReservePositionId (line 155)",
-    "generationToken (line 154)",
-    "genesisShares (line 153)",
-    "hook (line 152)",
-    "mifrens (line 153)",
-    "positionManager (line 152)",
-    "reserveTickLower (line 155)",
-    "reserveTickUpper (line 155)",
-    "summoned (line 148)"
+    "summoned (line 160)",
+    "currentGeneration (line 161)",
+    "positionManager (line 164)",
+    "hook (line 164)",
+    "collectionLedger (line 165)",
+    "mifrens (line 165)",
+    "genesisShares (line 165)",
+    "generationCollection (line 165)",
+    "generationToken (line 166)"
    ],
-   "semantics": "stale",
+   "semantics": "fresh",
    "signature": "function materializeLegacyReserve() external nonReentrant returns (uint256 added)",
-   "value": "NONE",
+   "value": "Sweeps the hook's held legacy-buyback tokens into the reserve position (`materializeLegacy` RedemptionExt.sol:163).",
    "visibility": "external",
    "writes": [
-    "genesisPending (line 158)"
+    "genesisReserveOutstanding (line 185)"
    ]
   },
   {
    "authority": "private; reachable only through Solidity callers",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    191,
-    210
+    192,
+    211
    ],
    "body_sha1": "e75f90d6fe77a920616f507a0f64bf5888044fd4",
    "contract": "RedemptionExt",
    "edges": [
-    "RedemptionExt._pullGrow (RedemptionExt.sol:165), TRUSTED, in-cluster",
-    "RedemptionExt.returns (RedemptionExt.sol:165), TRUSTED, out-of-cluster",
-    "PoolOps.addToReserve (RedemptionExt.sol:168), TRUSTED, out-of-cluster",
-    "RedemptionExt.floorPerFren (RedemptionExt.sol:183), TRUSTED, out-of-cluster"
+    "RedemptionExt._pullGrow (RedemptionExt.sol:192), TRUSTED, in-cluster",
+    "PoolOps.addToReserve (RedemptionExt.sol:195), TRUSTED, out-of-cluster",
+    "RedemptionExt.floorPerFren (RedemptionExt.sol:210), TRUSTED, out-of-cluster"
    ],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 191,
+   "line": 192,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "_pullGrow",
    "observations": [],
-   "reachability": "DERIVED from the current body: private; reachable only through Solidity callers; `_pullGrow` (RedemptionExt.sol:165) is a private node with 7 direct storage/immutable reads, 1 direct writes, and 4 resolved call edges.",
+   "reachability": "DERIVED from the current body: private; reachable only through Solidity callers; `_pullGrow` (RedemptionExt.sol:192) is a private node with 7 direct storage/immutable reads, 1 direct writes, and 3 resolved call edges.",
    "reads": [
-    "currentGeneration (line 166)",
-    "generationPoolKey (line 170)",
-    "generationReservePositionId (line 170)",
-    "generationToken (line 167)",
-    "positionManager (line 169)",
-    "reserveTickLower (line 171)",
-    "reserveTickUpper (line 171)"
+    "currentGeneration (line 193)",
+    "generationPoolKey (line 197)",
+    "generationReservePositionId (line 197)",
+    "generationToken (line 194)",
+    "positionManager (line 196)",
+    "reserveTickLower (line 198)",
+    "reserveTickUpper (line 198)"
    ],
    "semantics": "fresh",
    "signature": "function _pullGrow(address from, uint256 amount) private returns (uint256 added)",
    "value": "NONE",
    "visibility": "private",
    "writes": [
-    "genesisReserveOutstanding (line 182)"
+    "genesisReserveOutstanding (line 209)"
    ]
   },
   {
    "authority": "owner via onlyOwner",
-   "authority_gate_quote": "onlyOwner (RedemptionExt.sol:260)",
+   "authority_gate_quote": "onlyOwner (RedemptionExt.sol:287)",
    "body_lines": [
-    286,
-    291
+    287,
+    292
    ],
    "body_sha1": "704f917df702dbee18d0426a443f3a6753adb93f",
    "contract": "RedemptionExt",
    "edges": [
-    "RedemptionExt.setRotationWiring (RedemptionExt.sol:260), TRUSTED, in-cluster"
+    "RedemptionExt.setRotationWiring (RedemptionExt.sol:287), TRUSTED, in-cluster"
    ],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 286,
+   "line": 287,
    "modifiers": [
     "onlyOwner"
    ],
    "mutability": "nonpayable",
    "name": "setRotationWiring",
    "observations": [],
-   "reachability": "DERIVED from the current body: owner via onlyOwner; `setRotationWiring` (RedemptionExt.sol:260) is a external node with 0 direct storage/immutable reads, 3 direct writes, and 1 resolved call edges.",
+   "reachability": "DERIVED from the current body: owner via onlyOwner; `setRotationWiring` (RedemptionExt.sol:287) is a external node with 0 direct storage/immutable reads, 3 direct writes, and 1 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function setRotationWiring(address rotator, address governor) external onlyOwner",
    "value": "NONE",
    "visibility": "external",
    "writes": [
-    "governor (line 260)",
-    "quoteRotator (line 262)",
-    "treasuryGovernor (line 263)"
+    "governor (line 287)",
+    "quoteRotator (line 289)",
+    "treasuryGovernor (line 290)"
    ]
   },
   {
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    299,
-    301
+    300,
+    302
    ],
    "body_sha1": "60533d31111f24200eb06ee72d9a3c6858239f98",
    "contract": "RedemptionExt",
    "edges": [
-    "RedemptionExt.returns (RedemptionExt.sol:273), TRUSTED, out-of-cluster",
-    "RedemptionExt.rotateSliceFrom (RedemptionExt.sol:274), TRUSTED, in-cluster"
+    "RedemptionExt.rotateSliceFrom (RedemptionExt.sol:301), TRUSTED, in-cluster"
    ],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 295,
+   "line": 296,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "rotateSlice",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `rotateSlice` (RedemptionExt.sol:269) is a external node with 0 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `rotateSlice` (RedemptionExt.sol:296) is a external node with 0 direct storage/immutable reads, 0 direct writes, and 1 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function rotateSlice( uint16 sliceBps, uint256 minOut, PoolKey calldata route ) external returns (uint256 moved, uint256 positionId)",
@@ -2507,83 +2571,83 @@
    "writes": []
   },
   {
-   "authority": "anyone",
-   "authority_gate_quote": "UNGATED",
+   "authority": "anyone, within the treasury governor's approved rotation envelope",
+   "authority_gate_quote": "if (remaining == 0) revert NoRotationApproved(); (RedemptionExt.sol:344)",
    "body_lines": [
-    311,
-    709
+    312,
+    710
    ],
    "body_sha1": "f96000b26ca44abf3b7d3f5c0d17e7befce45cba",
    "contract": "RedemptionExt",
    "edges": [
-    "RedemptionExt.returns (RedemptionExt.sol:285), TRUSTED, out-of-cluster",
-    "PoolOps.removePartial (RedemptionExt.sol:419), TRUSTED, out-of-cluster",
-    "PoolOps.sendAsset (RedemptionExt.sol:431), TRUSTED, out-of-cluster",
-    "RedemptionExt._legPosition (RedemptionExt.sol:479), TRUSTED, in-cluster",
-    "PoolOps.removeAll (RedemptionExt.sol:485), TRUSTED, out-of-cluster",
-    "PoolOps.openOrAddPair (RedemptionExt.sol:493), TRUSTED, out-of-cluster",
-    "RedemptionExt._recordLeg (RedemptionExt.sol:534), TRUSTED, in-cluster",
-    "hook.perpEngine (RedemptionExt.sol:650), TRUSTED, out-of-cluster"
+    "ITreasuryGovernor.allowance (RedemptionExt.sol:330), TRUSTED, in-cluster",
+    "PoolOps.removePartial (RedemptionExt.sol:446), TRUSTED, library",
+    "PoolOps.sendAsset (RedemptionExt.sol:458), TRUSTED, library",
+    "IQuoteRotator.swapOnce (RedemptionExt.sol:459), UNTRUSTED, out-of-cluster",
+    "IQuoteRotator.withdraw (RedemptionExt.sol:460), UNTRUSTED, out-of-cluster",
+    "RedemptionExt._legPosition (RedemptionExt.sol:506), TRUSTED, in-cluster",
+    "PoolOps.removeAll (RedemptionExt.sol:512), TRUSTED, library",
+    "PoolOps.openOrAddPair (RedemptionExt.sol:536), TRUSTED, library",
+    "IHookVolume.linkVolume (RedemptionExt.sol:550), TRUSTED, out-of-cluster",
+    "RedemptionExt._recordLeg (RedemptionExt.sol:577), TRUSTED, in-cluster",
+    "ITreasuryGovernor.consume (RedemptionExt.sol:591), TRUSTED, in-cluster",
+    "ITreasuryGovernor.migrationMandateSpent (RedemptionExt.sol:658), TRUSTED, in-cluster",
+    "IPerpBook.requoteBook (RedemptionExt.sol:702), TRUSTED, out-of-cluster"
    ],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 306,
+   "line": 307,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "rotateSliceFrom",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `rotateSliceFrom` (RedemptionExt.sol:280) is a public node with 13 direct storage/immutable reads, 1 direct writes, and 8 resolved call edges.",
+   "reachability": "Permissionless execution of a governance-approved rotation: rotator and governor must be wired (`RotationNotWired` RedemptionExt.sol:320), the envelope must have budget for the slice (`remaining` RedemptionExt.sol:345), the destination allowlisted (`allowedQuote` RedemptionExt.sol:349) and the slice within bounds (`MAX_SLICE_BPS` RedemptionExt.sol:353). The source is the primary position or a recorded leg (`fromLeg` RedemptionExt.sol:373). The swap is floored by the rotator's oracle. Existing destination liquidity and, when returning to the launch quote, the launch position are consolidated into one tracked position (`removeAll` RedemptionExt.sol:527). The governor budget is consumed after success (`consume` RedemptionExt.sol:591). When a primary-sourced slice spends the whole migration mandate the generation is redenominated: quote, hook live key and the perp book are carried to the new quote (`requoteBook` RedemptionExt.sol:702), sync best-effort. No reentrancy guard; every callback in the path is owner-curated.",
    "reads": [
-    "MAX_SLICE_BPS (line 326)",
-    "allowedQuote (line 322)",
-    "currentGeneration (line 328)",
-    "generationLegs (line 373)",
-    "generationPoolId (line 507)",
-    "generationPoolKey (line 348)",
-    "generationPositionId (line 347)",
-    "generationToken (line 329)",
-    "hook (line 496)",
-    "poolManager (line 494)",
-    "positionManager (line 420)",
-    "quoteRotator (line 292)",
-    "treasuryGovernor (line 301)"
+    "quoteRotator (line 319)",
+    "treasuryGovernor (line 328)",
+    "allowedQuote (line 349)",
+    "currentGeneration (line 355)",
+    "generationToken (line 356)",
+    "generationPositionId (line 374)",
+    "generationPoolKey (line 375)",
+    "generationLegs (line 400)",
+    "generationQuote (line 439)"
    ],
-   "semantics": "stale",
+   "semantics": "fresh",
    "signature": "function rotateSliceFrom( uint8 fromLeg, uint16 sliceBps, uint256 minOut, PoolKey calldata route ) public returns (uint256 moved, uint256 positionId)",
-   "value": "NONE",
+   "value": "Removes a slice of the source position (`removePartial` RedemptionExt.sol:446), sends the quote to the rotator and swaps it (`swapOnce` RedemptionExt.sol:459), withdraws the proceeds (`withdraw` RedemptionExt.sol:460) and mints them with the removed tokens into the destination pair (`openOrAddPair` RedemptionExt.sol:536).",
    "visibility": "public",
    "writes": [
-    "generationQuote (line 412)"
+    "generationQuote (line 659)"
    ]
   },
   {
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    775,
-    781
+    776,
+    782
    ],
    "body_sha1": "9d6bcc8ce9db6a413608a84b1689a9b9d3cdcfdc",
    "contract": "RedemptionExt",
    "edges": [
-    "RedemptionExt.floorClaimableNow (RedemptionExt.sol:723), TRUSTED, in-cluster",
-    "RedemptionExt.returns (RedemptionExt.sol:723), TRUSTED, out-of-cluster",
-    "RedemptionExt.floorPerFren (RedemptionExt.sol:724), TRUSTED, out-of-cluster"
+    "RedemptionExt.floorClaimableNow (RedemptionExt.sol:776), TRUSTED, in-cluster",
+    "RedemptionExt.floorPerFren (RedemptionExt.sol:777), TRUSTED, out-of-cluster"
    ],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 775,
+   "line": 776,
    "modifiers": [],
    "mutability": "view",
    "name": "floorClaimableNow",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `floorClaimableNow` (RedemptionExt.sol:723) is a external node with 5 direct storage/immutable reads, 0 direct writes, and 3 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `floorClaimableNow` (RedemptionExt.sol:776) is a external node with 5 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
    "reads": [
-    "currentGeneration (line 725)",
-    "generationPoolId (line 727)",
-    "poolManager (line 727)",
-    "reserveTickUpper (line 728)",
-    "summoned (line 726)"
+    "currentGeneration (line 778)",
+    "generationPoolId (line 780)",
+    "poolManager (line 780)",
+    "reserveTickUpper (line 781)",
+    "summoned (line 779)"
    ],
    "semantics": "fresh",
    "signature": "function floorClaimableNow() external view returns (bool claimable, uint256 perFren)",
@@ -2593,35 +2657,35 @@
   },
   {
    "authority": "caller restricted by explicit msg.sender check",
-   "authority_gate_quote": "if (claimGate != address(0) && msg.sender != claimGate && msg.sender != hook.perpEngine()) { (RedemptionExt.sol:747)",
+   "authority_gate_quote": "if (claimGate != address(0) && msg.sender != claimGate && msg.sender != hook.perpEngine()) { (RedemptionExt.sol:800)",
    "body_lines": [
-    797,
-    815
+    798,
+    816
    ],
    "body_sha1": "761527f7c0e68bb23e95279c1de2160b47dfbd7f",
    "contract": "RedemptionExt",
    "edges": [
-    "hook.perpEngine (RedemptionExt.sol:747), TRUSTED, out-of-cluster",
-    "PoolOps.migrateUpTo (RedemptionExt.sol:758), TRUSTED, out-of-cluster"
+    "CauldronHook.perpEngine (RedemptionExt.sol:800), TRUSTED, out-of-cluster",
+    "PoolOps.migrateUpTo (RedemptionExt.sol:811), TRUSTED, out-of-cluster"
    ],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 794,
+   "line": 795,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "claimByBurnUpTo",
    "observations": [],
-   "reachability": "DERIVED from the current body: caller restricted by explicit msg.sender check; `claimByBurnUpTo` (RedemptionExt.sol:742) is a external node with 9 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
+   "reachability": "DERIVED from the current body: caller restricted by explicit msg.sender check; `claimByBurnUpTo` (RedemptionExt.sol:795) is a external node with 9 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
    "reads": [
-    "claimGate (line 747)",
-    "currentGeneration (line 746)",
-    "generationPoolKey (line 760)",
-    "generationReservePositionId (line 760)",
-    "generationToken (line 750)",
-    "hook (line 747)",
-    "positionManager (line 759)",
-    "reserveTickLower (line 760)",
-    "reserveTickUpper (line 760)"
+    "claimGate (line 800)",
+    "currentGeneration (line 799)",
+    "generationPoolKey (line 813)",
+    "generationReservePositionId (line 813)",
+    "generationToken (line 803)",
+    "hook (line 800)",
+    "positionManager (line 812)",
+    "reserveTickLower (line 813)",
+    "reserveTickUpper (line 813)"
    ],
    "semantics": "fresh",
    "signature": "function claimByBurnUpTo(uint256 fromGen, uint256 maxAmount) external returns (uint256 claimedAmount)",
@@ -2633,25 +2697,24 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    818,
-    820
+    819,
+    821
    ],
    "body_sha1": "9822da989af6d7a3edde9f38fc620498db347c6b",
    "contract": "RedemptionExt",
    "edges": [
-    "RedemptionExt.legCount (RedemptionExt.sol:766), TRUSTED, in-cluster",
-    "RedemptionExt.returns (RedemptionExt.sol:766), TRUSTED, out-of-cluster"
+    "RedemptionExt.legCount (RedemptionExt.sol:819), TRUSTED, in-cluster"
    ],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 818,
+   "line": 819,
    "modifiers": [],
    "mutability": "view",
    "name": "legCount",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `legCount` (RedemptionExt.sol:766) is a external node with 1 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `legCount` (RedemptionExt.sol:819) is a external node with 1 direct storage/immutable reads, 0 direct writes, and 1 resolved call edges.",
    "reads": [
-    "generationLegs (line 767)"
+    "generationLegs (line 820)"
    ],
    "semantics": "fresh",
    "signature": "function legCount(uint256 gen) external view returns (uint256)",
@@ -2663,22 +2726,22 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    827,
-    830
+    828,
+    831
    ],
    "body_sha1": "5afb5cbb7eb904ad5b929467bca20356d14c7c88",
    "contract": "RedemptionExt",
    "edges": [],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 823,
+   "line": 824,
    "modifiers": [],
    "mutability": "view",
    "name": "legAt",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `legAt` (RedemptionExt.sol:771) is a external node with 1 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `legAt` (RedemptionExt.sol:824) is a external node with 1 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
    "reads": [
-    "generationLegs (line 776)"
+    "generationLegs (line 829)"
    ],
    "semantics": "fresh",
    "signature": "function legAt(uint256 gen, uint256 i) external view returns (address quote, uint256 positionId, PoolKey memory key)",
@@ -2690,22 +2753,22 @@
    "authority": "private; reachable only through Solidity callers",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    842,
-    848
+    843,
+    849
    ],
    "body_sha1": "c7839d8057cce4b9331d6adf79d7fc214f42e4e2",
    "contract": "RedemptionExt",
    "edges": [],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 838,
+   "line": 839,
    "modifiers": [],
    "mutability": "view",
    "name": "_legPosition",
    "observations": [],
-   "reachability": "DERIVED from the current body: private; reachable only through Solidity callers; `_legPosition` (RedemptionExt.sol:786) is a private node with 1 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
+   "reachability": "DERIVED from the current body: private; reachable only through Solidity callers; `_legPosition` (RedemptionExt.sol:839) is a private node with 1 direct storage/immutable reads, 0 direct writes, and 0 resolved call edges.",
    "reads": [
-    "generationLegs (line 791)"
+    "generationLegs (line 844)"
    ],
    "semantics": "fresh",
    "signature": "function _legPosition(uint256 gen, address quote) private view returns (uint256 positionId, PoolKey memory key)",
@@ -2714,120 +2777,227 @@
    "writes": []
   },
   {
-   "authority": "private; reachable only through Solidity callers",
+   "authority": "internal (callers: rotateSliceFrom)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    851,
-    882
+    852,
+    883
    ],
    "body_sha1": "686553f9184755b764842587b081942427407713",
    "contract": "RedemptionExt",
-   "edges": [
-    "RedemptionExt._recordLeg (RedemptionExt.sol:799), TRUSTED, in-cluster"
-   ],
+   "edges": [],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 851,
+   "line": 852,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "_recordLeg",
    "observations": [],
-   "reachability": "DERIVED from the current body: private; reachable only through Solidity callers; `_recordLeg` (RedemptionExt.sol:799) is a private node with 1 direct storage/immutable reads, 0 direct writes, and 1 resolved call edges.",
+   "reachability": "Upserts the leg for a quote. A leg in the launch quote replaces the primary position id and drops any duplicate leg (`generationPositionId` RedemptionExt.sol:856); an existing leg updates its id; otherwise a new leg is appended. Emits LegOpened on every write so indexers follow the replacement id.",
    "reads": [
-    "generationLegs (line 800)"
+    "generationLegs (line 853)",
+    "generationPoolKey (line 855)"
    ],
-   "semantics": "stale",
+   "semantics": "fresh",
    "signature": "function _recordLeg(uint256 gen, address quote, uint256 positionId, PoolKey memory key) private",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": [
+    "generationPositionId (line 856)"
+   ]
+  },
+  {
+   "authority": "anyone (past generations; or the live generation after a successor handoff)",
+   "authority_gate_quote": "if (gen == 0 || gen >= currentGeneration) revert CannotClaimCurrentGen(); (RedemptionExt.sol:930)",
+   "body_lines": [
+    925,
+    933
+   ],
+   "body_sha1": "a97fea7f2d5b41318c0e9301ef3ccbc67a620222",
+   "contract": "RedemptionExt",
+   "edges": [
+    "RedemptionExt._handedOff (RedemptionExt.sol:926), TRUSTED, in-cluster",
+    "RedemptionExt._handOffLegs (RedemptionExt.sol:927), TRUSTED, in-cluster",
+    "RedemptionExt._recoverLegs (RedemptionExt.sol:931), TRUSTED, in-cluster",
+    "RedemptionExt._bookLegProceeds (RedemptionExt.sol:932), TRUSTED, in-cluster"
+   ],
+   "file": "cauldron/RedemptionExt.sol",
+   "kind": "function",
+   "line": 925,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "recoverLegs",
+   "observations": [],
+   "reachability": "Forwarded by the registry stub. For the live generation it acts only when the primary custody has provably moved to the recorded successor (`_handedOff` RedemptionExt.sol:926), handing every leg NFT to that successor; otherwise the live generation is refused (`CannotClaimCurrentGen` RedemptionExt.sol:930). Past generations are retried leg by leg and the recovered assets booked for the owner's sweep (`_bookLegProceeds` RedemptionExt.sol:932).",
+   "reads": [
+    "currentGeneration (line 926)"
+   ],
+   "semantics": "fresh",
+   "signature": "function recoverLegs(uint256 gen) public returns (uint256 quoteOut, uint256 tokenOut)",
+   "value": "Past generations: unwinds rotated legs into registry custody and books the proceeds (`_recoverLegs` RedemptionExt.sol:931). Handed-off live generation: transfers leg NFTs to the successor (`_handOffLegs` RedemptionExt.sol:927).",
+   "visibility": "public",
+   "writes": []
+  },
+  {
+   "authority": "internal (callers: recoverLegs)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    938,
+    943
+   ],
+   "body_sha1": "ee5f3e71c3f7de07c3f8bfdc486437714bb3ddf1",
+   "contract": "RedemptionExt",
+   "edges": [
+    "IERC721.ownerOf (RedemptionExt.sol:942), TRUSTED, out-of-cluster"
+   ],
+   "file": "cauldron/RedemptionExt.sol",
+   "kind": "function",
+   "line": 938,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "_handedOff",
+   "observations": [],
+   "reachability": "True when a successor is recorded and owns the generation's reserve NFT, or its active NFT if there is no reserve (`ownerOf` RedemptionExt.sol:942).",
+   "reads": [
+    "successor (line 939)",
+    "generationReservePositionId (line 940)",
+    "generationPositionId (line 941)",
+    "positionManager (line 942)"
+   ],
+   "semantics": "fresh",
+   "signature": "function _handedOff(uint256 gen) private view returns (bool)",
    "value": "NONE",
    "visibility": "private",
    "writes": []
   },
   {
-   "authority": "anyone",
+   "authority": "internal (callers: recoverLegs)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    914,
-    918
+    948,
+    959
    ],
-   "body_sha1": "8783320ef194e669b8f5055052f4d5f231c68ea3",
+   "body_sha1": "1ceca15e7bab0e9f44e4ce8d2353006e1967394c",
    "contract": "RedemptionExt",
    "edges": [
-    "RedemptionExt.recoverLegs (RedemptionExt.sol:848), TRUSTED, in-cluster",
-    "RedemptionExt.returns (RedemptionExt.sol:848), TRUSTED, out-of-cluster",
-    "RedemptionExt._recoverLegs (RedemptionExt.sol:850), TRUSTED, in-cluster",
-    "RedemptionExt._bookLegProceeds (RedemptionExt.sol:851), TRUSTED, in-cluster"
+    "IERC721.transferFrom (RedemptionExt.sol:956), TRUSTED, out-of-cluster"
    ],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 914,
+   "line": 948,
    "modifiers": [],
    "mutability": "nonpayable",
-   "name": "recoverLegs",
+   "name": "_handOffLegs",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `recoverLegs` (RedemptionExt.sol:848) is a public node with 1 direct storage/immutable reads, 0 direct writes, and 4 resolved call edges.",
+   "reachability": "Pops each leg and transfers its NFT to the successor (`legs` RedemptionExt.sol:955); all-or-nothing, so one failed transfer leaves every leg recorded.",
    "reads": [
-    "currentGeneration (line 849)"
+    "successor (line 949)",
+    "generationLegs (line 950)",
+    "positionManager (line 956)"
    ],
    "semantics": "fresh",
-   "signature": "function recoverLegs(uint256 gen) public returns (uint256 quoteOut, uint256 tokenOut)",
-   "value": "NONE",
-   "visibility": "public",
-   "writes": []
+   "signature": "function _handOffLegs(uint256 gen) private",
+   "value": "Transfers every recorded leg position NFT from the registry to the successor (`transferFrom` RedemptionExt.sol:956); liquidity is not touched.",
+   "visibility": "private",
+   "writes": [
+    "generationLegs (line 950)"
+   ]
   },
   {
    "authority": "internal; reachable only through Solidity callers",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    941,
-    952
+    984,
+    995
    ],
    "body_sha1": "91bfc4c6690343c9064a2dad25c72743c516527b",
    "contract": "RedemptionExt",
    "edges": [
-    "RedemptionExt._bookLegProceeds (RedemptionExt.sol:875), TRUSTED, in-cluster"
+    "RedemptionExt._bookLegProceeds (RedemptionExt.sol:984), TRUSTED, in-cluster"
    ],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 941,
+   "line": 984,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "_bookLegProceeds",
    "observations": [],
-   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_bookLegProceeds` (RedemptionExt.sol:875) is a internal node with 2 direct storage/immutable reads, 1 direct writes, and 1 resolved call edges.",
+   "reachability": "DERIVED from the current body: internal; reachable only through Solidity callers; `_bookLegProceeds` (RedemptionExt.sol:984) is a internal node with 2 direct storage/immutable reads, 1 direct writes, and 1 resolved call edges.",
    "reads": [
-    "generationPoolKey (line 877)",
-    "generationToken (line 882)"
+    "generationPoolKey (line 986)",
+    "generationToken (line 991)"
    ],
    "semantics": "fresh",
    "signature": "function _bookLegProceeds(uint256 gen, uint256 quoteOut, uint256 tokenOut) internal",
    "value": "NONE",
    "visibility": "internal",
    "writes": [
-    "legProceeds (line 878)"
+    "legProceeds (line 987)"
    ]
+  },
+  {
+   "authority": "the emergency admin (enforced by the registry stub before delegating)",
+   "authority_gate_quote": "function emergencyWithdrawLP(uint256) external onlyEmergency timelocked { _forwardToExt(); } (CauldronRegistry.sol:481)",
+   "body_lines": [
+    1020,
+    1046
+   ],
+   "body_sha1": "7f06f3b83310b8feea29356808326a2610790c9b",
+   "contract": "RedemptionExt",
+   "edges": [
+    "PoolOps.removeAll (RedemptionExt.sol:1027), TRUSTED, library",
+    "PoolOps.removeAll (RedemptionExt.sol:1030), TRUSTED, library",
+    "ISeeder.seeding (RedemptionExt.sol:1035), TRUSTED, out-of-cluster",
+    "ISeeder.withdrawAll (RedemptionExt.sol:1036), TRUSTED, out-of-cluster",
+    "RedemptionExt._recoverLegs (RedemptionExt.sol:1040), TRUSTED, in-cluster",
+    "PoolOps.sendAsset (RedemptionExt.sol:1043), TRUSTED, library",
+    "PoolOps.sendAsset (RedemptionExt.sol:1044), TRUSTED, library"
+   ],
+   "file": "cauldron/RedemptionExt.sol",
+   "kind": "function",
+   "line": 1020,
+   "modifiers": [
+    "nonReentrant"
+   ],
+   "mutability": "nonpayable",
+   "name": "emergencyWithdrawLP",
+   "observations": [],
+   "reachability": "Body of the registry's break-glass. Reachable only through the registry stub, which enforces the emergency admin and consumes the armed timelock before delegating, so `msg.sender` is the admin; called directly on the facet it acts on the facet's own empty storage. Tears down the same positions as relaunch (`removeAll` RedemptionExt.sol:1027; `withdrawAll` RedemptionExt.sol:1036; `_recoverLegs` RedemptionExt.sol:1040) and pays both assets out. Reentrancy-guarded.",
+   "reads": [
+    "generationPoolKey (line 1021)",
+    "generationToken (line 1022)",
+    "positionManager (line 1023)",
+    "generationPositionId (line 1026)",
+    "generationReservePositionId (line 1028)",
+    "seeder (line 1034)"
+   ],
+   "semantics": "fresh",
+   "signature": "function emergencyWithdrawLP(uint256 gen) external nonReentrant",
+   "value": "Removes the generation's active and reserve LP, any live seeder campaign and rotated legs into registry custody, then pays the tokens and the recovered quote in the generation's own currency0 to the caller (`sendAsset` RedemptionExt.sol:1044).",
+   "visibility": "external",
+   "writes": []
   },
   {
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    965,
-    967
+    1048,
+    1050
    ],
    "body_sha1": "d7dece021b5e0c665568aba60abe9e784dab521d",
    "contract": "RedemptionExt",
    "edges": [
-    "RedemptionExt.recoverLegsAtTeardown (RedemptionExt.sol:899), TRUSTED, in-cluster",
-    "RedemptionExt.returns (RedemptionExt.sol:899), TRUSTED, out-of-cluster",
-    "RedemptionExt._recoverLegs (RedemptionExt.sol:900), TRUSTED, in-cluster"
+    "RedemptionExt.recoverLegsAtTeardown (RedemptionExt.sol:1048), TRUSTED, in-cluster",
+    "RedemptionExt._recoverLegs (RedemptionExt.sol:1049), TRUSTED, in-cluster"
    ],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 965,
+   "line": 1048,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "recoverLegsAtTeardown",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `recoverLegsAtTeardown` (RedemptionExt.sol:899) is a external node with 0 direct storage/immutable reads, 0 direct writes, and 3 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `recoverLegsAtTeardown` (RedemptionExt.sol:1048) is a external node with 0 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function recoverLegsAtTeardown(uint256 gen) external returns (uint256, uint256)",
@@ -2839,62 +3009,59 @@
    "authority": "private; reachable only through Solidity callers",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    969,
-    1023
+    1052,
+    1106
    ],
    "body_sha1": "cac662339040ee882a1e967945a1ce70b843ae72",
    "contract": "RedemptionExt",
    "edges": [
-    "RedemptionExt._recoverLegs (RedemptionExt.sol:903), TRUSTED, in-cluster",
-    "RedemptionExt.returns (RedemptionExt.sol:903), TRUSTED, out-of-cluster",
-    "PoolOps.removeAll (RedemptionExt.sol:940), TRUSTED, out-of-cluster",
-    "RedemptionExt.returns (RedemptionExt.sol:940), TRUSTED, out-of-cluster"
+    "RedemptionExt._recoverLegs (RedemptionExt.sol:1052), TRUSTED, in-cluster",
+    "PoolOps.removeAll (RedemptionExt.sol:1089), TRUSTED, out-of-cluster"
    ],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 969,
+   "line": 1052,
    "modifiers": [],
    "mutability": "nonpayable",
    "name": "_recoverLegs",
    "observations": [],
-   "reachability": "DERIVED from the current body: private; reachable only through Solidity callers; `_recoverLegs` (RedemptionExt.sol:903) is a private node with 4 direct storage/immutable reads, 1 direct writes, and 4 resolved call edges.",
+   "reachability": "DERIVED from the current body: private; reachable only through Solidity callers; `_recoverLegs` (RedemptionExt.sol:1052) is a private node with 4 direct storage/immutable reads, 1 direct writes, and 2 resolved call edges.",
    "reads": [
-    "generationLegs (line 904)",
-    "generationPoolKey (line 934)",
-    "generationToken (line 905)",
-    "positionManager (line 906)"
+    "generationLegs (line 1053)",
+    "generationPoolKey (line 1083)",
+    "generationToken (line 1054)",
+    "positionManager (line 1055)"
    ],
    "semantics": "fresh",
    "signature": "function _recoverLegs(uint256 gen) private returns (uint256 quoteOut, uint256 tokenOut)",
    "value": "NONE",
    "visibility": "private",
    "writes": [
-    "legProceeds (line 947)"
+    "legProceeds (line 1096)"
    ]
   },
   {
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    1027,
-    1029
+    1110,
+    1112
    ],
    "body_sha1": "bfb0294c1f4fec68b57be7f90a59c88c86b8a909",
    "contract": "RedemptionExt",
    "edges": [
-    "RedemptionExt.legProceedsOf (RedemptionExt.sol:961), TRUSTED, in-cluster",
-    "RedemptionExt.returns (RedemptionExt.sol:961), TRUSTED, out-of-cluster"
+    "RedemptionExt.legProceedsOf (RedemptionExt.sol:1110), TRUSTED, in-cluster"
    ],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 1027,
+   "line": 1110,
    "modifiers": [],
    "mutability": "view",
    "name": "legProceedsOf",
    "observations": [],
-   "reachability": "DERIVED from the current body: anyone; `legProceedsOf` (RedemptionExt.sol:961) is a external node with 1 direct storage/immutable reads, 0 direct writes, and 2 resolved call edges.",
+   "reachability": "DERIVED from the current body: anyone; `legProceedsOf` (RedemptionExt.sol:1110) is a external node with 1 direct storage/immutable reads, 0 direct writes, and 1 resolved call edges.",
    "reads": [
-    "legProceeds (line 962)"
+    "legProceeds (line 1111)"
    ],
    "semantics": "fresh",
    "signature": "function legProceedsOf(address asset) external view returns (uint256)",
@@ -2904,35 +3071,34 @@
   },
   {
    "authority": "owner via onlyOwner",
-   "authority_gate_quote": "onlyOwner (RedemptionExt.sol:998)",
+   "authority_gate_quote": "onlyOwner (RedemptionExt.sol:1147)",
    "body_lines": [
-    1064,
-    1074
+    1147,
+    1157
    ],
    "body_sha1": "0c3687441f4eb237bd6d61f5eddeff3ae817de43",
    "contract": "RedemptionExt",
    "edges": [
-    "RedemptionExt.sweepLegProceeds (RedemptionExt.sol:998), TRUSTED, in-cluster",
-    "RedemptionExt.returns (RedemptionExt.sol:998), TRUSTED, out-of-cluster",
-    "PoolOps.sendAsset (RedemptionExt.sol:1006), TRUSTED, out-of-cluster"
+    "RedemptionExt.sweepLegProceeds (RedemptionExt.sol:1147), TRUSTED, in-cluster",
+    "PoolOps.sendAsset (RedemptionExt.sol:1155), TRUSTED, out-of-cluster"
    ],
    "file": "cauldron/RedemptionExt.sol",
    "kind": "function",
-   "line": 1064,
+   "line": 1147,
    "modifiers": [
     "onlyOwner"
    ],
    "mutability": "nonpayable",
    "name": "sweepLegProceeds",
    "observations": [],
-   "reachability": "DERIVED from the current body: owner via onlyOwner; `sweepLegProceeds` (RedemptionExt.sol:998) is a external node with 0 direct storage/immutable reads, 1 direct writes, and 3 resolved call edges.",
+   "reachability": "DERIVED from the current body: owner via onlyOwner; `sweepLegProceeds` (RedemptionExt.sol:1147) is a external node with 0 direct storage/immutable reads, 1 direct writes, and 2 resolved call edges.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function sweepLegProceeds(address asset, address to) external onlyOwner returns (uint256 amount)",
    "value": "NONE",
    "visibility": "external",
    "writes": [
-    "legProceeds (line 1000)"
+    "legProceeds (line 1149)"
    ]
   }
  ]

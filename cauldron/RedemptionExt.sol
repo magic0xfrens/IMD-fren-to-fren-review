@@ -11,6 +11,7 @@ import {PoolKey} from "v4-core/src/types/PoolKey.sol";
 import {Currency} from "v4-core/src/types/Currency.sol";
 import {IHooks} from "v4-core/src/interfaces/IHooks.sol";
 import {CauldronBase, IMiFrensContinuable, IPerpSync, IPerpBook} from "./CauldronBase.sol";
+import {ISeeder} from "./ISeeder.sol";
 
 /**
  * @title RedemptionExt
@@ -911,11 +912,53 @@ contract RedemptionExt is CauldronBase {
     ///  make a healthy generation read as dying. The teardown path needs no such
     ///  gate — it runs on the generation being torn down, by definition — so it has
     ///  its own entry below.
+    ///
+    ///  ONE EXCEPTION: A LIVE GENERATION ALREADY HANDED TO THE SUCCESSOR
+    ///  (FS-successor-01). `migrateToSuccessor` moves the active and reserve NFTs
+    ///  but not the rotated legs, and afterwards neither this retry (current gen)
+    ///  nor `emergencyWithdrawLP` (it must burn an NFT this registry no longer
+    ///  owns) could reach them — a rotated treasury stranded for good. Once the
+    ///  primary is provably the successor's, this registry no longer runs that
+    ///  generation, so the legs follow it the same way: ownership moves, the
+    ///  liquidity stays put, and the destination is the recorded successor, never
+    ///  the caller. Nothing is unwound, so there is no price to be sandwiched.
     function recoverLegs(uint256 gen) public returns (uint256 quoteOut, uint256 tokenOut) {
+        if (gen != 0 && gen == currentGeneration && _handedOff(gen)) {
+            _handOffLegs(gen);
+            return (0, 0);
+        }
         if (gen == 0 || gen >= currentGeneration) revert CannotClaimCurrentGen();
         (quoteOut, tokenOut) = _recoverLegs(gen);
         _bookLegProceeds(gen, quoteOut, tokenOut);
     }
+
+    /// @dev True once `migrateToSuccessor` has moved `gen`'s primary custody:
+    ///      the reserve NFT (or, when there is none, the active one) is owned by
+    ///      the recorded successor.
+    function _handedOff(uint256 gen) private view returns (bool) {
+        address to = successor;
+        uint256 id = generationReservePositionId[gen];
+        if (id == 0) id = generationPositionId[gen];
+        return to != address(0) && id != 0 && IERC721(address(positionManager)).ownerOf(id) == to;
+    }
+
+    /// @dev Transfer every recorded leg NFT of `gen` to the successor and drop it
+    ///      from the list. All-or-nothing: a failed transfer reverts the call and
+    ///      leaves every leg recorded for a retry.
+    function _handOffLegs(uint256 gen) private {
+        address to = successor;
+        TreasuryLeg[] storage legs = generationLegs[gen];
+        uint256 i = legs.length;
+        while (i > 0) {
+            --i;
+            TreasuryLeg memory l = legs[i];
+            legs.pop();
+            IERC721(address(positionManager)).transferFrom(address(this), to, l.positionId);
+            emit LegHandedOff(gen, l.quote, l.positionId, to);
+        }
+    }
+
+    event LegHandedOff(uint256 indexed gen, address indexed quote, uint256 positionId, address to);
 
     /// @dev Book what the RETRY recovered, so the existing exit covers it.
     ///
@@ -962,6 +1005,46 @@ contract RedemptionExt is CauldronBase {
     ///  caller can reach it. Calling the deployed facet directly runs against the
     ///  facet's own empty storage and recovers nothing. Stated explicitly because
     ///  it is implicit in the bytecode: DO NOT add a forwarder for this one.
+    event EmergencyWithdraw(uint256 indexed gen, address indexed to, uint256 eth, uint256 tokens);
+
+    /// @notice Body of the registry's break-glass LP pull. REACHABLE ONLY THROUGH
+    ///         the registry stub, which enforces `onlyEmergency` and consumes the
+    ///         armed timelock before delegating here, so `msg.sender` IS the
+    ///         emergency admin. Called on the facet directly it runs against the
+    ///         facet's own empty storage and moves nothing.
+    ///
+    ///  Same teardown as the relaunch path (primary, reserve, a live seeder
+    ///  campaign, rotated legs). The recovered quote is paid in the generation's
+    ///  OWN currency0: it used to be sent as native ether, which reverted for an
+    ///  ERC20-quoted generation or paid out unrelated ether.
+    function emergencyWithdrawLP(uint256 gen) external nonReentrant {
+        PoolKey memory key = generationPoolKey[gen];
+        address token = generationToken[gen];
+        IPositionManagerOps pm = IPositionManagerOps(address(positionManager));
+        uint256 q;
+        uint256 t;
+        uint256 id = generationPositionId[gen];
+        if (id != 0) (q, t) = PoolOps.removeAll(pm, id, key, token);
+        id = generationReservePositionId[gen];
+        if (id != 0) {
+            (uint256 q2, uint256 t2) = PoolOps.removeAll(pm, id, key, token);
+            q += q2;
+            t += t2;
+        }
+        address s = seeder;
+        if (s != address(0) && ISeeder(s).seeding()) {
+            (uint256 q3, uint256 t3) = ISeeder(s).withdrawAll(address(this));
+            q += q3;
+            t += t3;
+        }
+        (uint256 q4, uint256 t4) = _recoverLegs(gen);
+        q += q4;
+        t += t4;
+        PoolOps.sendAsset(token, msg.sender, t);
+        PoolOps.sendAsset(Currency.unwrap(key.currency0), msg.sender, q);
+        emit EmergencyWithdraw(gen, msg.sender, q, t);
+    }
+
     function recoverLegsAtTeardown(uint256 gen) external returns (uint256, uint256) {
         return _recoverLegs(gen);
     }

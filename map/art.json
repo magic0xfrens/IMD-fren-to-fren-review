@@ -801,23 +801,50 @@
    "writes": []
   },
   {
-   "authority": "internal",
+   "authority": "internal (callers: _append, _appendUint)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    305,
-    316
+    310,
+    323
    ],
-   "body_sha1": "969ed8e9165c29b3f3a2c56400b28603f925097d",
+   "body_sha1": "c6266b951fa9c7f47f2e76696a1135c527209198",
    "contract": "FrenRenderer",
    "edges": [],
    "file": "render/FrenRenderer.sol",
    "kind": "function",
-   "line": 305,
+   "line": 310,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_ensure",
+   "observations": [],
+   "reachability": "Grows the SVG buffer before any write that would pass its capacity: returns at once when the bytes fit (`need` FrenRenderer.sol:313), otherwise doubles the capacity from at least 32 until it fits (`cap` FrenRenderer.sol:315) and copies the used prefix into the new allocation (`mcopy` FrenRenderer.sol:320). Pure memory work; no state.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _ensure(Buf memory b, uint256 n) private pure",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal (callers: _appendHeader, _appendRow, _appendUint, renderSVG)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    325,
+    337
+   ],
+   "body_sha1": "7247ff96ce4414a2fab6a5ca2ec622fffe8762a9",
+   "contract": "FrenRenderer",
+   "edges": [
+    "FrenRenderer._ensure (FrenRenderer.sol:328), TRUSTED, in-cluster"
+   ],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 325,
    "modifiers": [],
    "mutability": "pure",
    "name": "_append",
    "observations": [],
-   "reachability": "Internal body declared at `_append` (FrenRenderer.sol:305); callers: _appendHeader, _appendRow, _appendUint, renderSVG.",
+   "reachability": "Appends a string to the SVG buffer. Capacity is ensured first (`_ensure` FrenRenderer.sol:328), so a long trait layer can no longer write past the allocation into adjacent memory; then the bytes are copied at the current length (`mcopy` FrenRenderer.sol:334) and the length advanced.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function _append(Buf memory b, string memory s) private pure",
@@ -826,25 +853,26 @@
    "writes": []
   },
   {
-   "authority": "internal",
+   "authority": "internal (callers: _appendRow)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    319,
-    340
+    340,
+    362
    ],
-   "body_sha1": "70f90d1514b0cce21c79dc35d7d91c4e1de4baa0",
+   "body_sha1": "95f3e5dedef542dc4ad34d36224546caf6417219",
    "contract": "FrenRenderer",
    "edges": [
-    "FrenRenderer._append (FrenRenderer.sol:321), TRUSTED, in-cluster"
+    "FrenRenderer._append (FrenRenderer.sol:342), TRUSTED, in-cluster",
+    "FrenRenderer._ensure (FrenRenderer.sol:353), TRUSTED, in-cluster"
    ],
    "file": "render/FrenRenderer.sol",
    "kind": "function",
-   "line": 319,
+   "line": 340,
    "modifiers": [],
    "mutability": "pure",
    "name": "_appendUint",
    "observations": [],
-   "reachability": "Internal body declared at `_appendUint` (FrenRenderer.sol:319); callers: _appendRow.",
+   "reachability": "Appends a decimal number of at most four digits (`tmp` FrenRenderer.sol:345); zero goes through `_append` (FrenRenderer.sol:342). The digit count is computed before the capacity check (`_ensure` FrenRenderer.sol:353), then the digits are copied in. A value of five or more digits underflows the checked index and reverts rather than writing out of bounds (DERIVED).",
    "reads": [],
    "semantics": "fresh",
    "signature": "function _appendUint(Buf memory b, uint256 v) private pure",
@@ -856,20 +884,20 @@
    "authority": "internal",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    342,
-    348
+    364,
+    370
    ],
    "body_sha1": "ab14aca7de92b75dfe4074cf31a9e9cff8e21728",
    "contract": "FrenRenderer",
    "edges": [],
    "file": "render/FrenRenderer.sol",
    "kind": "function",
-   "line": 342,
+   "line": 364,
    "modifiers": [],
    "mutability": "pure",
    "name": "_finalize",
    "observations": [],
-   "reachability": "Internal body declared at `_finalize` (FrenRenderer.sol:342); callers: renderSVG.",
+   "reachability": "Internal body declared at `_finalize` (FrenRenderer.sol:364); callers: renderSVG.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function _finalize(Buf memory b) private pure returns (bytes memory out)",

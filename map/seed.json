@@ -288,8 +288,7 @@
    "body_sha1": "05b36a004c5023c94d634942beeb830ded161fe5",
    "contract": "CauldronSeeder",
    "edges": [
-    "IRegistryOwner.owner (CauldronSeeder.sol:380), TRUSTED, in-cluster",
-    "to.call (CauldronSeeder.sol:387), UNTRUSTED, out-of-cluster"
+    "IRegistryOwner.owner (CauldronSeeder.sol:380), TRUSTED, in-cluster"
    ],
    "file": "cauldron/CauldronSeeder.sol",
    "kind": "function",
@@ -640,8 +639,7 @@
     "IPoolManager.modifyLiquidity (CauldronSeeder.sol:653), TRUSTED, out-of-cluster",
     "CauldronSeeder._settle (CauldronSeeder.sol:658), TRUSTED, in-cluster",
     "IERC20.balanceOf (CauldronSeeder.sol:673), UNTRUSTED, out-of-cluster",
-    "IERC20.transfer (CauldronSeeder.sol:674), UNTRUSTED, out-of-cluster",
-    "to.call (CauldronSeeder.sol:676), UNTRUSTED, out-of-cluster"
+    "IERC20.transfer (CauldronSeeder.sol:674), UNTRUSTED, out-of-cluster"
    ],
    "file": "cauldron/CauldronSeeder.sol",
    "kind": "function",
@@ -837,8 +835,7 @@
    "contract": "CauldronSeeder",
    "edges": [
     "IERC20.balanceOf (CauldronSeeder.sol:890), UNTRUSTED, out-of-cluster",
-    "IERC20.transfer (CauldronSeeder.sol:891), UNTRUSTED, out-of-cluster",
-    "to.call (CauldronSeeder.sol:893), UNTRUSTED, out-of-cluster"
+    "IERC20.transfer (CauldronSeeder.sol:891), UNTRUSTED, out-of-cluster"
    ],
    "file": "cauldron/CauldronSeeder.sol",
    "kind": "function",
@@ -1261,7 +1258,6 @@
    "contract": "LaunchSniper",
    "edges": [
     "Ownable.owner (LaunchSniper.sol:104), TRUSTED, out-of-cluster",
-    "owner.call (LaunchSniper.sol:104), UNTRUSTED, out-of-cluster",
     "IERC20.transfer (LaunchSniper.sol:107), UNTRUSTED, out-of-cluster",
     "Ownable.owner (LaunchSniper.sol:107), TRUSTED, out-of-cluster",
     "IERC20.balanceOf (LaunchSniper.sol:107), UNTRUSTED, out-of-cluster"
@@ -1680,16 +1676,16 @@
    "writes": []
   },
   {
-   "authority": "internal",
+   "authority": "internal (callers: _pullAndVest)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
     308,
-    314
+    323
    ],
-   "body_sha1": "33c763282c1eb5b5a7b7608e503724197f076fc5",
+   "body_sha1": "109f097b8633242cd8bcd05c2ce4ef65b73012f2",
    "contract": "MigrationVesting",
    "edges": [
-    "IStakerOracle.isInstant (MigrationVesting.sol:312), UNTRUSTED, in-cluster"
+    "IStakerOracle.isInstant (MigrationVesting.sol:313), UNTRUSTED, out-of-cluster"
    ],
    "file": "cauldron/MigrationVesting.sol",
    "kind": "function",
@@ -1698,10 +1694,9 @@
    "mutability": "view",
    "name": "_isInstant",
    "observations": [],
-   "reachability": "Internal body declared at `_isInstant` (MigrationVesting.sol:308); callers: _pullAndVest.",
+   "reachability": "Decides whether a migrating holder skips the vesting window. No oracle means false (`policy` MigrationVesting.sol:310). Otherwise the oracle is asked by a bounded one-word STATICCALL (`valid` MigrationVesting.sol:319), and only an answer of exactly 1 counts as instant (`word` MigrationVesting.sol:322); a revert, a short reply or any other word vests normally, so a broken or hostile oracle can only make migration slower, never revert it.",
    "reads": [
-    "stakerOracle (line 309)",
-    "stakerOracle (line 312)"
+    "stakerOracle (line 309)"
    ],
    "semantics": "fresh",
    "signature": "function _isInstant(address who) private view returns (bool)",
@@ -1713,24 +1708,24 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    321,
-    326
+    330,
+    335
    ],
    "body_sha1": "4c3df377ebf198c9784a76d1e1430d9ba5a7ff4f",
    "contract": "MigrationVesting",
    "edges": [
-    "MigrationVesting._vestedOf (MigrationVesting.sol:324), TRUSTED, in-cluster"
+    "MigrationVesting._vestedOf (MigrationVesting.sol:333), TRUSTED, in-cluster"
    ],
    "file": "cauldron/MigrationVesting.sol",
    "kind": "function",
-   "line": 321,
+   "line": 330,
    "modifiers": [],
    "mutability": "view",
    "name": "claimable",
    "observations": [],
-   "reachability": "Externally reachable at `claimable` (MigrationVesting.sol:321); authority is anyone. Gate evidence is recorded separately.",
+   "reachability": "Externally reachable at `claimable` (MigrationVesting.sol:330); authority is anyone. Gate evidence is recorded separately.",
    "reads": [
-    "_grants (line 322)"
+    "_grants (line 331)"
    ],
    "semantics": "fresh",
    "signature": "function claimable(address holder) external view returns (uint256 total)",
@@ -1742,24 +1737,24 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    329,
-    334
+    338,
+    343
    ],
    "body_sha1": "b13b631b0d1dfe9b8e13e01b2753f7a1cfafa7ae",
    "contract": "MigrationVesting",
    "edges": [
-    "MigrationVesting._vestedOf (MigrationVesting.sol:332), TRUSTED, in-cluster"
+    "MigrationVesting._vestedOf (MigrationVesting.sol:341), TRUSTED, in-cluster"
    ],
    "file": "cauldron/MigrationVesting.sol",
    "kind": "function",
-   "line": 329,
+   "line": 338,
    "modifiers": [],
    "mutability": "view",
    "name": "locked",
    "observations": [],
-   "reachability": "Externally reachable at `locked` (MigrationVesting.sol:329); authority is anyone. Gate evidence is recorded separately.",
+   "reachability": "Externally reachable at `locked` (MigrationVesting.sol:338); authority is anyone. Gate evidence is recorded separately.",
    "reads": [
-    "_grants (line 330)"
+    "_grants (line 339)"
    ],
    "semantics": "fresh",
    "signature": "function locked(address holder) external view returns (uint256 total)",
@@ -1771,22 +1766,22 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    337,
-    339
+    346,
+    348
    ],
    "body_sha1": "9f40086f59d7b82f8b75eaf78d2055fad6e9d9cc",
    "contract": "MigrationVesting",
    "edges": [],
    "file": "cauldron/MigrationVesting.sol",
    "kind": "function",
-   "line": 337,
+   "line": 346,
    "modifiers": [],
    "mutability": "view",
    "name": "grantCount",
    "observations": [],
-   "reachability": "Externally reachable at `grantCount` (MigrationVesting.sol:337); authority is anyone. Gate evidence is recorded separately.",
+   "reachability": "Externally reachable at `grantCount` (MigrationVesting.sol:346); authority is anyone. Gate evidence is recorded separately.",
    "reads": [
-    "_grants (line 338)"
+    "_grants (line 347)"
    ],
    "semantics": "fresh",
    "signature": "function grantCount(address holder) external view returns (uint256)",
@@ -1798,22 +1793,22 @@
    "authority": "anyone",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    342,
-    344
+    351,
+    353
    ],
    "body_sha1": "f8952a3673639deca041dd5f3a395496f2544fc8",
    "contract": "MigrationVesting",
    "edges": [],
    "file": "cauldron/MigrationVesting.sol",
    "kind": "function",
-   "line": 342,
+   "line": 351,
    "modifiers": [],
    "mutability": "view",
    "name": "grantAt",
    "observations": [],
-   "reachability": "Externally reachable at `grantAt` (MigrationVesting.sol:342); authority is anyone. Gate evidence is recorded separately.",
+   "reachability": "Externally reachable at `grantAt` (MigrationVesting.sol:351); authority is anyone. Gate evidence is recorded separately.",
    "reads": [
-    "_grants (line 343)"
+    "_grants (line 352)"
    ],
    "semantics": "fresh",
    "signature": "function grantAt(address holder, uint256 i) external view returns (Grant memory)",
@@ -1823,83 +1818,83 @@
   },
   {
    "authority": "owner",
-   "authority_gate_quote": "onlyOwner (MigrationVesting.sol:352)",
+   "authority_gate_quote": "onlyOwner (MigrationVesting.sol:361)",
    "body_lines": [
-    352,
-    356
+    361,
+    365
    ],
    "body_sha1": "b7589f6183f908aad2c60d43f1c8dadd67aff83b",
    "contract": "MigrationVesting",
    "edges": [],
    "file": "cauldron/MigrationVesting.sol",
    "kind": "function",
-   "line": 352,
+   "line": 361,
    "modifiers": [
     "onlyOwner"
    ],
    "mutability": "nonpayable",
    "name": "setVestWindow",
    "observations": [],
-   "reachability": "Externally reachable at `setVestWindow` (MigrationVesting.sol:352); authority is owner. Gate evidence is recorded separately.",
+   "reachability": "Externally reachable at `setVestWindow` (MigrationVesting.sol:361); authority is owner. Gate evidence is recorded separately.",
    "reads": [
-    "MIN_WINDOW (line 353, constant)",
-    "MAX_WINDOW (line 353, constant)"
+    "MIN_WINDOW (line 362, constant)",
+    "MAX_WINDOW (line 362, constant)"
    ],
    "semantics": "fresh",
    "signature": "function setVestWindow(uint64 _window) external onlyOwner",
    "value": "NONE",
    "visibility": "external",
    "writes": [
-    "vestWindow (line 354)"
+    "vestWindow (line 363)"
    ]
   },
   {
    "authority": "owner",
-   "authority_gate_quote": "onlyOwner (MigrationVesting.sol:359)",
+   "authority_gate_quote": "onlyOwner (MigrationVesting.sol:368)",
    "body_lines": [
-    359,
-    362
+    368,
+    371
    ],
    "body_sha1": "5af99fb2ac32d5bf577e37227c6a6c7e5e15c751",
    "contract": "MigrationVesting",
    "edges": [],
    "file": "cauldron/MigrationVesting.sol",
    "kind": "function",
-   "line": 359,
+   "line": 368,
    "modifiers": [
     "onlyOwner"
    ],
    "mutability": "nonpayable",
    "name": "setStakerOracle",
    "observations": [],
-   "reachability": "Externally reachable at `setStakerOracle` (MigrationVesting.sol:359); authority is owner. Gate evidence is recorded separately.",
+   "reachability": "Externally reachable at `setStakerOracle` (MigrationVesting.sol:368); authority is owner. Gate evidence is recorded separately.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function setStakerOracle(address _oracle) external onlyOwner",
    "value": "NONE",
    "visibility": "external",
    "writes": [
-    "stakerOracle (line 360)"
+    "stakerOracle (line 369)"
    ]
   },
   {
    "authority": "anyone (always reverts)",
    "authority_gate_quote": "UNGATED",
    "body_lines": [
-    372,
-    374
+    381,
+    383
    ],
    "body_sha1": "3811e82976dafcadd631a6a38b558f29702a2f65",
    "contract": "MigrationVesting",
    "edges": [],
    "file": "cauldron/MigrationVesting.sol",
    "kind": "function",
-   "line": 372,
+   "line": 381,
    "modifiers": [],
    "mutability": "pure",
    "name": "renounceOwnership",
    "observations": [],
-   "reachability": "Externally reachable at `renounceOwnership` (MigrationVesting.sol:372); authority is anyone (always reverts). Gate evidence is recorded separately.",
+   "reachability": "Externally reachable at `renounceOwnership` (MigrationVesting.sol:381); authority is anyone (always reverts). Gate evidence is recorded separately.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function renounceOwnership() public pure override",

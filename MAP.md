@@ -1,9 +1,9 @@
 # The map of the machine
 
-Every function in this repository's Solidity, pinned to the source in this commit (1093 functions).
+Every function in this repository's Solidity, pinned to the source in this commit (1102 functions).
 `python3 tools/check-map.py` proves it still matches.
 
-Source digest: `8c94eaa7f5343e083063bd065284b9c671e8b652ab1f352c3f52679dfb1efef1`
+Source digest: `2a69af2d0a7669b9bdb87e64f54df216c173d378ed879877c875c037b4e09941`
 
 Per-function facts live in `map/<cluster>.json`: `authority`, `authority_gate_quote`,
 `reads`, `writes`, `value`, `edges` (TRUSTED/UNTRUSTED), `reachability`, `observations`.
@@ -17,16 +17,16 @@ Below: the **entry points** (externally callable, state-changing) per cluster, i
 
 | cluster | files | functions | fresh | stale | missing | entry points |
 |---|---|---|---|---|---|---|
-| hook | 9 | 148 | 138 | 7 | 3 | 59 |
+| hook | 9 | 148 | 148 | 0 | 0 | 59 |
 | registry | 6 | 89 | 89 | 0 | 0 | 53 |
-| pool | 2 | 78 | 75 | 2 | 1 | 21 |
-| perp | 5 | 261 | 202 | 12 | 47 | 59 |
-| rotation | 7 | 98 | 82 | 11 | 5 | 39 |
-| nft | 10 | 172 | 165 | 2 | 5 | 73 |
+| pool | 2 | 78 | 78 | 0 | 0 | 21 |
+| perp | 5 | 261 | 261 | 0 | 0 | 59 |
+| rotation | 7 | 103 | 103 | 0 | 0 | 40 |
+| nft | 10 | 173 | 173 | 0 | 0 | 74 |
 | governance | 2 | 48 | 48 | 0 | 0 | 12 |
 | seed | 5 | 69 | 69 | 0 | 0 | 16 |
-| art | 6 | 61 | 61 | 0 | 0 | 7 |
-| deploy | 14 | 69 | 64 | 1 | 4 | 18 |
+| art | 6 | 62 | 62 | 0 | 0 | 7 |
+| deploy | 14 | 71 | 71 | 0 | 0 | 18 |
 
 ## hook
 
@@ -44,53 +44,53 @@ Files: `CauldronHook.sol`, `vendor/BaseHook.sol`, `vendor/HookMiner.sol`, `cauld
 | `BaseHook.afterSwap` | vendor/BaseHook.sol:161 | poolManager | NONE | fresh |
 | `BaseHook.beforeDonate` | vendor/BaseHook.sol:180 | poolManager | NONE | fresh |
 | `BaseHook.afterDonate` | vendor/BaseHook.sol:199 | poolManager | NONE | fresh |
-| `CauldronHook.setSweepFailOpen` | CauldronHook.sol:186 | ? | ? | missing |
-| `CauldronHook.legacyBuyStep` | CauldronHook.sol:1240 | hook itself (self-call only) | spends native or the ERC20 quote out of the hook … | stale |
+| `CauldronHook.setSweepFailOpen` | CauldronHook.sol:186 | owner | NONE | fresh |
+| `CauldronHook.legacyBuyStep` | CauldronHook.sol:1240 | hook itself (self-call only) | spends native or the ERC20 quote out of the hook … | fresh |
 | `CauldronHook.fundLegacyBuffer` | CauldronHook.sol:1288 | anyone | receives native; it is credited to `legacyBuffer`… | fresh |
 | `CauldronHook.sweepLegacyReserve` | CauldronHook.sol:1336 | legacyRegistry | transfers `token` to the caller-supplied recipien… | fresh |
-| `CauldronHook.setSnipeParams` | CauldronHook.sol:1710 | owner | NONE | fresh |
-| `CauldronHook.linkVolume` | CauldronHook.sol:1800 | registry | NONE | fresh |
-| `CauldronHook.setDefaultTaxBps` | CauldronHook.sol:1912 | owner | NONE | fresh |
-| `CauldronHook.releaseRelaunchETH` | CauldronHook.sol:1927 | registry | sends native to `registry` (line 1859) | fresh |
-| `CauldronHook.releaseRelaunchAsset` | CauldronHook.sol:1955 | registry | ERC20 transfer of `asset` to `registry` (line 188… | fresh |
-| `CauldronHook.setDeathThreshold` | CauldronHook.sol:2037 | owner | NONE | fresh |
-| `CauldronHook.forceClosePerps` | CauldronHook.sol:2060 | registry | NONE | fresh |
-| `CauldronHook.setLiveKey` | CauldronHook.sol:2122 | registry | NONE | stale |
-| `CauldronHook.setLegacyBuyback` | CauldronHook.sol:2136 | owner or registry | NONE | stale |
-| `CauldronHook.setDeathChecker` | CauldronHook.sol:2198 | owner or registry | NONE | fresh |
-| `CauldronHook.setPolicies` | CauldronHook.sol:2208 | owner or registry | NONE | fresh |
-| `CauldronHook.setFeeRouter` | CauldronHook.sol:2220 | owner or registry | NONE | fresh |
-| `CauldronHook.setNftContract` | CauldronHook.sol:2226 | owner | NONE | fresh |
-| `CauldronHook.setRegistry` | CauldronHook.sol:2239 | owner | NONE | fresh |
-| `CauldronHook.proposeRegistryOverride` | CauldronHook.sol:2255 | owner | NONE | fresh |
-| `CauldronHook.cancelRegistryOverride` | CauldronHook.sol:2264 | owner | NONE | fresh |
-| `CauldronHook.executeRegistryOverride` | CauldronHook.sol:2275 | owner | sends native to the OUTGOING `registry` (line 215… | fresh |
-| `CauldronHook.setCollection` | CauldronHook.sol:2307 | registry | NONE | fresh |
-| `CauldronHook.setVault` | CauldronHook.sol:2335 | registry | NONE | fresh |
-| `CauldronHook.setQuest` | CauldronHook.sol:2341 | owner or registry | NONE | fresh |
-| `CauldronHook.setSeeder` | CauldronHook.sol:2350 | owner or registry | NONE | fresh |
-| `CauldronHook.setPerpEngine` | CauldronHook.sol:2358 | owner or registry | NONE | fresh |
-| `CauldronHook.setFloorBps` | CauldronHook.sol:2367 | owner | NONE | fresh |
-| `CauldronHook.setGuild` | CauldronHook.sol:2374 | owner or registry | NONE | fresh |
-| `CauldronHook.setGuildBps` | CauldronHook.sol:2386 | owner | NONE | fresh |
-| `CauldronHook.setActiveProposer` | CauldronHook.sol:2394 | owner or registry | NONE | fresh |
-| `CauldronHook.setProposerBps` | CauldronHook.sol:2401 | owner | NONE | fresh |
-| `CauldronHook.claimProposerFees` | CauldronHook.sol:2409 | anyone (each caller can only claim their own accrued balance) | sends native to the caller via `call` (line 2288) | fresh |
-| `CauldronHook.setNftCurve` | CauldronHook.sol:2419 | owner | NONE | fresh |
-| `CauldronHook.setCreditUntaggedSwaps` | CauldronHook.sol:2425 | owner | NONE | fresh |
-| `CauldronHook.setNftCurveFrom` | CauldronHook.sol:2432 | registry | NONE | fresh |
-| `CauldronHook.commitCrystals` | CauldronHook.sol:2545 | opener (an address flagged in isOpener) | NONE | fresh |
-| `CauldronHook.resolveTickets` | CauldronHook.sol:2625 | anyone | NONE | fresh |
-| `CauldronHook.nativeGachaStep` | CauldronHook.sol:2655 | hook itself (self-call only) | NONE | fresh |
-| `CauldronHook.setOpener` | CauldronHook.sol:2664 | owner or registry | NONE | fresh |
-| `CauldronHook.setTaxExempt` | CauldronHook.sol:2674 | owner or registry | NONE | fresh |
-| `CauldronHook.setOddsParams` | CauldronHook.sol:2704 | owner | NONE | fresh |
-| `CauldronHook.setMaxOdds` | CauldronHook.sol:2711 | owner | NONE | fresh |
-| `CauldronHook.setWeights` | CauldronHook.sol:2717 | owner | NONE | fresh |
+| `CauldronHook.setSnipeParams` | CauldronHook.sol:1723 | owner | NONE | fresh |
+| `CauldronHook.linkVolume` | CauldronHook.sol:1813 | registry | NONE | fresh |
+| `CauldronHook.setDefaultTaxBps` | CauldronHook.sol:1925 | owner | NONE | fresh |
+| `CauldronHook.releaseRelaunchETH` | CauldronHook.sol:1940 | registry | sends native to `registry` (line 1948) | fresh |
+| `CauldronHook.releaseRelaunchAsset` | CauldronHook.sol:1968 | registry | ERC20 transfer of `asset` to `registry` (line 197… | fresh |
+| `CauldronHook.setDeathThreshold` | CauldronHook.sol:2050 | owner | NONE | fresh |
+| `CauldronHook.forceClosePerps` | CauldronHook.sol:2073 | registry | NONE | fresh |
+| `CauldronHook.setLiveKey` | CauldronHook.sol:2135 | registry | NONE | fresh |
+| `CauldronHook.setLegacyBuyback` | CauldronHook.sol:2149 | owner or registry | NONE | fresh |
+| `CauldronHook.setDeathChecker` | CauldronHook.sol:2211 | owner or registry | NONE | fresh |
+| `CauldronHook.setPolicies` | CauldronHook.sol:2221 | owner or registry | NONE | fresh |
+| `CauldronHook.setFeeRouter` | CauldronHook.sol:2233 | owner or registry | NONE | fresh |
+| `CauldronHook.setNftContract` | CauldronHook.sol:2239 | owner | NONE | fresh |
+| `CauldronHook.setRegistry` | CauldronHook.sol:2252 | owner | NONE | fresh |
+| `CauldronHook.proposeRegistryOverride` | CauldronHook.sol:2268 | owner | NONE | fresh |
+| `CauldronHook.cancelRegistryOverride` | CauldronHook.sol:2277 | owner | NONE | fresh |
+| `CauldronHook.executeRegistryOverride` | CauldronHook.sol:2288 | owner | sends native to the OUTGOING `registry` (line 229… | fresh |
+| `CauldronHook.setCollection` | CauldronHook.sol:2320 | registry | NONE | fresh |
+| `CauldronHook.setVault` | CauldronHook.sol:2348 | registry | NONE | fresh |
+| `CauldronHook.setQuest` | CauldronHook.sol:2354 | owner or registry | NONE | fresh |
+| `CauldronHook.setSeeder` | CauldronHook.sol:2363 | owner or registry | NONE | fresh |
+| `CauldronHook.setPerpEngine` | CauldronHook.sol:2371 | owner or registry | NONE | fresh |
+| `CauldronHook.setFloorBps` | CauldronHook.sol:2380 | owner | NONE | fresh |
+| `CauldronHook.setGuild` | CauldronHook.sol:2387 | owner or registry | NONE | fresh |
+| `CauldronHook.setGuildBps` | CauldronHook.sol:2399 | owner | NONE | fresh |
+| `CauldronHook.setActiveProposer` | CauldronHook.sol:2407 | owner or registry | NONE | fresh |
+| `CauldronHook.setProposerBps` | CauldronHook.sol:2414 | owner | NONE | fresh |
+| `CauldronHook.claimProposerFees` | CauldronHook.sol:2422 | anyone (each caller can only claim their own accrued balance) | sends native to the caller via `call` (line 2426) | fresh |
+| `CauldronHook.setNftCurve` | CauldronHook.sol:2432 | owner | NONE | fresh |
+| `CauldronHook.setCreditUntaggedSwaps` | CauldronHook.sol:2438 | owner | NONE | fresh |
+| `CauldronHook.setNftCurveFrom` | CauldronHook.sol:2445 | registry | NONE | fresh |
+| `CauldronHook.commitCrystals` | CauldronHook.sol:2567 | opener (an address flagged in isOpener) | NONE | fresh |
+| `CauldronHook.resolveTickets` | CauldronHook.sol:2647 | anyone | NONE | fresh |
+| `CauldronHook.nativeGachaStep` | CauldronHook.sol:2677 | hook itself (self-call only) | NONE | fresh |
+| `CauldronHook.setOpener` | CauldronHook.sol:2686 | owner or registry | NONE | fresh |
+| `CauldronHook.setTaxExempt` | CauldronHook.sol:2696 | owner or registry | NONE | fresh |
+| `CauldronHook.setOddsParams` | CauldronHook.sol:2726 | owner | NONE | fresh |
+| `CauldronHook.setMaxOdds` | CauldronHook.sol:2733 | owner | NONE | fresh |
+| `CauldronHook.setWeights` | CauldronHook.sol:2739 | owner | NONE | fresh |
 | `FeeRouteLib.routeSplit` | cauldron/FeeRouteLib.sol:48 | internal to the hook via delegatecall (callers: CauldronHook._routeEt… | no direct transfer; value leaves through `_fundGu… | fresh |
 | `FeeRouteLib.routePerp` | cauldron/FeeRouteLib.sol:79 | internal to the hook via delegatecall (caller: CauldronHook._routePer… | no direct transfer; value leaves through `_fundGu… | fresh |
 | `FeeRouteLib.send` | cauldron/FeeRouteLib.sol:201 | internal to the hook via delegatecall (caller: CauldronHook.releaseRe… | sends native to `to` (line 207); sends native wit… | fresh |
-| `FeeRouteLib.deliver` | cauldron/FeeRouteLib.sol:231 | internal to the hook via delegatecall; NO caller anywhere in the sour… | sends native to `to` (line 251); ERC20 approve of… | stale |
+| `FeeRouteLib.deliver` | cauldron/FeeRouteLib.sol:231 | internal to the hook via delegatecall; NO caller anywhere in the sour… | sends native to `to` (line 251); ERC20 approve of… | fresh |
 | `LegacyBuyLib.buyStep` | cauldron/LegacyBuyLib.sol:132 | anyone at the linked library address; in protocol delegatecalled only… | sends native to `poolManager` (LegacyBuyLib.sol:2… | fresh |
 | `RoyaltyRouter.sweep` | cauldron/RoyaltyRouter.sol:101 | anyone | sends held native to `hook` (line 108), or all he… | fresh |
 
@@ -105,7 +105,7 @@ Files: `CauldronRegistry.sol`, `CauldronToken.sol`, `cauldron/IPolicies.sol`, `c
 | `CauldronRegistry.rotateSlice` | CauldronRegistry.sol:246 | anyone at the registry; the facet holds the gate (RedemptionExt.rotat… | NONE in this stub; the value movement happens ins… | fresh |
 | `CauldronRegistry.rotateSliceFrom` | CauldronRegistry.sol:270 | anyone at the registry; the facet holds the gate (RedemptionExt.rotat… | NONE in this stub; the value movement happens ins… | fresh |
 | `CauldronRegistry.setRotationWiring` | CauldronRegistry.sol:280 | owner (the gate is on the facet: RedemptionExt.setRotationWiring is o… | NONE | fresh |
-| `CauldronRegistry.recoverLegs` | CauldronRegistry.sol:296 | anyone at the registry; the facet holds the only gate (RedemptionExt.… | NONE in this stub; the facet moves the recovered … | fresh |
+| `CauldronRegistry.recoverLegs` | CauldronRegistry.sol:296 | anyone at the registry; the facet holds the only gate (past generatio… | NONE in this stub; the facet moves recovered leg … | fresh |
 | `CauldronRegistry.sweepLegProceeds` | CauldronRegistry.sol:306 | owner (the gate is on the facet: RedemptionExt.sweepLegProceeds is on… | NONE in this stub; the facet sends the booked ass… | fresh |
 | `CauldronRegistry.setAllowedQuote` | CauldronRegistry.sol:314 | owner | NONE | fresh |
 | `CauldronRegistry.setSeeder` | CauldronRegistry.sol:333 | owner | NONE | fresh |
@@ -117,41 +117,41 @@ Files: `CauldronRegistry.sol`, `CauldronToken.sol`, `cauldron/IPolicies.sol`, `c
 | `CauldronRegistry.vetoEmergency` | CauldronRegistry.sol:444 | guardian | NONE | fresh |
 | `CauldronRegistry.setRedemptionPaused` | CauldronRegistry.sol:459 | emergencyAdmin | NONE | fresh |
 | `CauldronRegistry.setEnchantFeeMult` | CauldronRegistry.sol:468 | emergencyAdmin | NONE | fresh |
-| `CauldronRegistry.emergencyWithdrawLP` | CauldronRegistry.sol:475 | emergencyAdmin | ERC20 transfer of the generation token `tok` to t… | fresh |
-| `CauldronRegistry.emergencySweep` | CauldronRegistry.sol:488 | emergencyAdmin | sends the registry's whole native balance to `eme… | fresh |
-| `CauldronRegistry.setSuccessor` | CauldronRegistry.sol:505 | emergencyAdmin | NONE | fresh |
-| `CauldronRegistry.setClaimGate` | CauldronRegistry.sol:524 | emergencyAdmin | NONE | fresh |
-| `CauldronRegistry.migrateToSuccessor` | CauldronRegistry.sol:540 | emergencyAdmin | ERC721 ownership of the active position is moved … | fresh |
-| `CauldronRegistry.setGovernor` | CauldronRegistry.sol:585 | owner | NONE | fresh |
-| `CauldronRegistry.setMinLifetime` | CauldronRegistry.sol:590 | emergencyAdmin | NONE | fresh |
-| `CauldronRegistry.setFactory` | CauldronRegistry.sol:595 | owner | NONE | fresh |
-| `CauldronRegistry.setNftMaxSupply` | CauldronRegistry.sol:600 | owner | NONE | fresh |
-| `CauldronRegistry.setRoyalty` | CauldronRegistry.sol:607 | owner | NONE | fresh |
-| `CauldronRegistry.setGenesisMetadata` | CauldronRegistry.sol:615 | owner | NONE | fresh |
-| `CauldronRegistry.setCollectionMetadata` | CauldronRegistry.sol:643 | caller satisfying `onlyOwner` | NONE | fresh |
-| `CauldronRegistry.setGenesisBonus` | CauldronRegistry.sol:661 | owner | NONE | fresh |
-| `CauldronRegistry.setAirdropReserve` | CauldronRegistry.sol:676 | owner | NONE | fresh |
-| `CauldronRegistry.setPrimeFunder` | CauldronRegistry.sol:685 | owner | NONE | fresh |
-| `CauldronRegistry.fundPrimeBuy` | CauldronRegistry.sol:695 | primeFunder | receives native, accumulated into `primeBuyEth` (… | fresh |
-| `CauldronRegistry.sweepPrimeBuy` | CauldronRegistry.sol:701 | primeFunder | sends native equal to `amt` back to the funder (l… | fresh |
-| `CauldronRegistry.summon` | CauldronRegistry.sol:722 | owner or igniter | receives native as the entire genesis pairing, wh… | fresh |
-| `CauldronRegistry.relaunch` | CauldronRegistry.sol:821 | anyone | NONE | fresh |
-| `CauldronRegistry.claimByBurn` | CauldronRegistry.sol:1291 | anyone (holders of a previous generation's token); blocked for ordina… | burns the caller's previous-generation balance an… | fresh |
-| `CauldronRegistry.claimByBurnUpTo` | CauldronRegistry.sol:1336 | any holder of an earlier generation, unless a claim gate is set, in w… | NONE in this stub; the burn and the reserve withd… | fresh |
-| `CauldronRegistry.enableAutoMigrate` | CauldronRegistry.sol:1354 | anyone (free for any MiFren holder, otherwise a fee is required) | receives native: the opt-in fee is required only … | fresh |
-| `CauldronRegistry.disableAutoMigrate` | CauldronRegistry.sol:1382 | anyone (for their own wallet only) | NONE | fresh |
-| `CauldronRegistry.autoMigrateBatch` | CauldronRegistry.sol:1394 | anyone (permissionless keeper) | burns each opted-in holder's whole previous-gener… | fresh |
-| `CauldronRegistry.redeemOgFren` | CauldronRegistry.sol:1437 | anyone holding a genesis fren; the facet holds the gate (RedemptionEx… | NONE in this stub; the facet pays the live floor … | fresh |
-| `CauldronRegistry.buyTreasuryOgFren` | CauldronRegistry.sol:1443 | anyone; the facet holds the gate (the fren must currently sit in this… | NONE in this stub; the facet pulls twice the live… | fresh |
-| `CauldronRegistry.donateToReserve` | CauldronRegistry.sol:1449 | anyone | NONE in this stub; the facet pulls the donated am… | fresh |
-| `CauldronRegistry.materializeLegacyReserve` | CauldronRegistry.sol:1455 | anyone (permissionless keeper) | NONE in this stub; the facet sweeps the hook's he… | fresh |
-| `CauldronRegistry.floorClaimableNow` | CauldronRegistry.sol:1472 | anyone | NONE | fresh |
-| `CauldronRegistry.legCount` | CauldronRegistry.sol:1477 | anyone | NONE | fresh |
-| `CauldronRegistry.legAt` | CauldronRegistry.sol:1482 | anyone | NONE | fresh |
-| `CauldronRegistry.setCollectionLedger` | CauldronRegistry.sol:1527 | owner | NONE | fresh |
-| `CauldronRegistry.recycleCollectionNFT` | CauldronRegistry.sol:1562 | anyone owning the collection NFT (ownership enforced in the library) | releases the collection's floor entitlement in th… | fresh |
-| `CauldronRegistry.buyCollectionNFT` | CauldronRegistry.sol:1583 | anyone (the NFT must currently sit in this registry's treasury) | pulls twice the NFT's floor in the live token fro… | fresh |
-| `CauldronRegistry.unlockCallback` | CauldronRegistry.sol:1812 | poolManager, and only while the seed-buy window is armed | spends this registry's quote side and receives th… | fresh |
+| `CauldronRegistry.emergencyWithdrawLP` | CauldronRegistry.sol:481 | the emergency admin, after a matured emergency arm | NONE in this stub; the facet removes the generati… | fresh |
+| `CauldronRegistry.emergencySweep` | CauldronRegistry.sol:485 | emergencyAdmin | sends the registry's whole native balance to `eme… | fresh |
+| `CauldronRegistry.setSuccessor` | CauldronRegistry.sol:502 | emergencyAdmin | NONE | fresh |
+| `CauldronRegistry.setClaimGate` | CauldronRegistry.sol:521 | emergencyAdmin | NONE | fresh |
+| `CauldronRegistry.migrateToSuccessor` | CauldronRegistry.sol:537 | emergencyAdmin | ERC721 ownership of the active position is moved … | fresh |
+| `CauldronRegistry.setGovernor` | CauldronRegistry.sol:582 | owner | NONE | fresh |
+| `CauldronRegistry.setMinLifetime` | CauldronRegistry.sol:587 | emergencyAdmin | NONE | fresh |
+| `CauldronRegistry.setFactory` | CauldronRegistry.sol:592 | owner | NONE | fresh |
+| `CauldronRegistry.setNftMaxSupply` | CauldronRegistry.sol:597 | owner | NONE | fresh |
+| `CauldronRegistry.setRoyalty` | CauldronRegistry.sol:604 | owner | NONE | fresh |
+| `CauldronRegistry.setGenesisMetadata` | CauldronRegistry.sol:612 | owner | NONE | fresh |
+| `CauldronRegistry.setCollectionMetadata` | CauldronRegistry.sol:640 | caller satisfying `onlyOwner` | NONE | fresh |
+| `CauldronRegistry.setGenesisBonus` | CauldronRegistry.sol:658 | owner | NONE | fresh |
+| `CauldronRegistry.setAirdropReserve` | CauldronRegistry.sol:673 | owner | NONE | fresh |
+| `CauldronRegistry.setPrimeFunder` | CauldronRegistry.sol:682 | owner | NONE | fresh |
+| `CauldronRegistry.fundPrimeBuy` | CauldronRegistry.sol:692 | primeFunder | receives native, accumulated into `primeBuyEth` (… | fresh |
+| `CauldronRegistry.sweepPrimeBuy` | CauldronRegistry.sol:698 | primeFunder | sends native equal to `amt` back to the funder (l… | fresh |
+| `CauldronRegistry.summon` | CauldronRegistry.sol:719 | owner or igniter | receives native as the entire genesis pairing, wh… | fresh |
+| `CauldronRegistry.relaunch` | CauldronRegistry.sol:818 | anyone | NONE | fresh |
+| `CauldronRegistry.claimByBurn` | CauldronRegistry.sol:1303 | anyone (holders of a previous generation's token); blocked for ordina… | burns the caller's previous-generation balance an… | fresh |
+| `CauldronRegistry.claimByBurnUpTo` | CauldronRegistry.sol:1348 | any holder of an earlier generation, unless a claim gate is set, in w… | NONE in this stub; the burn and the reserve withd… | fresh |
+| `CauldronRegistry.enableAutoMigrate` | CauldronRegistry.sol:1366 | anyone (free for any MiFren holder, otherwise a fee is required) | receives native: the opt-in fee is required only … | fresh |
+| `CauldronRegistry.disableAutoMigrate` | CauldronRegistry.sol:1394 | anyone (for their own wallet only) | NONE | fresh |
+| `CauldronRegistry.autoMigrateBatch` | CauldronRegistry.sol:1406 | anyone (permissionless keeper) | burns each opted-in holder's whole previous-gener… | fresh |
+| `CauldronRegistry.redeemOgFren` | CauldronRegistry.sol:1449 | anyone holding a genesis fren; the facet holds the gate (RedemptionEx… | NONE in this stub; the facet pays the live floor … | fresh |
+| `CauldronRegistry.buyTreasuryOgFren` | CauldronRegistry.sol:1455 | anyone; the facet holds the gate (the fren must currently sit in this… | NONE in this stub; the facet pulls twice the live… | fresh |
+| `CauldronRegistry.donateToReserve` | CauldronRegistry.sol:1461 | anyone | NONE in this stub; the facet pulls the donated am… | fresh |
+| `CauldronRegistry.materializeLegacyReserve` | CauldronRegistry.sol:1467 | anyone (permissionless keeper) | NONE in this stub; the facet sweeps the hook's he… | fresh |
+| `CauldronRegistry.floorClaimableNow` | CauldronRegistry.sol:1484 | anyone | NONE | fresh |
+| `CauldronRegistry.legCount` | CauldronRegistry.sol:1489 | anyone | NONE | fresh |
+| `CauldronRegistry.legAt` | CauldronRegistry.sol:1494 | anyone | NONE | fresh |
+| `CauldronRegistry.setCollectionLedger` | CauldronRegistry.sol:1539 | owner | NONE | fresh |
+| `CauldronRegistry.recycleCollectionNFT` | CauldronRegistry.sol:1574 | anyone owning the collection NFT (ownership enforced in the library) | releases the collection's floor entitlement in th… | fresh |
+| `CauldronRegistry.buyCollectionNFT` | CauldronRegistry.sol:1595 | anyone (the NFT must currently sit in this registry's treasury) | pulls twice the NFT's floor in the live token fro… | fresh |
+| `CauldronRegistry.unlockCallback` | CauldronRegistry.sol:1824 | poolManager, and only while the seed-buy window is armed | spends this registry's quote side and receives th… | fresh |
 | `CauldronToken.burn` | CauldronToken.sol:58 | registry | destroys `amount` of the named holder's balance, … | fresh |
 
 ## pool
@@ -179,8 +179,8 @@ Files: `cauldron/CauldronBase.sol`, `cauldron/PoolOps.sol`
 | `PoolOps.doLegacyNote` | cauldron/PoolOps.sol:1462 | anyone directly at the linked library address; in the protocol path, … | NONE | fresh |
 | `PoolOps.materializeLegacy` | cauldron/PoolOps.sol:1493 | anyone directly at the linked library address; in the protocol path, … | ERC20 transfer of the hook's held live-buyback to… | fresh |
 | `PoolOps.crystallizeCollection` | cauldron/PoolOps.sol:1518 | anyone directly at the linked library address; in the protocol path, … | NONE | fresh |
-| `PoolOps.recycleCollection` | cauldron/PoolOps.sol:1576 | anyone at the linked library; protocol path is the registry's externa… | moves the NFT into registry custody and releases … | fresh |
-| `PoolOps.buyCollection` | cauldron/PoolOps.sol:1625 | anyone at the linked library; protocol path is the registry's externa… | pulls payment tokens from `caller`, adds them to … | stale |
+| `PoolOps.recycleCollection` | cauldron/PoolOps.sol:1576 | internal to the registry via delegatecall (external library function) | moves the NFT into registry custody and releases … | fresh |
+| `PoolOps.buyCollection` | cauldron/PoolOps.sol:1628 | internal to the registry via delegatecall (external library function) | pulls payment tokens from `caller`, adds them to … | fresh |
 
 ## perp
 
@@ -188,42 +188,42 @@ Files: `cauldron/PerpEngine.sol`, `cauldron/PerpVault.sol`, `cauldron/PerpSwapLi
 
 | function | where | who can call | value | map |
 |---|---|---|---|---|
-| `PerpEngine.poke` | cauldron/PerpEngine.sol:758 | anyone | NONE | fresh |
-| `PerpEngine.openLong` | cauldron/PerpEngine.sol:1003 | anyone | NONE | fresh |
-| `PerpEngine.openShort` | cauldron/PerpEngine.sol:1034 | anyone | NONE | fresh |
-| `PerpEngine.close` | cauldron/PerpEngine.sol:1063 | caller restricted by explicit msg.sender check | NONE | fresh |
-| `PerpEngine.liquidate` | cauldron/PerpEngine.sol:1070 | anyone | NONE | fresh |
-| `PerpEngine.sweepLiquidations` | cauldron/PerpEngine.sol:1127 | ? | ? | missing |
-| `PerpEngine.selfSweep` | cauldron/PerpEngine.sol:1151 | caller restricted by explicit msg.sender check | NONE | fresh |
-| `PerpEngine.forceCloseDead` | cauldron/PerpEngine.sol:1482 | anyone | NONE | fresh |
-| `PerpEngine.forceCloseAllDead` | cauldron/PerpEngine.sol:1495 | anyone | NONE | fresh |
-| `PerpEngine.requoteBook` | cauldron/PerpEngine.sol:1550 | ? | ? | missing |
-| `PerpEngine.syncGeneration` | cauldron/PerpEngine.sol:1571 | caller restricted by explicit msg.sender check | NONE | stale |
-| `PerpEngine.unlockCallback` | cauldron/PerpEngine.sol:2134 | caller restricted by explicit msg.sender check | NONE | fresh |
-| `PerpEngine.retirePayout` | cauldron/PerpEngine.sol:2493 | anyone | NONE | fresh |
-| `PerpEngine.claimPayout` | cauldron/PerpEngine.sol:2528 | anyone | NONE | fresh |
-| `PerpEngine.claimLiquidatorBadges` | cauldron/PerpEngine.sol:2714 | anyone | NONE | fresh |
-| `PerpEngine.fundPlv` | cauldron/PerpEngine.sol:2740 | owner via onlyOwner | NONE | fresh |
-| `PerpEngine.fundPlvToken` | cauldron/PerpEngine.sol:2748 | owner via onlyOwner | NONE | fresh |
-| `PerpEngine.fundInsurance` | cauldron/PerpEngine.sol:2759 | anyone | NONE | fresh |
-| `PerpEngine.creditPerpFee` | cauldron/PerpEngine.sol:2769 | anyone | NONE | fresh |
-| `PerpEngine.creditPerpFeeToken` | cauldron/PerpEngine.sol:2774 | anyone | NONE | fresh |
-| `PerpEngine.creditPerpFeeAsset` | cauldron/PerpEngine.sol:2795 | caller restricted by explicit msg.sender check | NONE | fresh |
-| `PerpEngine.fundFromVault` | cauldron/PerpEngine.sol:2844 | configured vault via onlyVault | NONE | fresh |
-| `PerpEngine.withdrawPlvTo` | cauldron/PerpEngine.sol:2850 | configured vault via onlyVault | NONE | fresh |
-| `PerpEngine.withdrawTokYieldTo` | cauldron/PerpEngine.sol:2862 | configured vault via onlyVault | NONE | fresh |
-| `PerpEngine.fundTokenFromVault` | cauldron/PerpEngine.sol:2867 | configured vault via onlyVault | NONE | fresh |
-| `PerpEngine.withdrawPlvTokenTo` | cauldron/PerpEngine.sol:2872 | configured vault via onlyVault | NONE | fresh |
-| `PerpEngine.setFees` | cauldron/PerpEngine.sol:2879 | owner via onlyOwner | NONE | fresh |
-| `PerpEngine.setRisk` | cauldron/PerpEngine.sol:2883 | owner via onlyOwner | NONE | fresh |
-| `PerpEngine.setTiers` | cauldron/PerpEngine.sol:2920 | owner via onlyOwner | NONE | fresh |
-| `PerpEngine.setRouting` | cauldron/PerpEngine.sol:2942 | owner via onlyOwner | NONE | fresh |
-| `PerpEngine.setVaultSplit` | cauldron/PerpEngine.sol:2961 | owner via onlyOwner | NONE | fresh |
-| `PerpEngine.setGuards` | cauldron/PerpEngine.sol:2966 | owner via onlyOwner | NONE | fresh |
-| `PerpEngine.setVault` | cauldron/PerpEngine.sol:3000 | owner via onlyOwner | NONE | fresh |
-| `PerpEngine.setVaultLimits` | cauldron/PerpEngine.sol:3006 | owner via onlyOwner | NONE | fresh |
-| `PerpEngine.setMinCollateral` | cauldron/PerpEngine.sol:3011 | owner via onlyOwner | NONE | fresh |
-| `PerpEngine.skimInsurance` | cauldron/PerpEngine.sol:3027 | owner via onlyOwner | NONE | fresh |
+| `PerpEngine.poke` | cauldron/PerpEngine.sol:760 | anyone | NONE | fresh |
+| `PerpEngine.openLong` | cauldron/PerpEngine.sol:1005 | anyone | NONE | fresh |
+| `PerpEngine.openShort` | cauldron/PerpEngine.sol:1036 | anyone | NONE | fresh |
+| `PerpEngine.close` | cauldron/PerpEngine.sol:1065 | caller restricted by explicit msg.sender check | NONE | fresh |
+| `PerpEngine.liquidate` | cauldron/PerpEngine.sol:1072 | anyone | NONE | fresh |
+| `PerpEngine.sweepLiquidations` | cauldron/PerpEngine.sol:1129 | the hook only | NONE | fresh |
+| `PerpEngine.selfSweep` | cauldron/PerpEngine.sol:1153 | caller restricted by explicit msg.sender check | NONE | fresh |
+| `PerpEngine.forceCloseDead` | cauldron/PerpEngine.sol:1484 | anyone | NONE | fresh |
+| `PerpEngine.forceCloseAllDead` | cauldron/PerpEngine.sol:1497 | anyone | NONE | fresh |
+| `PerpEngine.requoteBook` | cauldron/PerpEngine.sol:1552 | the registry (checked inside the delegatecalled library, against the … | Through the library: converts the book's quote-si… | fresh |
+| `PerpEngine.syncGeneration` | cauldron/PerpEngine.sol:1573 | anyone (quote-change write-off path differs for the owner, see the li… | Migrates the engine's dead-generation token inven… | fresh |
+| `PerpEngine.unlockCallback` | cauldron/PerpEngine.sol:2136 | caller restricted by explicit msg.sender check | NONE | fresh |
+| `PerpEngine.retirePayout` | cauldron/PerpEngine.sol:2495 | anyone | NONE | fresh |
+| `PerpEngine.claimPayout` | cauldron/PerpEngine.sol:2530 | anyone | NONE | fresh |
+| `PerpEngine.claimLiquidatorBadges` | cauldron/PerpEngine.sol:2716 | anyone | NONE | fresh |
+| `PerpEngine.fundPlv` | cauldron/PerpEngine.sol:2742 | owner via onlyOwner | NONE | fresh |
+| `PerpEngine.fundPlvToken` | cauldron/PerpEngine.sol:2750 | owner via onlyOwner | NONE | fresh |
+| `PerpEngine.fundInsurance` | cauldron/PerpEngine.sol:2761 | anyone | NONE | fresh |
+| `PerpEngine.creditPerpFee` | cauldron/PerpEngine.sol:2771 | anyone | NONE | fresh |
+| `PerpEngine.creditPerpFeeToken` | cauldron/PerpEngine.sol:2776 | anyone | NONE | fresh |
+| `PerpEngine.creditPerpFeeAsset` | cauldron/PerpEngine.sol:2797 | caller restricted by explicit msg.sender check | NONE | fresh |
+| `PerpEngine.fundFromVault` | cauldron/PerpEngine.sol:2846 | configured vault via onlyVault | NONE | fresh |
+| `PerpEngine.withdrawPlvTo` | cauldron/PerpEngine.sol:2852 | configured vault via onlyVault | NONE | fresh |
+| `PerpEngine.withdrawTokYieldTo` | cauldron/PerpEngine.sol:2864 | configured vault via onlyVault | NONE | fresh |
+| `PerpEngine.fundTokenFromVault` | cauldron/PerpEngine.sol:2869 | configured vault via onlyVault | NONE | fresh |
+| `PerpEngine.withdrawPlvTokenTo` | cauldron/PerpEngine.sol:2874 | configured vault via onlyVault | NONE | fresh |
+| `PerpEngine.setFees` | cauldron/PerpEngine.sol:2881 | owner via onlyOwner | NONE | fresh |
+| `PerpEngine.setRisk` | cauldron/PerpEngine.sol:2885 | owner via onlyOwner | NONE | fresh |
+| `PerpEngine.setTiers` | cauldron/PerpEngine.sol:2922 | owner via onlyOwner | NONE | fresh |
+| `PerpEngine.setRouting` | cauldron/PerpEngine.sol:2944 | owner via onlyOwner | NONE | fresh |
+| `PerpEngine.setVaultSplit` | cauldron/PerpEngine.sol:2963 | owner via onlyOwner | NONE | fresh |
+| `PerpEngine.setGuards` | cauldron/PerpEngine.sol:2968 | owner via onlyOwner | NONE | fresh |
+| `PerpEngine.setVault` | cauldron/PerpEngine.sol:3002 | owner via onlyOwner | NONE | fresh |
+| `PerpEngine.setVaultLimits` | cauldron/PerpEngine.sol:3008 | owner via onlyOwner | NONE | fresh |
+| `PerpEngine.setMinCollateral` | cauldron/PerpEngine.sol:3013 | owner via onlyOwner | NONE | fresh |
+| `PerpEngine.skimInsurance` | cauldron/PerpEngine.sol:3029 | owner via onlyOwner | NONE | fresh |
 | `PerpMarkSource.setPrimary` | cauldron/PerpMarkSource.sol:115 | owner via onlyOwner | NONE | fresh |
 | `PerpMarkSource.addPool` | cauldron/PerpMarkSource.sol:126 | owner via onlyOwner | NONE | fresh |
 | `PerpMarkSource.removePool` | cauldron/PerpMarkSource.sol:147 | owner via onlyOwner | NONE | fresh |
@@ -233,20 +233,20 @@ Files: `cauldron/PerpEngine.sol`, `cauldron/PerpVault.sol`, `cauldron/PerpSwapLi
 | `PerpSwapLib.tryTransfer` | cauldron/PerpSwapLib.sol:498 | anyone | NONE | fresh |
 | `PerpSwapLib.swapLeg` | cauldron/PerpSwapLib.sol:532 | anyone | NONE | fresh |
 | `PerpSwapLib.migrateInventory` | cauldron/PerpSwapLib.sol:627 | anyone | NONE | fresh |
-| `PerpSwapLib.syncQuoteChangeAt` | cauldron/PerpSwapLib.sol:968 | ? | ? | missing |
-| `PerpSwapLib.requoteBookAt` | cauldron/PerpSwapLib.sol:1032 | ? | ? | missing |
-| `PerpVault.deposit` | cauldron/PerpVault.sol:319 | anyone | receives or validates `msg.value` (line 316) | stale |
-| `PerpVault.depositEth` | cauldron/PerpVault.sol:362 | anyone | receives or validates `msg.value` (line 334) | fresh |
-| `PerpVault.withdrawEth` | cauldron/PerpVault.sol:390 | anyone | NONE | stale |
-| `PerpVault.beforeBookRequote` | cauldron/PerpVault.sol:460 | ? | ? | missing |
-| `PerpVault.afterBookRequote` | cauldron/PerpVault.sol:482 | ? | ? | missing |
-| `PerpVault.settlePendingEth` | cauldron/PerpVault.sol:616 | anyone | NONE | fresh |
-| `PerpVault.claimPendingEth` | cauldron/PerpVault.sol:628 | caller restricted by explicit msg.sender check | NONE | stale |
-| `PerpVault.depositToken` | cauldron/PerpVault.sol:748 | anyone | NONE | fresh |
-| `PerpVault.claimTokYield` | cauldron/PerpVault.sol:776 | anyone | NONE | stale |
-| `PerpVault.withdrawToken` | cauldron/PerpVault.sol:788 | anyone | NONE | fresh |
-| `PerpVault.settlePendingToken` | cauldron/PerpVault.sol:855 | anyone | NONE | fresh |
-| `PerpVault.claimPendingToken` | cauldron/PerpVault.sol:870 | caller restricted by explicit msg.sender check | NONE | fresh |
+| `PerpSwapLib.syncQuoteChangeAt` | cauldron/PerpSwapLib.sol:968 | anyone reaching it through the engine's generation sync; non-owners c… | Owner path: sends the old-quote PLV, insurance an… | fresh |
+| `PerpSwapLib.requoteBookAt` | cauldron/PerpSwapLib.sol:1032 | anyone (external library function); effective gate is the registry ch… | NONE | fresh |
+| `PerpVault.deposit` | cauldron/PerpVault.sol:327 | anyone | Receives native (msg.value must equal amount) or … | fresh |
+| `PerpVault.depositEth` | cauldron/PerpVault.sol:370 | anyone | receives or validates `msg.value` (line 371) | fresh |
+| `PerpVault.withdrawEth` | cauldron/PerpVault.sol:398 | share holder (own shares) | Pays the free part of the exit from the engine to… | fresh |
+| `PerpVault.beforeBookRequote` | cauldron/PerpVault.sol:468 | the engine only | NONE | fresh |
+| `PerpVault.afterBookRequote` | cauldron/PerpVault.sol:490 | the engine only | NONE | fresh |
+| `PerpVault.settlePendingEth` | cauldron/PerpVault.sol:624 | anyone | NONE | fresh |
+| `PerpVault.claimPendingEth` | cauldron/PerpVault.sol:636 | queued claimant (own queue) | Pays the claimant's queued ETH, up to what the en… | fresh |
+| `PerpVault.depositToken` | cauldron/PerpVault.sol:761 | anyone | NONE | fresh |
+| `PerpVault.claimTokYield` | cauldron/PerpVault.sol:789 | token staker (own reward) | Pays the converted reward from the engine's segre… | fresh |
+| `PerpVault.withdrawToken` | cauldron/PerpVault.sol:803 | anyone | NONE | fresh |
+| `PerpVault.settlePendingToken` | cauldron/PerpVault.sol:870 | anyone | NONE | fresh |
+| `PerpVault.claimPendingToken` | cauldron/PerpVault.sol:885 | caller restricted by explicit msg.sender check | NONE | fresh |
 
 ## rotation
 
@@ -254,8 +254,8 @@ Files: `cauldron/QuoteRotator.sol`, `cauldron/QuoteOracle.sol`, `cauldron/Redemp
 
 | function | where | who can call | value | map |
 |---|---|---|---|---|
-| `CauldronVault.redeem` | cauldron/CauldronVault.sol:161 | caller restricted by explicit msg.sender check | sends native through `value` (line 170) | stale |
-| `CauldronVault.close` | cauldron/CauldronVault.sol:197 | caller restricted by explicit msg.sender check | sends native through `value` (line 191) | fresh |
+| `CauldronVault.redeem` | cauldron/CauldronVault.sol:161 | NFT owner of an eligible art id | Burns the NFT through the collection (`burnFromVa… | fresh |
+| `CauldronVault.close` | cauldron/CauldronVault.sol:199 | caller restricted by explicit msg.sender check | sends native through `value` (line 206) | fresh |
 | `MockAggregator.transferOwnership` | cauldron/MockAggregator.sol:65 | owner via onlyOwner | NONE | fresh |
 | `MockAggregator.peg` | cauldron/MockAggregator.sol:68 | owner via onlyOwner | NONE | fresh |
 | `MockAggregator.setStale` | cauldron/MockAggregator.sol:76 | owner via onlyOwner | NONE | fresh |
@@ -268,31 +268,32 @@ Files: `cauldron/QuoteRotator.sol`, `cauldron/QuoteOracle.sol`, `cauldron/Redemp
 | `QuoteOracle.setPegged` | cauldron/QuoteOracle.sol:153 | owner via onlyOwner | NONE | fresh |
 | `QuoteOracle.setBounds` | cauldron/QuoteOracle.sol:175 | owner via onlyOwner | NONE | fresh |
 | `QuoteOracle.setSequencer` | cauldron/QuoteOracle.sol:182 | owner via onlyOwner | NONE | fresh |
-| `QuoteOracle.cachedUsdPerRawUnit` | cauldron/QuoteOracle.sol:334 | anyone | NONE | fresh |
+| `QuoteOracle.cachedUsdPerRawUnit` | cauldron/QuoteOracle.sol:335 | anyone | NONE | fresh |
 | `QuoteRotator.transferOwnership` | cauldron/QuoteRotator.sol:155 | owner via onlyOwner | NONE | fresh |
-| `QuoteRotator.setVenue` | cauldron/QuoteRotator.sol:210 | owner via onlyOwner | NONE | stale |
+| `QuoteRotator.setVenue` | cauldron/QuoteRotator.sol:210 | owner | NONE | fresh |
 | `QuoteRotator.setPlan` | cauldron/QuoteRotator.sol:263 | owner via onlyOwner | NONE | fresh |
 | `QuoteRotator.cancelPlan` | cauldron/QuoteRotator.sol:295 | owner via onlyOwner | NONE | fresh |
 | `QuoteRotator.setKeeperBps` | cauldron/QuoteRotator.sol:300 | owner via onlyOwner | NONE | fresh |
 | `QuoteRotator.rotateStep` | cauldron/QuoteRotator.sol:331 | anyone | NONE | fresh |
-| `QuoteRotator.swapOnce` | cauldron/QuoteRotator.sol:382 | anyone | NONE | stale |
+| `QuoteRotator.swapOnce` | cauldron/QuoteRotator.sol:382 | the registry or the live perp engine | Swaps `amountIn` of `from` held by the rotator in… | fresh |
 | `QuoteRotator.setRotationSlipBps` | cauldron/QuoteRotator.sol:451 | owner via onlyOwner | NONE | fresh |
 | `QuoteRotator.setArbParams` | cauldron/QuoteRotator.sol:529 | owner via onlyOwner | NONE | fresh |
 | `QuoteRotator.setMaxArbNotionalUsd` | cauldron/QuoteRotator.sol:539 | owner via onlyOwner | NONE | fresh |
 | `QuoteRotator.arbStep` | cauldron/QuoteRotator.sol:577 | anyone | NONE | fresh |
-| `QuoteRotator.withdraw` | cauldron/QuoteRotator.sol:697 | caller restricted by explicit msg.sender check | NONE | stale |
+| `QuoteRotator.withdraw` | cauldron/QuoteRotator.sol:697 | registry or owner to any recipient; the live engine only to itself | Sends `amount` of `asset` from the rotator to `to… | fresh |
 | `QuoteRotator.unlockCallback` | cauldron/QuoteRotator.sol:724 | caller restricted by explicit msg.sender check | NONE | fresh |
-| `RedemptionExt.redeemOgFren` | cauldron/RedemptionExt.sol:80 | caller restricted by explicit msg.sender check | NONE | stale |
-| `RedemptionExt.buyTreasuryOgFren` | cauldron/RedemptionExt.sol:121 | anyone | NONE | stale |
-| `RedemptionExt.donateToReserve` | cauldron/RedemptionExt.sol:147 | anyone | NONE | fresh |
-| `RedemptionExt.materializeLegacyReserve` | cauldron/RedemptionExt.sol:158 | anyone | NONE | stale |
-| `RedemptionExt.setRotationWiring` | cauldron/RedemptionExt.sol:286 | owner via onlyOwner | NONE | fresh |
-| `RedemptionExt.rotateSlice` | cauldron/RedemptionExt.sol:295 | anyone | NONE | fresh |
-| `RedemptionExt.rotateSliceFrom` | cauldron/RedemptionExt.sol:306 | anyone | NONE | stale |
-| `RedemptionExt.claimByBurnUpTo` | cauldron/RedemptionExt.sol:794 | caller restricted by explicit msg.sender check | NONE | fresh |
-| `RedemptionExt.recoverLegs` | cauldron/RedemptionExt.sol:914 | anyone | NONE | fresh |
-| `RedemptionExt.recoverLegsAtTeardown` | cauldron/RedemptionExt.sol:965 | anyone | NONE | fresh |
-| `RedemptionExt.sweepLegProceeds` | cauldron/RedemptionExt.sol:1064 | owner via onlyOwner | NONE | fresh |
+| `RedemptionExt.redeemOgFren` | cauldron/RedemptionExt.sol:81 | anyone holding a genesis (OG) MiFren | Moves the OG NFT into registry custody (`custodyT… | fresh |
+| `RedemptionExt.buyTreasuryOgFren` | cauldron/RedemptionExt.sol:122 | anyone (buyer) | Pulls twice the floor in the live token from the … | fresh |
+| `RedemptionExt.donateToReserve` | cauldron/RedemptionExt.sol:148 | anyone | NONE | fresh |
+| `RedemptionExt.materializeLegacyReserve` | cauldron/RedemptionExt.sol:159 | anyone | Sweeps the hook's held legacy-buyback tokens into… | fresh |
+| `RedemptionExt.setRotationWiring` | cauldron/RedemptionExt.sol:287 | owner via onlyOwner | NONE | fresh |
+| `RedemptionExt.rotateSlice` | cauldron/RedemptionExt.sol:296 | anyone | NONE | fresh |
+| `RedemptionExt.rotateSliceFrom` | cauldron/RedemptionExt.sol:307 | anyone, within the treasury governor's approved rotation envelope | Removes a slice of the source position (`removePa… | fresh |
+| `RedemptionExt.claimByBurnUpTo` | cauldron/RedemptionExt.sol:795 | caller restricted by explicit msg.sender check | NONE | fresh |
+| `RedemptionExt.recoverLegs` | cauldron/RedemptionExt.sol:925 | anyone (past generations; or the live generation after a successor ha… | Past generations: unwinds rotated legs into regis… | fresh |
+| `RedemptionExt.emergencyWithdrawLP` | cauldron/RedemptionExt.sol:1020 | the emergency admin (enforced by the registry stub before delegating) | Removes the generation's active and reserve LP, a… | fresh |
+| `RedemptionExt.recoverLegsAtTeardown` | cauldron/RedemptionExt.sol:1048 | anyone | NONE | fresh |
+| `RedemptionExt.sweepLegProceeds` | cauldron/RedemptionExt.sol:1147 | owner via onlyOwner | NONE | fresh |
 
 ## nft
 
@@ -321,39 +322,40 @@ Files: `cauldron/MiFrensGenesis.sol`, `cauldron/CauldronCollection.sol`, `cauldr
 | `CauldronFactory.deployBrew` | cauldron/CauldronFactory.sol:63 | anyone | No funds move; the call deploys `CauldronCollecti… | fresh |
 | `CauldronFactory.deployVault` | cauldron/CauldronFactory.sol:105 | anyone | no native or token value moves; the call is a DEP… | fresh |
 | `CauldronGachaRouter.setOracle` | cauldron/CauldronGachaRouter.sol:99 | owner | NONE | fresh |
-| `CauldronGachaRouter.play` | cauldron/CauldronGachaRouter.sol:235 | anyone | receives native when the generation's quote is na… | fresh |
-| `CauldronGachaRouter.playLiq` | cauldron/CauldronGachaRouter.sol:250 | anyone | receives native when the generation's quote is na… | fresh |
-| `CauldronGachaRouter.openReady` | cauldron/CauldronGachaRouter.sol:347 | anyone | NONE | fresh |
-| `CauldronGachaRouter.playChurn` | cauldron/CauldronGachaRouter.sol:379 | anyone | receives native when native quote is selected; re… | fresh |
-| `CauldronGachaRouter.unlockCallback` | cauldron/CauldronGachaRouter.sol:409 | poolManager (re-entered during unlock) | the pool manager pays the swap output to the play… | fresh |
-| `CauldronGachaRouter.rescueETH` | cauldron/CauldronGachaRouter.sol:579 | owner | sends native to `to` (line 580) | fresh |
-| `CauldronGachaRouter.rescueToken` | cauldron/CauldronGachaRouter.sol:592 | owner | sends `amount` of an arbitrary ERC20 to `to` (lin… | fresh |
-| `CollectionLedger.credit` | cauldron/CollectionLedger.sol:146 | registry | NONE | fresh |
-| `CollectionLedger.redeem` | cauldron/CollectionLedger.sol:161 | registry | NONE | fresh |
-| `CollectionLedger.buyback` | cauldron/CollectionLedger.sol:174 | registry | NONE | fresh |
-| `CollectionLedger.crystallize` | cauldron/CollectionLedger.sol:187 | registry | NONE | fresh |
+| `CauldronGachaRouter.play` | cauldron/CauldronGachaRouter.sol:244 | anyone | receives native when the generation's quote is na… | fresh |
+| `CauldronGachaRouter.playLiq` | cauldron/CauldronGachaRouter.sol:259 | anyone | receives native when the generation's quote is na… | fresh |
+| `CauldronGachaRouter.openReady` | cauldron/CauldronGachaRouter.sol:356 | anyone | NONE | fresh |
+| `CauldronGachaRouter.playChurn` | cauldron/CauldronGachaRouter.sol:388 | anyone | receives native when native quote is selected; re… | fresh |
+| `CauldronGachaRouter.unlockCallback` | cauldron/CauldronGachaRouter.sol:418 | poolManager (re-entered during unlock) | the pool manager pays the swap output to the play… | fresh |
+| `CauldronGachaRouter.rescueETH` | cauldron/CauldronGachaRouter.sol:588 | owner | sends native to `to` (line 589) | fresh |
+| `CauldronGachaRouter.rescueToken` | cauldron/CauldronGachaRouter.sol:601 | owner | sends `amount` of an arbitrary ERC20 to `to` (lin… | fresh |
+| `CollectionLedger.credit` | cauldron/CollectionLedger.sol:148 | registry | NONE | fresh |
+| `CollectionLedger.redeem` | cauldron/CollectionLedger.sol:163 | registry | NONE | fresh |
+| `CollectionLedger.buyback` | cauldron/CollectionLedger.sol:176 | registry | NONE | fresh |
+| `CollectionLedger.crystallize` | cauldron/CollectionLedger.sol:189 | registry | NONE | fresh |
 | `GachaLib.resolveTickets` | cauldron/GachaLib.sol:173 | anyone at linked library address; protocol reaches it by delegatecall… | NONE | fresh |
 | `MiFrensDividend.setRegistry` | cauldron/MiFrensDividend.sol:189 | treasury | NONE | fresh |
 | `MiFrensDividend.setFunder` | cauldron/MiFrensDividend.sol:199 | treasury | NONE | fresh |
-| `MiFrensDividend.fundToken` | cauldron/MiFrensDividend.sol:273 | funder (hook), wired once by treasury | pulls requested ERC20 `amount` of `asset` from fu… | fresh |
-| `MiFrensDividend.adopt` | cauldron/MiFrensDividend.sol:323 | anyone for known assets; funder or treasury for a new asset | books ERC20 balance already held by this contract… | fresh |
-| `MiFrensDividend.claimTokens` | cauldron/MiFrensDividend.sol:357 | holder of token who is also its caster | ERC20 push of `a` to `msg.sender` (line 375) | fresh |
-| `MiFrensDividend.withdrawOwedToken` | cauldron/MiFrensDividend.sol:383 | anyone (pays only the caller's own banked balance) | ERC20 push of `asset` to `msg.sender` (line 390) | fresh |
-| `MiFrensDividend.castSpell` | cauldron/MiFrensDividend.sol:434 | holder of token | NONE | fresh |
-| `MiFrensDividend.castMany` | cauldron/MiFrensDividend.sol:439 | holder of token | NONE | fresh |
-| `MiFrensDividend.onMiFrenTransfer` | cauldron/MiFrensDividend.sol:523 | the MiFrens collection | NONE | fresh |
-| `MiFrensDividend.claim` | cauldron/MiFrensDividend.sol:561 | holder of token who is also its caster | sends native to `msg.sender` (line 597) | fresh |
-| `MiFrensDividend.claimMany` | cauldron/MiFrensDividend.sol:566 | holder of token who is also its caster | sends native to `msg.sender` (line 597) | fresh |
-| `MiFrensDividend.withdrawOwed` | cauldron/MiFrensDividend.sol:577 | anyone (pays only the caller's own banked balance) | sends native to `msg.sender` (line 582) | fresh |
+| `MiFrensDividend.fundToken` | cauldron/MiFrensDividend.sol:278 | funder (hook), wired once by treasury | pulls requested ERC20 `amount` of `asset` from fu… | fresh |
+| `MiFrensDividend.adopt` | cauldron/MiFrensDividend.sol:328 | anyone for known assets; funder or treasury for a new asset | books ERC20 balance already held by this contract… | fresh |
+| `MiFrensDividend.claimTokens` | cauldron/MiFrensDividend.sol:362 | holder of token who is also its caster | ERC20 push of `a` to `msg.sender` (line 380) | fresh |
+| `MiFrensDividend.withdrawOwedToken` | cauldron/MiFrensDividend.sol:388 | anyone (pays only the caller's own banked balance) | ERC20 push of `asset` to `msg.sender` (line 395) | fresh |
+| `MiFrensDividend.pushTokenIsolated` | cauldron/MiFrensDividend.sol:429 | this contract only (self-call) | transfers `amount` of `asset` from the dividend t… | fresh |
+| `MiFrensDividend.castSpell` | cauldron/MiFrensDividend.sol:454 | holder of token | NONE | fresh |
+| `MiFrensDividend.castMany` | cauldron/MiFrensDividend.sol:459 | holder of token | NONE | fresh |
+| `MiFrensDividend.onMiFrenTransfer` | cauldron/MiFrensDividend.sol:543 | the MiFrens collection | NONE | fresh |
+| `MiFrensDividend.claim` | cauldron/MiFrensDividend.sol:581 | holder of token who is also its caster | sends native to `msg.sender` (line 617) | fresh |
+| `MiFrensDividend.claimMany` | cauldron/MiFrensDividend.sol:586 | holder of token who is also its caster | sends native to `msg.sender` (line 617) | fresh |
+| `MiFrensDividend.withdrawOwed` | cauldron/MiFrensDividend.sol:597 | anyone (pays only the caller's own banked balance) | sends native to `msg.sender` (line 602) | fresh |
 | `MiFrensGenesis.setMaxPerWallet` | cauldron/MiFrensGenesis.sol:356 | deployer | NONE | fresh |
 | `MiFrensGenesis.setUnrevealedURI` | cauldron/MiFrensGenesis.sol:372 | deployer | NONE | fresh |
 | `MiFrensGenesis.setRegistry` | cauldron/MiFrensGenesis.sol:378 | deployer | NONE | fresh |
-| `MiFrensGenesis.mint` | cauldron/MiFrensGenesis.sol:391 | anyone | receives native - exact `msg.value` required (lin… | stale |
-| `MiFrensGenesis.mintDiscounted` | cauldron/MiFrensGenesis.sol:398 | ? | ? | missing |
-| `MiFrensGenesis.setDiscountRoot` | cauldron/MiFrensGenesis.sol:414 | ? | ? | missing |
-| `MiFrensGenesis.setDiscountSetter` | cauldron/MiFrensGenesis.sol:421 | ? | ? | missing |
+| `MiFrensGenesis.mint` | cauldron/MiFrensGenesis.sol:391 | anyone | receives native - exact `msg.value` of the public… | fresh |
+| `MiFrensGenesis.mintDiscounted` | cauldron/MiFrensGenesis.sol:398 | frenlisted wallets, up to their allowance | receives native - exact `msg.value` of the discou… | fresh |
+| `MiFrensGenesis.setDiscountRoot` | cauldron/MiFrensGenesis.sol:414 | deployer or the discount setter | NONE | fresh |
+| `MiFrensGenesis.setDiscountSetter` | cauldron/MiFrensGenesis.sol:421 | deployer | NONE | fresh |
 | `MiFrensGenesis.cancelPresale` | cauldron/MiFrensGenesis.sol:468 | deployer | NONE | fresh |
-| `MiFrensGenesis.refund` | cauldron/MiFrensGenesis.sol:479 | anyone (pays out only to a caller with a recorded balance) | sends native to `msg.sender` (line 375) | fresh |
+| `MiFrensGenesis.refund` | cauldron/MiFrensGenesis.sol:479 | anyone (pays out only to a caller with a recorded balance) | sends native to `msg.sender` (line 484) | fresh |
 | `MiFrensGenesis.setMinter` | cauldron/MiFrensGenesis.sol:512 | deployer or registry | NONE | fresh |
 | `MiFrensGenesis.setVault` | cauldron/MiFrensGenesis.sol:517 | deployer or registry | NONE | fresh |
 | `MiFrensGenesis.setDividend` | cauldron/MiFrensGenesis.sol:522 | deployer or registry | NONE | fresh |
@@ -387,11 +389,11 @@ Files: `cauldron/CauldronGovernor.sol`, `cauldron/TreasuryGovernor.sol`
 | `CauldronGovernor.markConsumed` | cauldron/CauldronGovernor.sol:763 | registry | NONE | fresh |
 | `TreasuryGovernor.propose` | cauldron/TreasuryGovernor.sol:415 | caller satisfying the in-body msg.sender check | NONE | fresh |
 | `TreasuryGovernor.vote` | cauldron/TreasuryGovernor.sol:468 | anyone holding checkpointed MiFrens power at the proposal's snapshot | none - it only records votes (DERIVED) | fresh |
-| `TreasuryGovernor.execute` | cauldron/TreasuryGovernor.sol:588 | anyone | NONE | fresh |
-| `TreasuryGovernor.cancel` | cauldron/TreasuryGovernor.sol:651 | guardian | NONE | fresh |
-| `TreasuryGovernor.setGuardian` | cauldron/TreasuryGovernor.sol:666 | guardian only | none (DERIVED) | fresh |
-| `TreasuryGovernor.consume` | cauldron/TreasuryGovernor.sol:935 | caller satisfying the in-body msg.sender check | NONE | fresh |
-| `TreasuryGovernor.setQuoteOracle` | cauldron/TreasuryGovernor.sol:1052 | guardian | NONE | fresh |
+| `TreasuryGovernor.execute` | cauldron/TreasuryGovernor.sol:591 | anyone | NONE | fresh |
+| `TreasuryGovernor.cancel` | cauldron/TreasuryGovernor.sol:657 | guardian | NONE | fresh |
+| `TreasuryGovernor.setGuardian` | cauldron/TreasuryGovernor.sol:675 | guardian only | none (DERIVED) | fresh |
+| `TreasuryGovernor.consume` | cauldron/TreasuryGovernor.sol:944 | caller satisfying the in-body msg.sender check | NONE | fresh |
+| `TreasuryGovernor.setQuoteOracle` | cauldron/TreasuryGovernor.sol:1061 | guardian | NONE | fresh |
 
 ## seed
 
@@ -413,8 +415,8 @@ Files: `cauldron/CauldronSeeder.sol`, `cauldron/SeedLib.sol`, `cauldron/ISeeder.
 | `MigrationVesting.vestBatch` | cauldron/MigrationVesting.sol:191 | anyone | NONE | fresh |
 | `MigrationVesting.claim` | cauldron/MigrationVesting.sol:249 | anyone | NONE | fresh |
 | `MigrationVesting.claimFor` | cauldron/MigrationVesting.sol:256 | anyone | NONE | fresh |
-| `MigrationVesting.setVestWindow` | cauldron/MigrationVesting.sol:352 | owner | NONE | fresh |
-| `MigrationVesting.setStakerOracle` | cauldron/MigrationVesting.sol:359 | owner | NONE | fresh |
+| `MigrationVesting.setVestWindow` | cauldron/MigrationVesting.sol:361 | owner | NONE | fresh |
+| `MigrationVesting.setStakerOracle` | cauldron/MigrationVesting.sol:368 | owner | NONE | fresh |
 
 ## art
 
@@ -436,21 +438,21 @@ Files: `deploy/DeployCauldron.s.sol`, `deploy/DeployLaunchSniper.s.sol`, `deploy
 
 | function | where | who can call | value | map |
 |---|---|---|---|---|
-| `DeployCauldron (declared in DeployCauldron.s.sol).run` | deploy/DeployCauldron.s.sol:45 | off-chain script invoker; broadcast authority comes from configured k… | NONE | fresh |
+| `DeployCauldron (declared in DeployCauldron.s.sol).run` | deploy/DeployCauldron.s.sol:55 | off-chain script invoker; broadcast authority is whichever key the op… | Broadcasts the genesis summon with GENESIS_ETH of… | fresh |
 | `DeployLaunchSniper (declared in DeployLaunchSniper.s.sol).r…` | deploy/DeployLaunchSniper.s.sol:28 | off-chain script invoker; broadcast authority comes from configured k… | NONE | fresh |
-| `DeployLaunchpad (declared in DeployLaunchpad.s.sol).run` | deploy/DeployLaunchpad.s.sol:114 | caller satisfying the in-body msg.sender check | NONE | stale |
-| `DeployMigrationVesting (declared in DeployMigrationVesting.…` | deploy/DeployMigrationVesting.s.sol:54 | off-chain script invoker; broadcast authority comes from configured k… | NONE | fresh |
+| `DeployLaunchpad (declared in DeployLaunchpad.s.sol).run` | deploy/DeployLaunchpad.s.sol:114 | off-chain script invoker; broadcast authority is whichever key the op… | NONE | fresh |
+| `DeployMigrationVesting (declared in DeployMigrationVesting.…` | deploy/DeployMigrationVesting.s.sol:55 | off-chain script invoker; broadcast authority is whichever key the op… | NONE | fresh |
 | `DeployPerp (declared in DeployPerp.s.sol).run` | deploy/DeployPerp.s.sol:65 | off-chain script invoker; broadcast authority comes from configured k… | NONE | fresh |
 | `DeployQuoteAssets (declared in DeployQuoteAssets.s.sol).run` | deploy/DeployQuoteAssets.s.sol:29 | off-chain script invoker; broadcast authority comes from configured k… | NONE | fresh |
 | `DeployRenderer (declared in DeployRenderer.s.sol).run` | deploy/DeployRenderer.s.sol:38 | off-chain script invoker; broadcast authority comes from configured k… | NONE | fresh |
 | `DeployRotationStack (declared in DeployRotationStack.s.sol)…` | deploy/DeployRotationStack.s.sol:111 | caller satisfying the in-body msg.sender check | transfers token or native value through `transfer… | fresh |
 | `DeployV4Core (declared in DeployV4Core.s.sol).run` | deploy/DeployV4Core.s.sol:55 | caller satisfying the in-body msg.sender check | NONE | fresh |
-| `FixFactoryWiring (declared in FixFactoryWiring.s.sol).run` | deploy/FixFactoryWiring.s.sol:33 | off-chain script invoker; broadcast authority comes from configured k… | NONE | fresh |
+| `FixFactoryWiring (declared in FixFactoryWiring.s.sol).run` | deploy/FixFactoryWiring.s.sol:33 | off-chain script invoker; broadcast authority is whichever key the op… | NONE | fresh |
 | `RecoverVenue (declared in TopUpVenue.s.sol).run` | deploy/TopUpVenue.s.sol:102 | off-chain script invoker; broadcast authority comes from configured k… | NONE | fresh |
 | `SellVolume (declared in SellVolume.s.sol).run` | deploy/SellVolume.s.sol:24 | off-chain script invoker; broadcast authority comes from configured k… | NONE | fresh |
 | `SnipeBuy (declared in SnipeBuy.s.sol).run` | deploy/SnipeBuy.s.sol:50 | off-chain script invoker; broadcast authority comes from configured k… | NONE | fresh |
 | `SwapVolume (declared in SwapVolume.s.sol).run` | deploy/SwapVolume.s.sol:35 | off-chain script invoker; broadcast authority comes from configured k… | NONE | fresh |
 | `TopUpVenue (declared in TopUpVenue.s.sol).run` | deploy/TopUpVenue.s.sol:55 | off-chain script invoker; broadcast authority comes from configured k… | NONE | fresh |
-| `VenueSeeder (declared in DeployRotationStack.s.sol).seed` | deploy/DeployRotationStack.s.sol:271 | caller satisfying the in-body msg.sender check | NONE | fresh |
-| `VenueSeeder (declared in DeployRotationStack.s.sol).seedBand` | deploy/DeployRotationStack.s.sol:329 | caller satisfying the in-body msg.sender check | NONE | fresh |
-| `VenueSeeder (declared in DeployRotationStack.s.sol).recover` | deploy/DeployRotationStack.s.sol:419 | caller satisfying the in-body msg.sender check | transfers token or native value through `transfer… | fresh |
+| `VenueSeeder (declared in DeployRotationStack.s.sol).seed` | deploy/DeployRotationStack.s.sol:271 | the seeder's deployer | Mints a full-range ETH/USDG position with the att… | fresh |
+| `VenueSeeder (declared in DeployRotationStack.s.sol).seedBand` | deploy/DeployRotationStack.s.sol:330 | the seeder's deployer | Mints a concentrated ETH/USDG band with the attac… | fresh |
+| `VenueSeeder (declared in DeployRotationStack.s.sol).recover` | deploy/DeployRotationStack.s.sol:423 | caller satisfying the in-body msg.sender check | transfers token or native value through `transfer… | fresh |

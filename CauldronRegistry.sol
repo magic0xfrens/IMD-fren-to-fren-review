@@ -470,18 +470,15 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
         enchantFeeMultBps = bps;
     }
 
-    /// @notice Break-glass: pull a generation's LP (ETH + tokens) to the admin.
+    /// @notice Break-glass: pull a generation's LP (quote + tokens) to the admin.
     ///         Timelocked on mainnet (arm → wait → execute); instant on testnet.
-    function emergencyWithdrawLP(uint256 gen) external onlyEmergency timelocked nonReentrant {
-        (uint256 eth, uint256 tokens) = _removeLiquidity(gen);
-        address tok = generationToken[gen];
-        if (tokens > 0) IERC20(tok).transfer(emergencyAdmin, tokens);
-        if (eth > 0) {
-            (bool ok, ) = emergencyAdmin.call{value: eth}("");
-            if (!ok) revert EthSend();
-        }
-        emit EmergencyWithdraw(gen, emergencyAdmin, eth, tokens);
-    }
+    ///
+    ///  AUTHORITY AND THE ARM ARE CHECKED HERE, on this contract's immutable admin
+    ///  and delay; the teardown and payout run in RedemptionExt, because paying the
+    ///  recovered quote in the generation's own asset did not fit under EIP-170.
+    ///  No `nonReentrant` on this stub: `_forwardToExt` returns from assembly, so a
+    ///  modifier's exit path would never run. The facet body holds the shared lock.
+    function emergencyWithdrawLP(uint256) external onlyEmergency timelocked { _forwardToExt(); }
 
     /// @notice Break-glass: sweep the registry's ETH (token==0) or an ERC20 to
     ///         the admin. Timelocked on mainnet; instant on testnet.
@@ -1052,6 +1049,12 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
         // Fold the OG share of iteration-#2 live buybacks into the redemption floor
         // BEFORE sizing, so the new reserve covers the grown OG entitlement and the
         // OG floor "moons" into the new iteration alongside the forged floor.
+        //  Flush the dying collection's un-materialized buybacks FIRST, so the OG
+        //  share it returns lands in genesisPending BEFORE this fold and is covered
+        //  by the reserve sized below. Flushing after the fold left that share
+        //  unbacked until the NEXT relaunch (FS-registry-L02).
+        bool hasLedger = address(collectionLedger) != address(0);
+        if (hasLedger) _flushLegacyAtRelaunch(oldGen, oldToken);
         genesisReserveOutstanding += genesisPending;
         genesisPending = 0;
         uint256 unclaimedGenesis = genesisReserveOutstanding;
@@ -1087,8 +1090,7 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
         // 8b. LEGACY FLOOR: flush any un-materialized live buybacks into the dying
         //     collection's ledger FIRST (so sizing covers them), crystallize it, then
         //     carve its reserve out of the new active supply.
-        if (address(collectionLedger) != address(0)) {
-            _flushLegacyAtRelaunch(oldGen, oldToken);
+        if (hasLedger) {
             PoolOps.crystallizeCollection(
                 address(collectionLedger), generationCollection[oldGen], generationVault[oldGen],
                 oldGen, vaultSwept, newActive, totalETH
@@ -1187,10 +1189,20 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
             //  leaving the winning proposal live for a retry with more gas. The
             //  work is bounded (64-position book, ~7.5M gas), so a retry always
             //  fits in a block and this can never wedge the machine.
-            uint256 g = gasleft();
-            if (g > RELAUNCH_TAIL_RESERVE) {
-                hook.forceClosePerps{gas: g - RELAUNCH_TAIL_RESERVE}();
-            }
+            //
+            //  NOR MAY IT BE SKIPPED (FS-relaunch-01). This was guarded by
+            //  `if (gasleft() > RELAUNCH_TAIL_RESERVE)`, and the rest of the
+            //  rebirth fits in well under that reserve — so a caller who sent
+            //  just enough gas to land here at <= 8M skipped the close entirely,
+            //  never reached the hook's `PerpsOpen` check, and completed the
+            //  relaunch with the book stranded exactly as described above.
+            //  Measured on local managers: 6.0M-8.0M caps completed with every
+            //  position open and unrecoverable, and `eth_estimateGas` searches
+            //  for the lowest succeeding limit, so an honest wallet lands there
+            //  too. The subtraction is checked: below the reserve it reverts,
+            //  and a budget too small for the close reverts through the call,
+            //  so the rebirth either drains the book or does not happen.
+            hook.forceClosePerps{gas: gasleft() - RELAUNCH_TAIL_RESERVE}();
         }
     }
 

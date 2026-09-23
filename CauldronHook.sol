@@ -1535,9 +1535,22 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
         bool routed;
         IFeeRouter fr = feeRouter;
         if (address(fr) != address(0)) {
-            try fr.route(feeAmount, guild, vault, guildBps, floorBps) returns (uint256 g, uint256 f, uint256 r) {
-                if (g + f + r == feeAmount) { wantGuild = g; wantFloor = f; wantRelaunch = r; routed = true; }
-            } catch { /* fall through to built-in */ }
+            bytes memory input = abi.encodeCall(IFeeRouter.route, (feeAmount, guild, vault, guildBps, floorBps));
+            uint256[3] memory split;
+            // Bound return copying and validate before accepting a custom split.
+            // Typed try/catch does not catch malformed return decoding.
+            assembly ("memory-safe") {
+                routed := staticcall(gas(), fr, add(input, 32), mload(input), split, 96)
+                routed := and(routed, iszero(lt(returndatasize(), 96)))
+            }
+            if (routed) {
+                uint256 g = split[0];
+                uint256 f = split[1];
+                uint256 r = split[2];
+                // Subtraction bounds also reject overflowing sums without panic.
+                routed = g <= feeAmount && f <= feeAmount - g && r == feeAmount - g - f;
+                if (routed) { wantGuild = g; wantFloor = f; wantRelaunch = r; }
+            }
         }
         if (!routed) {
             // Built-in: guildBps off the top → floorBps of remainder → rest relaunch.
@@ -2440,10 +2453,19 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
     function nftPriceAt(uint256 k) public view returns (uint256) {
         ICurvePolicy pol = curvePolicy;
         if (address(pol) != address(0)) {
-            try pol.priceAt(k, volumePerNFT, nftPriceStep) returns (uint256 c) {
-                // A zero cost would let credit mint infinite NFTs — guard it.
-                if (c > 0) return c;
-            } catch { /* fall through */ }
+            //  One bounded word, like the surtax/router reads (FS-hook-L01): a
+            //  typed `try` cannot catch a reply too short to decode, so a
+            //  malformed policy used to revert commits instead of falling back.
+            bytes memory input = abi.encodeCall(ICurvePolicy.priceAt, (k, volumePerNFT, nftPriceStep));
+            bool valid;
+            uint256 c;
+            assembly ("memory-safe") {
+                let ok := staticcall(gas(), pol, add(input, 32), mload(input), 0, 32)
+                valid := and(ok, iszero(lt(returndatasize(), 32)))
+                c := mload(0)
+            }
+            // A zero cost would let credit mint infinite NFTs — guard it.
+            if (valid && c > 0) return c;
         }
         return volumePerNFT + k * nftPriceStep;
     }
