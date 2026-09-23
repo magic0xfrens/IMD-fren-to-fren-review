@@ -1,0 +1,167 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.26;
+
+import {Test} from "forge-std/Test.sol";
+import {TreasuryGovernor, IVotes721} from "../../cauldron/TreasuryGovernor.sol";
+
+/// @dev Minimal ERC721Votes stand-in. Every account holds 10 votes; total supply
+///      is 100, so QUORUM_BPS (10%) needs exactly 10 FOR-votes.
+contract X2aVotes {
+    function getVotes(address) external pure returns (uint256) { return 10; }
+    function getPastVotes(address, uint256) external pure returns (uint256) { return 10; }
+    function getPastTotalSupply(uint256) external pure returns (uint256) { return 100; }
+}
+
+/**
+ * X2a — REGRESSION. A voted MIGRATION mandate could be spent to zero without ever
+ *       migrating; now a full-position envelope refuses to pay for anything but
+ *       the migration it was voted for.
+ *
+ * TreasuryGovernor.consume (TreasuryGovernor.sol:697) debits ONE budget:
+ *      e.movedBps += bps;                          // every slice
+ *      if (fromPrimary) e.movedPrimaryBps += bps;  // only primary slices
+ *      if (e.movedBps >= e.maxTotalBps) e.active = false;
+ * while migrationMandateSpent (TreasuryGovernor.sol:683) requires
+ *      e.maxTotalBps >= 10_000 && e.movedPrimaryBps >= e.maxTotalBps
+ * and RedemptionExt.rotateSliceFrom (RedemptionExt.sol:505) is the ONLY writer of
+ * generationQuote for a live generation, gated on that flag.
+ *
+ * `fromPrimary` is `fromLeg == 0`, and `fromLeg` is an argument of the
+ * PERMISSIONLESS RedemptionExt.rotateSliceFrom. So anyone could route the guild's
+ * whole migration budget through a secondary leg: movedBps reaches maxTotalBps,
+ * the envelope deactivates, and movedPrimaryBps never can.
+ *
+ * REACHABILITY (the verifier's narrowed precondition, asserted below): a secondary
+ * leg in a DIFFERENT quote must already exist, because `_recordLeg` upserts by
+ * quote (RedemptionExt.sol:676) and `fromQuote == toQuote` reverts BadConfig
+ * (RedemptionExt.sol:358). So a generation's FIRST migration cannot be starved and
+ * every migration after one is a candidate.
+ *
+ * FIX: TreasuryGovernor.consume refuses `fromPrimary == false` while the envelope is
+ * a full-position migration mandate (`maxTotalBps >= BPS_ONE`). Partial envelopes —
+ * every envelope that is not a migration — still fund leg-to-leg rebalancing.
+ *
+ * This test drives TreasuryGovernor directly as the registry (the only caller
+ * `consume` accepts), which is exactly the call RedemptionExt.sol:437 makes.
+ */
+contract X2a_MigrationMandateStarvation is Test {
+    TreasuryGovernor internal gov;
+    X2aVotes internal votes;
+
+    // TreasuryGovernor reads `IRegistryQuotes(registry).allowedQuote` — this
+    // contract IS the registry, so the allowlist lives here.
+    function allowedQuote(address) external pure returns (bool) { return true; }
+
+    address internal constant USDG = address(0xDDDD);
+
+    function setUp() public {
+        votes = new X2aVotes();
+        // zeros => mainnet defaults: 3d vote, 30d envelope, 7d cooldown, 3d window.
+        gov = new TreasuryGovernor(IVotes721(address(votes)), address(this), address(this), 0, 0, 0, 0, false);
+        vm.warp(100 days);
+        vm.roll(1000);
+    }
+
+    /// @dev File + pass + install a FULL-POSITION migration envelope (10_000 bps).
+    function _installFullMigrationEnvelope() internal returns (uint256 id) {
+        id = gov.propose(USDG, 10_000);
+        gov.vote(id, true);
+        vm.warp(block.timestamp + 3 days + 1);
+        gov.execute(id);
+    }
+
+    /// @dev Try to spend the envelope out of a SECONDARY leg (fromPrimary = false).
+    ///      Returns false when the governor refuses.
+    function _trySecondaryLegSlice(uint16 bps) internal returns (bool ok) {
+        try gov.consume(bps, false) { ok = true; } catch { ok = false; }
+    }
+
+    /// @dev Spend the whole envelope out of the PRIMARY position — the honest path.
+    function _spendFromPrimary() internal {
+        for (uint256 i; i < 4; ++i) gov.consume(2500, true);
+    }
+
+    /// @dev Can the guild file a replacement right now?
+    function _canReproposeNow() internal returns (bool) {
+        try gov.propose(USDG, 10_000) returns (uint256) { return true; } catch { return false; }
+    }
+
+    /// @dev Is any further slice authorised under the envelope?
+    function _remaining() internal view returns (uint16 left) {
+        (, left) = gov.allowance();
+    }
+
+    // ── POSITIVE CONTROL: the property that is supposed to hold ──────────────
+
+    function test_X2a_control_primarySlicesCompleteTheMigration() public {
+        _installFullMigrationEnvelope();
+        _spendFromPrimary();
+        bool spent = gov.migrationMandateSpent();
+        uint16 left = _remaining();
+        assertTrue(spent, "a full mandate consumed out of the primary MUST declare the migration done");
+        assertEq(left, 0, "and the envelope is exhausted");
+    }
+
+    // ── THE ATTACK ───────────────────────────────────────────────────────────
+
+    function test_X2a_legSlicesCannotStarveTheMigrationMandate() public {
+        _installFullMigrationEnvelope();
+
+        // THE ATTACK: spend the guild's whole migration budget out of a secondary
+        // leg. The slices still RUN — leg-to-leg rebalancing is authorised under
+        // this envelope and rotating a leg home to ether is a normal move — they
+        // simply meter against their own budget now.
+        for (uint256 i; i < 4; ++i) {
+            assertTrue(_trySecondaryLegSlice(2500), "secondary rebalancing still works");
+        }
+        assertFalse(_trySecondaryLegSlice(1), "and is still bounded by what the guild voted");
+
+        // The migration's own budget is untouched by all of it.
+        assertEq(_remaining(), 10_000, "FIXED: the voted migration budget survives intact");
+        assertFalse(gov.migrationMandateSpent(), "not yet spent - but still spendABLE");
+
+        // ...and the honest path still completes it, under the very same envelope.
+        _spendFromPrimary();
+        assertTrue(gov.migrationMandateSpent(), "the primary path still migrates the generation");
+        assertEq(_remaining(), 0, "and exhausts the envelope");
+        emit log_string("X2a: full mandate is exclusive to the primary position");
+    }
+
+    /// @dev The fix must not kill rebalancing. A PARTIAL envelope — anything a guild
+    ///      votes that is not a whole-position migration — still pays for leg-to-leg
+    ///      slices, which is what `fromLeg` exists for.
+    function test_X2a_partialEnvelopeStillFundsLegRebalancing() public {
+        uint256 id = gov.propose(USDG, 2_500);      // a quarter, not a migration
+        gov.vote(id, true);
+        vm.warp(block.timestamp + 3 days + 1);
+        gov.execute(id);
+
+        assertTrue(_trySecondaryLegSlice(1_000), "a partial envelope funds a secondary leg");
+
+        //  ── THE NUMBER MOVED, AND THAT WAS THE FIX (commit 5b2f2b5, T2a) ────
+        //  This asserted `_remaining() == 1_500`: a secondary slice debited the
+        //  budget `allowance()` reports. That asymmetry — migration mandates
+        //  metered on `movedPrimaryBps`, partial ones on the shared `movedBps` —
+        //  WAS the bug. One permissionless `rotateSliceFrom(fromLeg != 0, 2500)`
+        //  drove a partial envelope's remainder to zero out of a side pool,
+        //  deactivated it and left COOLDOWN blocking the replacement, so a partial
+        //  mandate could never execute against the primary.
+        //
+        //  `allowance()` now reports, for EVERY envelope, the progress of the
+        //  position the guild voted about — the sibling test above already
+        //  asserts exactly this for a migration mandate (`_remaining() == 10_000`
+        //  after four secondary slices). 2_500 is that same number here.
+        assertEq(_remaining(), 2_500, "the VOTED budget is not debited by a side leg (5b2f2b5)");
+
+        //  Rebalancing is still metered and still bounded — on `movedBps` against
+        //  `maxTotalBps`, which is the meter it always had. 1_000 of 2_500 is gone,
+        //  so 1_500 more fits and not one bp beyond it. That is what "debited for
+        //  it" means now, and it is asserted rather than inferred.
+        assertTrue(_trySecondaryLegSlice(1_500), "the rest of the leg-to-leg budget is still there");
+        assertFalse(_trySecondaryLegSlice(1), "and it IS debited: nothing beyond the voted total");
+
+        //  Meanwhile the mandate the guild actually voted for is still spendable.
+        assertEq(_remaining(), 2_500, "the primary budget survived the rebalancing in full");
+        assertFalse(gov.migrationMandateSpent(), "a partial envelope never declares a migration");
+    }
+}

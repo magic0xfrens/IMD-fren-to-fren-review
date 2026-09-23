@@ -1,0 +1,16 @@
+{
+  "source": "https://github.com/magic0xfrens/Magic-Internet-Frens",
+  "commit": "72832ad21332f9febb9540d6237405712f886880",
+  "round": 1,
+  "exported_at": "2026-09-23T10:06:16+00:00",
+  "overlay": [
+    "contracts/solidity/test/fren-review",
+    "contracts/solidity/test/GenesisDiscountMint.t.sol",
+    "contracts/solidity/cauldron/MiFrensGenesis.sol"
+  ],
+  "submodules": {
+    "lib/openzeppelin-contracts": "5fd1781b1454fd1ef8e722282f86f9293cacf256",
+    "lib/v4-core": "46c6834698c48bc4a463a86d8420f4eb1d7f3b75",
+    "lib/v4-periphery": "07336f2144f522874e2c3c85e04d1d3f8d5fa471"
+  }
+}

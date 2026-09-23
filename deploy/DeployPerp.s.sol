@@ -1,0 +1,267 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.26;
+
+import {Script, console2} from "forge-std/Script.sol";
+import {IPoolManager} from "v4-core/src/interfaces/IPoolManager.sol";
+import {PerpEngine} from "../cauldron/PerpEngine.sol";
+import {PerpVault} from "../cauldron/PerpVault.sol";
+import {PerpMarkSource} from "../cauldron/PerpMarkSource.sol";
+import {PoolKey} from "v4-core/src/types/PoolKey.sol";
+import {Currency} from "v4-core/src/types/Currency.sol";
+import {IHooks} from "v4-core/src/interfaces/IHooks.sol";
+
+interface IHookWire {
+    function setPerpEngine(address engine) external;
+    function collection() external view returns (address);
+}
+interface ICollLiq {
+    function liquidatorMinter() external view returns (address);
+}
+interface IPerpVaultDeposit {
+    function depositEth() external payable returns (uint256);
+}
+interface IOwnable {
+    function transferOwnership(address newOwner) external;
+}
+interface IRegistryGen {
+    function currentGeneration() external view returns (uint256);
+    function generationPoolKey(uint256 gen)
+        external
+        view
+        returns (Currency currency0, Currency currency1, uint24 fee, int24 tickSpacing, IHooks hooks);
+}
+
+/**
+ * @title DeployPerp
+ * @notice POST-SUMMON deploy of the hook-native perp stack for a live Cauldron.
+ *         Run this AFTER the launchpad has been deployed and gen-1 has summoned
+ *         (finalize()), because the engine reads the live pool for its TWAP seed.
+ *
+ *  Deploys + wires:
+ *    1. PerpEngine(poolManager, hook, registry, mifrens, dividend, treasury, owner)
+ *    2. PerpVault(engine, registry)                — Community PLV (LP-for-perps)
+ *    3. hook.setPerpEngine(engine)                 — enables afterSwap auto-liq
+ *                                                    AND auto-wires the current
+ *                                                    collection's badge minter
+ *    4. engine.setHook(hook)                        — badge-mint target lookup
+ *    5. engine.setVault(vault)                      — activates fee→LP/insurance
+ *    6. (optional) seed the ETH PLV via the vault so longs work immediately
+ *
+ *  Env:
+ *    PRIVATE_KEY        deployer/owner (required)
+ *    POOL_MANAGER       V4 PoolManager (required)
+ *    HOOK               the launchpad's CauldronHook (required)
+ *    REGISTRY           the launchpad's CauldronRegistry (required)
+ *    PRESALE            MiFrensGenesis (for the OG open-fee discount) (required)
+ *    DIVIDEND           MiFrensDividend (fee sink) (required)
+ *    TREASURY           treasury (default: deployer)
+ *    PLV_SEED_ETH       ETH to seed the vault/PLV so longs open (default 0)
+ *
+ *  Run (from contracts/solidity):
+ *    FOUNDRY_PROFILE=cauldron forge script deploy/DeployPerp.s.sol \
+ *      --rpc-url $SEPOLIA_RPC --broadcast -vvv
+ */
+contract DeployPerp is Script {
+    function run() external {
+        uint256 pk = vm.envUint("PRIVATE_KEY");
+        address deployer = vm.addr(pk);
+        address poolManager = vm.envAddress("POOL_MANAGER");
+        address hook = vm.envAddress("HOOK");
+        address registry = vm.envAddress("REGISTRY");
+        address presale = vm.envAddress("PRESALE");
+        address dividend = vm.envAddress("DIVIDEND");
+        address treasury = vm.envOr("TREASURY", deployer);
+        uint256 seed = vm.envOr("PLV_SEED_ETH", uint256(0));
+        // The governance timelock (from DeployLaunchpad). If set, this script hands
+        // BOTH the hook and the engine to it as the final step — so from launch,
+        // every param/policy/fee-router change is timelock.schedule → wait →
+        // execute. Leave unset (0) only for throwaway local tests.
+        address timelock = vm.envOr("TIMELOCK", address(0));
+
+        vm.startBroadcast(pk);
+
+        PerpEngine engine = new PerpEngine(
+            IPoolManager(poolManager), hook, registry, presale, dividend, treasury, deployer
+        );
+        console2.log("PerpEngine     :", address(engine));
+
+        PerpVault vault = new PerpVault(address(engine), registry);
+        console2.log("PerpVault      :", address(vault));
+
+        // Wire. The engine already knows the hook (constructor `hookAddr`), so it
+        // reads hook.collection() for badge minting. setPerpEngine enables the
+        // afterSwap auto-liq AND auto-wires the live collection's badge minter.
+        IHookWire(hook).setPerpEngine(address(engine));
+        // NOTE: the engine is NOT permanently tax-exempt — perp swaps SHOULD pay the
+        // hook fee (they're high-volume revenue for the dividend/floor/reserve). The
+        // registry exempts the engine ONLY for the split-second of the relaunch
+        // force-close (see CauldronRegistry._perpHousekeep), so force-close swaps
+        // don't nest into the legacy buyback on the dying pool.
+        engine.setVault(address(vault));
+        // AUDIT (M-05): `insuranceFloor` defaults to 0, which BOTH disables the
+        // opens circuit-breaker (`insuranceEth < insuranceFloor` is never true) and
+        // — before the risk-based guard was added — let `skimInsurance` drain the
+        // entire bad-debt buffer. Arm it explicitly at deploy.
+        engine.setVaultLimits(
+            vm.envOr("MAX_UTIL_BPS", uint256(8_000)),
+            vm.envOr("INSURANCE_FLOOR_WEI", uint256(0.05 ether))
+        );
+
+        //  ── WARMUP AND THE OPENING INSURANCE ──────────────────────────────
+        //  `warmup` defaults to 24 HOURS, which is right for mainnet (it is what
+        //  keeps a fresh pool's TWAP from being opened against before it has any
+        //  history) and makes a testnet perp untestable: every other testnet
+        //  timing is cut to minutes and this one was never in that list, so the
+        //  first live attempt reverted `NotWarm` with nothing on screen saying
+        //  why. Overridable, and left at the safe default when unset.
+        uint256 warmup = vm.envOr("PERP_WARMUP", uint256(0));
+        if (warmup != 0) {
+            engine.setRisk(warmup, 3, 1_500, 500, 3_000, 100);
+            console2.log("  warmup (s)     :", warmup);
+        }
+
+        //  SEED THE INSURANCE BUFFER. It absorbs bad debt a liquidation cannot
+        //  cover and fills from trading FEES — so a brand-new engine has none,
+        //  `insuranceEth < insuranceFloor` holds, and every open reverts
+        //  `InsurancePaused` until somebody trades. That is correct behaviour and
+        //  a terrible first impression, and the alternative (lowering the floor)
+        //  would make opens work by deleting the protection rather than meeting
+        //  it. `fundInsurance` is permissionless, so this is just pre-paying it.
+        uint256 seedIns = vm.envOr("INSURANCE_SEED_WEI", uint256(0));
+        if (seedIns != 0) {
+            engine.fundInsurance{value: seedIns}(seedIns);
+            console2.log("  insurance seed :", seedIns);
+        }
+
+        // LIQUIDATION-MARK GUARDS, SET AT DEPLOY (audit F-12).
+        //
+        //  These used to be left at the contract defaults with a runbook note to
+        //  "set risk params via cast BEFORE the handoff". That step did not happen:
+        //  the round-31 engine still reads `twapWindow == 300` on-chain. A pending
+        //  manual step behind an ownership transfer is a step that silently never
+        //  runs, so the window is now an explicit deploy parameter and is correct
+        //  from birth.
+        //
+        //  CHOOSING `TWAP_WINDOW`. This is the averaging window for the liquidation
+        //  mark; execution still happens at spot. It is NOT the same thing as the
+        //  engine's `OBS_INTERVAL` (15s), which is only the minimum spacing between
+        //  observation-ring writes — that throttle means the EFFECTIVE lookback is
+        //  between `twapWindow` and `twapWindow + 15s`.
+        //
+        //  Size it in BLOCKS, not seconds, because that is what an attacker has to
+        //  hold a price across:
+        //    * Sepolia / L1 (~12s blocks): 300s ~ 25 blocks. A 15s window would be
+        //      ONE block — trivially flash-manipulable. Do not go low here.
+        //    * Orbit L2 (~250ms blocks): 15s ~ 60 blocks, which is a defensible
+        //      window and hugs spot far more closely (fewer born-underwater opens).
+        //  Hence the default stays 300 and the fast-L2 value is opt-in per chain.
+        engine.setGuards(
+            uint32(vm.envOr("TWAP_WINDOW", uint256(300))),
+            vm.envOr("MAX_LIQ_BPS", uint256(2_000)),
+            vm.envOr("MAX_FUNDING_BPS", uint256(5_000))
+        );
+        console2.log("twapWindow (s) :", vm.envOr("TWAP_WINDOW", uint256(300)));
+
+        //  LIQUIDITY-WEIGHTED MARK (audit P-1 / Q-07). Optional and OFF by
+        //  default: with no mark source the engine reads the primary pool's tick,
+        //  which is exactly the behaviour that shipped before this existed.
+        //
+        //  Wire it when a generation is going to run MORE THAN ONE POOL. It is
+        //  the thing that makes "several pools" and "perps" compatible: the mark
+        //  becomes liquidity-weighted across the generation's pools, so the thin
+        //  pool an attacker can cheaply push carries proportionally little weight
+        //  instead of being solely authoritative over liquidations.
+        //
+        //  Sequencing, and it matters — the mark must aggregate BEFORE a second
+        //  pool carries real depth:
+        //    1. deploy PerpMarkSource, `setPrimary(<the generation's pool key>)`
+        //    2. `engine.setRouting(dividend, treasury, nftBeneficiary, markSource, quoteOracle)`
+        //    3. only then add siblings via `markSource.addPool(...)`
+        //  On every relaunch, call `setPrimary` again — it re-points the mark and
+        //  clears the previous generation's siblings.
+        //  ── ARM THE WEIGHTED MARK AT DEPLOY, NOT "LATER" ────────────────────
+        //  DEPLOY_MARK_SOURCE builds one here and points it at the live pool.
+        //  Two reasons this is worth doing even on a single-pool generation,
+        //  where the weighted tick is IDENTICAL to the primary's:
+        //
+        //   1. `PerpEngine.blocksVolumeLink()` is
+        //      `openCount != 0 && markSource == address(0)`, and
+        //      `CauldronHook.linkVolume` reverts `PerpsOpen()` on it. With no mark
+        //      source, ONE open perp position — a dust position costing well under
+        //      a thousandth of an ETH — blocks every `linkVolume`, and
+        //      `RedemptionExt.rotateSliceFrom` calls `linkVolume` on every slice.
+        //      A governance-approved treasury rotation could therefore be held
+        //      hostage indefinitely for almost nothing, and no reachable call
+        //      closes a SOLVENT position to clear it. Arming the mark removes the
+        //      hazard the interlock exists to guard, so the interlock stands down.
+        //   2. It must be armed BEFORE a second pool carries depth (see the
+        //      sequencing note above). Doing it at deploy is the only point where
+        //      that ordering is guaranteed; afterwards the engine is owned by the
+        //      timelock and it becomes a scheduled proposal nobody remembers.
+        //
+        //  Safe by construction on a fresh generation: with only the primary in
+        //  the set, `weightedTick()` returns the primary's tick, so liquidation
+        //  behaviour is byte-for-byte what it was before.
+        address markSource = vm.envOr("PERP_MARK_SOURCE", address(0));
+        if (markSource == address(0) && vm.envOr("DEPLOY_MARK_SOURCE", false)) {
+            PerpMarkSource ms = new PerpMarkSource(IPoolManager(poolManager), deployer);
+            uint256 gen = IRegistryGen(registry).currentGeneration();
+            (Currency c0, Currency c1, uint24 fee, int24 spacing, IHooks hk) =
+                IRegistryGen(registry).generationPoolKey(gen);
+            //  A generation that has not summoned has a zero pool key, and
+            //  `setPrimary` would arm the mark at a pool that does not exist —
+            //  every `weightedTick()` would then read an uninitialised slot0.
+            //  Refuse rather than arm something meaningless.
+            require(address(hk) != address(0), "no live pool: run DeployPerp AFTER the summon");
+            ms.setPrimary(PoolKey(c0, c1, fee, spacing, hk));
+            markSource = address(ms);
+            console2.log("PerpMarkSource :", markSource, "(armed at gen)", gen);
+        }
+        //  WIRE THE QUOTE ORACLE UNCONDITIONALLY (red-team F-03). {PerpEngine._q}
+        //  prices its wei-written thresholds — the dust filter, the insurance
+        //  circuit breaker and the leverage tiers — through this oracle. Without it
+        //  they fall back to unit scaling, which on a 6-decimal quote means "$25 of
+        //  pool depth" where "$80,000" was intended. This used to run only when a
+        //  mark source was configured, so on a single-pool generation the engine
+        //  never learned the oracle at all.
+        address quoteOracle = vm.envOr("QUOTE_ORACLE", address(0));
+        engine.setRouting(dividend, treasury, treasury, markSource, quoteOracle);
+        console2.log("markSource     :", markSource);
+        console2.log("quoteOracle    :", quoteOracle);
+
+        // Optional: seed the ETH PLV through the vault (deployer gets LP shares)
+        // so longs can open immediately without waiting for community deposits.
+        if (seed > 0) {
+            IPerpVaultDeposit(address(vault)).depositEth{value: seed}();
+            console2.log("seeded PLV via vault (wei):", seed);
+        }
+
+        // FINAL HANDOFF — hand the hook AND the engine to the governance timelock.
+        // All owner-gated wiring (setPerpEngine, setVault, risk params done via cast
+        // after) is either done or must itself now go through the timelock. NOTE:
+        // set engine risk/guards BEFORE this in a combined script, or do them via
+        // the timelock after. Here we transfer last; the deploy runbook sets risk
+        // params via cast BEFORE calling this handoff (see round-25 runbook).
+        if (timelock != address(0)) {
+            IHookWire(hook).setPerpEngine(address(engine)); // ensure wired pre-handoff
+            IOwnable(hook).transferOwnership(timelock);
+            IOwnable(address(engine)).transferOwnership(timelock);
+            //  The mark source governs what price liquidations fire at, so it is
+            //  custody-relevant and goes to the timelock with everything else.
+            //  Only when WE deployed it — a caller-supplied PERP_MARK_SOURCE is
+            //  somebody else's contract and may already be owned correctly.
+            if (markSource != address(0) && vm.envOr("DEPLOY_MARK_SOURCE", false)) {
+                IOwnable(markSource).transferOwnership(timelock);
+            }
+            console2.log("hook + engine owner -> timelock:", timelock);
+        }
+
+        vm.stopBroadcast();
+
+        address col = IHookWire(hook).collection();
+        console2.log("--- PERP WIRED ---");
+        console2.log("active collection:", col);
+        console2.log("badge minter set :", col == address(0) ? address(0) : ICollLiq(col).liquidatorMinter());
+        console2.log("(should equal the PerpEngine above)");
+    }
+}

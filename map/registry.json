@@ -1,0 +1,2774 @@
+{
+ "cluster": "registry",
+ "files": [
+  "CauldronRegistry.sol",
+  "CauldronToken.sol",
+  "cauldron/IPolicies.sol",
+  "cauldron/IDeathChecker.sol",
+  "cauldron/ILiquidatorMintable.sol",
+  "cauldron/ICauldron.sol"
+ ],
+ "nodes": [
+  {
+   "authority": "implementation-defined caller through this interface",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "ICollectionMetadata (declared in CauldronRegistry.sol)",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 60,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "setMetadata",
+   "observations": [],
+   "reachability": "`setMetadata` is declared at CauldronRegistry.sol:60; implementation-defined caller through this interface.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function setMetadata(MetadataMode mode, address renderer, string calldata baseURI) external",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "deployer",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    170,
+    184
+   ],
+   "body_sha1": "ac9f50e383eb5a01580185e0f657365980910a8c",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "constructor",
+   "line": 164,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "",
+   "observations": [],
+   "reachability": "Runs once at deploy. It writes the three former immutables as STORAGE so the delegatecall facet reads them correctly: `poolManager` CauldronRegistry.sol:173, `positionManager` CauldronRegistry.sol:174 and `hook` CauldronRegistry.sol:175. `emergencyAdmin` CauldronRegistry.sol:177 falls back to msg.sender when the argument is zero, and `emergencyDelay` CauldronRegistry.sol:178 is immutable so it can never be lowered afterwards. Native ether is seeded into the quote allowlist with `allowedQuote` CauldronRegistry.sol:181 and a 1e18 identity in `quoteScale` CauldronRegistry.sol:182, so a fresh deployment can always launch against ether. Ownership comes from the base constructor at `Ownable` CauldronBase.sol:437, which makes the deployer the owner (DERIVED).",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "constructor( address _poolManager, address _positionManager, address _hook, address _emergencyAdmin, uint256 _emergencyDelay )",
+   "value": "NONE",
+   "visibility": "",
+   "writes": [
+    "poolManager (line 173)",
+    "positionManager (line 174)",
+    "hook (line 175)",
+    "emergencyAdmin (line 177, immutable)",
+    "emergencyDelay (line 178, immutable)",
+    "allowedQuote (line 181)",
+    "quoteScale (line 182)"
+   ]
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (CauldronRegistry.sol:190)",
+   "body_lines": [
+    190,
+    198
+   ],
+   "body_sha1": "2dc45b036e815acb5638a2f7f75bda242a87b46f",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 190,
+   "modifiers": [
+    "onlyOwner"
+   ],
+   "mutability": "nonpayable",
+   "name": "setRedemptionExt",
+   "observations": [],
+   "reachability": "Owner-only and one-shot: `redemptionExt` CauldronRegistry.sol:196 must still be zero or the call reverts AlreadySummoned, so the delegatecall target is frozen after the first write at `redemptionExt` CauldronRegistry.sol:196. A code-less target is rejected at `ext` CauldronRegistry.sol:190 because a delegatecall to an empty account returns success with no data. Every facet forwarder in this file depends on this having been set (DERIVED).",
+   "reads": [
+    "redemptionExt (line 196)"
+   ],
+   "semantics": "fresh",
+   "signature": "function setRedemptionExt(address ext) external onlyOwner",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "redemptionExt (line 196)"
+   ]
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (CauldronRegistry.sol:203)",
+   "body_lines": [
+    203,
+    206
+   ],
+   "body_sha1": "f06c8dc361c98da77a39a956e79b8e944f6244e8",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 203,
+   "modifiers": [
+    "onlyOwner"
+   ],
+   "mutability": "nonpayable",
+   "name": "setReserveCeiling",
+   "observations": [],
+   "reachability": "Owner-only. Bounds-checked at `offset` CauldronRegistry.sol:202 then stored in `nextReserveCeilingOffset` CauldronRegistry.sol:205, which the next seed reads at `nextReserveCeilingOffset` CauldronRegistry.sol:205 and CauldronRegistry.sol:205. It takes effect on the NEXT summon or relaunch only (DERIVED).",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function setReserveCeiling(int24 offset) external onlyOwner",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "nextReserveCeilingOffset (line 205)"
+   ]
+  },
+  {
+   "authority": "anyone at the registry; the facet holds the gate (RedemptionExt.rotateSliceFrom requires rotation wiring plus a live treasury-vote envelope)",
+   "authority_gate_quote": "if (remaining == 0) revert NoRotationApproved(); (RedemptionExt.sol:316)",
+   "body_lines": [
+    246,
+    248
+   ],
+   "body_sha1": "9d5aae3209f78c6a79992368fb811104a5954f83",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronRegistry._forwardToExt (CauldronRegistry.sol:247), TRUSTED, in-cluster",
+    "RedemptionExt.rotateSlice (CauldronRegistry.sol:246), TRUSTED, delegatecall"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 246,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "rotateSlice",
+   "observations": [],
+   "reachability": "A three-argument stub whose whole body is `_forwardToExt` CauldronRegistry.sol:247, which delegatecalls the facet with the untouched calldata. It lands on `rotateSlice` RedemptionExt.sol:269, which immediately tail-calls `rotateSliceFrom` RedemptionExt.sol:274 with fromLeg hard-coded to 0, so this entry can only ever drain the primary pool. The registry side is ungated; the facet side requires `quoteRotator` RedemptionExt.sol:292 and `treasuryGovernor` RedemptionExt.sol:301 to be wired and the guild's envelope to have room at `remaining` RedemptionExt.sol:317.",
+   "reads": [
+    "redemptionExt (line 1501)"
+   ],
+   "semantics": "fresh",
+   "signature": "function rotateSlice(uint16, uint256, PoolKey calldata) external returns (uint256, uint256)",
+   "value": "NONE in this stub; the value movement happens inside the delegatecalled facet, which runs on this registry's own custody",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone at the registry; the facet holds the gate (RedemptionExt.rotateSliceFrom requires rotation wiring plus a live treasury-vote envelope)",
+   "authority_gate_quote": "if (remaining == 0) revert NoRotationApproved(); (RedemptionExt.sol:316)",
+   "body_lines": [
+    273,
+    275
+   ],
+   "body_sha1": "9d5aae3209f78c6a79992368fb811104a5954f83",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronRegistry._forwardToExt (CauldronRegistry.sol:274), TRUSTED, in-cluster",
+    "RedemptionExt.rotateSliceFrom (RedemptionExt.sol:280), TRUSTED, delegatecall"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 270,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "rotateSliceFrom",
+   "observations": [],
+   "reachability": "The four-argument form. Body is `_forwardToExt` CauldronRegistry.sol:274 and it reaches `rotateSliceFrom` RedemptionExt.sol:280, which is public on the facet. The gate is entirely facet-side: wiring at `rot` RedemptionExt.sol:293, a governor at `gov` RedemptionExt.sol:302, a non-zero envelope at `remaining` RedemptionExt.sol:317 and a slice within it at `sliceBps` RedemptionExt.sol:318. Timing is the only thing the caller chooses; destination and ceiling come from the vote (`allowance` RedemptionExt.sol:303).",
+   "reads": [
+    "redemptionExt (line 1501)"
+   ],
+   "semantics": "fresh",
+   "signature": "function rotateSliceFrom(uint8, uint16, uint256, PoolKey calldata) external returns (uint256, uint256)",
+   "value": "NONE in this stub; the value movement happens inside the delegatecalled facet, which runs on this registry's own custody",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "owner (the gate is on the facet: RedemptionExt.setRotationWiring is onlyOwner and runs against this registry's owner slot)",
+   "authority_gate_quote": "external onlyOwner (RedemptionExt.sol:260)",
+   "body_lines": [
+    280,
+    280
+   ],
+   "body_sha1": "9d5aae3209f78c6a79992368fb811104a5954f83",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronRegistry._forwardToExt (CauldronRegistry.sol:280), TRUSTED, in-cluster",
+    "RedemptionExt.setRotationWiring (CauldronRegistry.sol:280), TRUSTED, delegatecall"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 280,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "setRotationWiring",
+   "observations": [],
+   "reachability": "Stub for `setRotationWiring` RedemptionExt.sol:260. Because the forward is a delegatecall, the facet's `onlyOwner` resolves against this registry's own owner slot, and the writes to `quoteRotator` RedemptionExt.sol:262 and `treasuryGovernor` RedemptionExt.sol:263 land in this registry's storage. Both arguments must be non-zero (`rotator` RedemptionExt.sol:261). Not one-shot: the wiring can be replaced (DERIVED).",
+   "reads": [
+    "redemptionExt (line 1501)"
+   ],
+   "semantics": "fresh",
+   "signature": "function setRotationWiring(address, address) external",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone at the registry; the facet holds the only gate (RedemptionExt.recoverLegs refuses generation 0 and the live generation)",
+   "authority_gate_quote": "if (gen == 0 || gen >= currentGeneration) revert CannotClaimCurrentGen(); (RedemptionExt.sol:848)",
+   "body_lines": [
+    296,
+    296
+   ],
+   "body_sha1": "9d5aae3209f78c6a79992368fb811104a5954f83",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronRegistry._forwardToExt (CauldronRegistry.sol:296), TRUSTED, in-cluster",
+    "RedemptionExt.recoverLegs (RedemptionExt.sol:878), TRUSTED, delegatecall"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 296,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "recoverLegs",
+   "observations": [],
+   "reachability": "New forwarder stub for the leg-unwind retry. The whole body is `_forwardToExt` CauldronRegistry.sol:296, which delegatecalls `recoverLegs` RedemptionExt.sol:834 on this registry's storage and custody. The gate is entirely facet-side: past generations only at `currentGeneration` RedemptionExt.sol:725, then the recovery at `_recoverLegs` RedemptionExt.sol:850 and the booking of its proceeds at `_bookLegProceeds` RedemptionExt.sol:851. This registry has no fallback, so before the stub existed the selector had no entry at all and the facet's own `recoverLegs` RedemptionExt.sol:834, though `public`, would run against the facet's empty storage (comment at `recoverLegs` CauldronRegistry.sol:296 records exactly that).",
+   "reads": [
+    "redemptionExt (line 1501)"
+   ],
+   "semantics": "fresh",
+   "signature": "function recoverLegs(uint256) external returns (uint256, uint256)",
+   "value": "NONE in this stub; the facet moves the recovered leg balances under delegatecall, so they land in this registry's own custody",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "owner (the gate is on the facet: RedemptionExt.sweepLegProceeds is onlyOwner)",
+   "authority_gate_quote": "external onlyOwner returns (uint256 amount) (RedemptionExt.sol:997)",
+   "body_lines": [
+    306,
+    306
+   ],
+   "body_sha1": "9d5aae3209f78c6a79992368fb811104a5954f83",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronRegistry._forwardToExt (CauldronRegistry.sol:306), TRUSTED, in-cluster",
+    "RedemptionExt.sweepLegProceeds (RedemptionExt.sol:1028), TRUSTED, delegatecall"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 306,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "sweepLegProceeds",
+   "observations": [],
+   "reachability": "Stub for `sweepLegProceeds` RedemptionExt.sol:864. Owner-gated facet-side; it zeroes `legProceeds` RedemptionExt.sol:883 before calling `sendAsset` RedemptionExt.sol:1006, so the balance leaves this registry's custody to an owner-chosen recipient. The matching reader `legProceedsOf` RedemptionExt.sol:961 has no stub here, and this contract declares no fallback (`receive` CauldronRegistry.sol:578), so that reader is unreachable through the registry.",
+   "reads": [
+    "redemptionExt (line 1501)"
+   ],
+   "semantics": "fresh",
+   "signature": "function sweepLegProceeds(address, address) external returns (uint256)",
+   "value": "NONE in this stub; the facet sends the booked asset out of this registry's balance",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (CauldronRegistry.sol:314)",
+   "body_lines": [
+    314,
+    331
+   ],
+   "body_sha1": "4e840067d50b7b62691196dd56bb392348e206d4",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 314,
+   "modifiers": [
+    "onlyOwner"
+   ],
+   "mutability": "nonpayable",
+   "name": "setAllowedQuote",
+   "observations": [],
+   "reachability": "Owner-only curation of the quote set a proposer may pick FROM. Native ether can never be removed (`quote` CauldronRegistry.sol:314) and an admitted quote must sort below the watermark (`QUOTE_WATERMARK` CauldronRegistry.sol:316) so every mined iteration token stays currency1. The flag is written at `allowedQuote` CauldronRegistry.sol:327 and, on admission only, a per-unit ether scale at `quoteScale` CauldronRegistry.sol:329 defaulting to 1e18. Relaunch re-reads the flag at `allowedQuote` CauldronRegistry.sol:327, so a de-listing between proposal and execution degrades the winner to native ether.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function setAllowedQuote(address quote, bool allowed, uint256 scale) external onlyOwner",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "allowedQuote (line 327)",
+    "quoteScale (line 329)"
+   ]
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (CauldronRegistry.sol:333)",
+   "body_lines": [
+    333,
+    337
+   ],
+   "body_sha1": "8c9871e6a38cc2941abd16cfe4a60b549a53c877",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronHook.setSeeder (CauldronRegistry.sol:333), TRUSTED, out-of-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 333,
+   "modifiers": [
+    "onlyOwner"
+   ],
+   "mutability": "nonpayable",
+   "name": "setSeeder",
+   "observations": [],
+   "reachability": "Owner-only. Writes `seeder` CauldronRegistry.sol:334 and propagates the same address to the hook at `setSeeder` CauldronRegistry.sol:333 so afterSwap can nudge the stream. Setting it to zero turns progressive seeding off; the seed dispatcher tests both this and the window at `seeder` CauldronRegistry.sol:334.",
+   "reads": [
+    "hook (line 335)"
+   ],
+   "semantics": "fresh",
+   "signature": "function setSeeder(address _seeder) external onlyOwner",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "seeder (line 334)"
+   ]
+  },
+  {
+   "authority": "emergencyAdmin",
+   "authority_gate_quote": "onlyEmergency timelocked nonReentrant (CauldronRegistry.sol:345)",
+   "body_lines": [
+    345,
+    349
+   ],
+   "body_sha1": "95aef2801cd68f592f5f712213e25d70febad569",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "ISeeder.rescue (CauldronRegistry.sol:348), TRUSTED, out-of-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 345,
+   "modifiers": [
+    "onlyEmergency",
+    "timelocked",
+    "nonReentrant"
+   ],
+   "mutability": "nonpayable",
+   "name": "rescueSeeder",
+   "observations": [],
+   "reachability": "Break-glass path for an aborted progressive campaign. The caller must be the emergency admin (`emergencyAdmin` CauldronRegistry.sol:370) and must have armed the action first, since `_consumeTimelock` CauldronRegistry.sol:412 reverts when `emergencyReadyAt` CauldronRegistry.sol:408 is zero and clears it at CauldronRegistry.sol:408. A seeder must be configured (`s` CauldronRegistry.sol:346) before `rescue` CauldronRegistry.sol:348 pulls the seeder's loose ledger funds back to this registry.",
+   "reads": [
+    "seeder (line 344)",
+    "emergencyAdmin (line 370, immutable)",
+    "emergencyReadyAt (line 408)",
+    "emergencyDelay (line 407, immutable)"
+   ],
+   "semantics": "fresh",
+   "signature": "function rescueSeeder() external onlyEmergency timelocked nonReentrant",
+   "value": "receives native and/or token back from the seeder through `rescue` (line 348)",
+   "visibility": "external",
+   "writes": [
+    "emergencyReadyAt (line 408)"
+   ]
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (CauldronRegistry.sol:356)",
+   "body_lines": [
+    356,
+    360
+   ],
+   "body_sha1": "309d038d7dd5fbd68b22b6b9e0f43da620c13b2a",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 356,
+   "modifiers": [
+    "onlyOwner"
+   ],
+   "mutability": "nonpayable",
+   "name": "setSeedWindow",
+   "observations": [],
+   "reachability": "Owner-only. Either zero (atomic) or bounded to 60 seconds .. 7 days at `window` CauldronRegistry.sol:356, then stored at `nextSeedWindow` CauldronRegistry.sol:358. Progressive seeding fires only when this is non-zero AND a seeder is set, tested together at `nextSeedWindow` CauldronRegistry.sol:358.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function setSeedWindow(uint64 window) external onlyOwner",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "nextSeedWindow (line 358)"
+   ]
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    365,
+    367
+   ],
+   "body_sha1": "394896c89565c60eb6cbaf108d7c8ec9e08d6c00",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronBase.floorPerFren (CauldronRegistry.sol:366), TRUSTED, out-of-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 365,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "enchantFee",
+   "observations": [],
+   "reachability": "Open view. Multiplies the live floor from `floorPerFren` CauldronRegistry.sol:366 by `enchantFeeMultBps` CauldronRegistry.sol:366 over 10000. The multiplier is emergency-admin tunable at `enchantFeeMultBps` CauldronRegistry.sol:366, so the quoted fee moves with that setting.",
+   "reads": [
+    "enchantFeeMultBps (line 366)"
+   ],
+   "semantics": "fresh",
+   "signature": "function enchantFee() external view returns (uint256)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "internal (callers: rescueSeeder, armEmergency, setRedemptionPaused, setEnchantFeeMult, emergencyWithdrawLP, emergencySweep, setSuccessor, setClaimGate, migrateToSuccessor, setMinLifetime)",
+   "authority_gate_quote": "if (msg.sender != emergencyAdmin) revert NotAdmin(); (CauldronRegistry.sol:369)",
+   "body_lines": [
+    369,
+    372
+   ],
+   "body_sha1": "20a35bf6c20670520dfdc5b78d431b3bc4c00e8a",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "modifier",
+   "line": 369,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "onlyEmergency",
+   "observations": [],
+   "reachability": "The single break-glass gate. `emergencyAdmin` CauldronRegistry.sol:370 is immutable, set in the constructor at CauldronRegistry.sol:370, so this role can never be rotated or renounced after deploy. It is independent of `owner` CauldronRegistry.sol:437, which is the governance/timelock role.",
+   "reads": [
+    "emergencyAdmin (line 370, immutable)"
+   ],
+   "semantics": "fresh",
+   "signature": "modifier onlyEmergency()",
+   "value": "NONE",
+   "visibility": "",
+   "writes": []
+  },
+  {
+   "authority": "internal (callers: rescueSeeder, emergencyWithdrawLP, emergencySweep, migrateToSuccessor)",
+   "authority_gate_quote": "_consumeTimelock(); (CauldronRegistry.sol:378)",
+   "body_lines": [
+    378,
+    381
+   ],
+   "body_sha1": "86c236a6ab08919917cdd0279d8e1f5a5e24decc",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronRegistry._consumeTimelock (CauldronRegistry.sol:379), TRUSTED, in-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "modifier",
+   "line": 378,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "timelocked",
+   "observations": [],
+   "reachability": "Applied to the four custody-moving emergency actions. It consumes the arming BEFORE the body runs (`_consumeTimelock` CauldronRegistry.sol:379), so a revert inside the body rolls the consumption back with the transaction. Arming is always required even at zero delay (`emergencyReadyAt` CauldronRegistry.sol:408), which is what keeps the forced-open redemption exit in `_redeemBlocked` CauldronBase.sol:433 meaningful.",
+   "reads": [
+    "emergencyReadyAt (line 408)",
+    "emergencyDelay (line 407, immutable)"
+   ],
+   "semantics": "fresh",
+   "signature": "modifier timelocked()",
+   "value": "NONE",
+   "visibility": "",
+   "writes": [
+    "emergencyReadyAt (line 408)"
+   ]
+  },
+  {
+   "authority": "internal (callers: timelocked, setClaimGate)",
+   "authority_gate_quote": "if (emergencyReadyAt == 0) revert Timelocked(); (CauldronRegistry.sol:412)",
+   "body_lines": [
+    412,
+    416
+   ],
+   "body_sha1": "769be33c99c2016580d227394ff7e67f0c9267bc",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 412,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "_consumeTimelock",
+   "observations": [],
+   "reachability": "Two independent conditions: the action must be armed (`emergencyReadyAt` CauldronRegistry.sol:413) and, when the delay is non-zero, the wait must have elapsed (`emergencyDelay` CauldronRegistry.sol:414). It then zeroes the arming at `emergencyReadyAt` CauldronRegistry.sol:413, so each arming buys exactly one execution. The claim-gate setter invokes `_consumeTimelock` CauldronRegistry.sol:412 only in the restricting direction.",
+   "reads": [
+    "emergencyReadyAt (line 413)",
+    "emergencyDelay (line 414, immutable)"
+   ],
+   "semantics": "fresh",
+   "signature": "function _consumeTimelock() private",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": [
+    "emergencyReadyAt (line 413)"
+   ]
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (CauldronRegistry.sol:420)",
+   "body_lines": [
+    420,
+    422
+   ],
+   "body_sha1": "e37025db1a72a7f28aa99a7550d9a54265d22f4f",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 420,
+   "modifiers": [
+    "onlyOwner"
+   ],
+   "mutability": "nonpayable",
+   "name": "setIgniter",
+   "observations": [],
+   "reachability": "Owner-only, no bound and no one-shot. `igniter` CauldronRegistry.sol:419 is the second address (besides the owner) accepted by summon at `igniter` CauldronRegistry.sol:421, so it is a one-time ignition right rather than a standing power once `summoned` CauldronRegistry.sol:686 is set.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function setIgniter(address who) external onlyOwner",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "igniter (line 419)"
+   ]
+  },
+  {
+   "authority": "emergencyAdmin",
+   "authority_gate_quote": "onlyEmergency (CauldronRegistry.sol:426)",
+   "body_lines": [
+    426,
+    429
+   ],
+   "body_sha1": "2f53aa515b613ebbb5c8dd1d1ab3f582d0fed37c",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 426,
+   "modifiers": [
+    "onlyEmergency"
+   ],
+   "mutability": "nonpayable",
+   "name": "armEmergency",
+   "observations": [],
+   "reachability": "Emergency-admin only. Sets `emergencyReadyAt` CauldronRegistry.sol:427 to now plus `emergencyDelay` CauldronRegistry.sol:425 and announces it. Arming has a second effect beyond the wait: it forces the redemption exit open, because `_redeemBlocked` CauldronBase.sol:433 only blocks while the arming is zero. The guardian can cancel it at `emergencyReadyAt` CauldronRegistry.sol:428.",
+   "reads": [
+    "emergencyAdmin (line 370, immutable)",
+    "emergencyDelay (line 425, immutable)",
+    "emergencyReadyAt (line 427)"
+   ],
+   "semantics": "fresh",
+   "signature": "function armEmergency() external onlyEmergency",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "emergencyReadyAt (line 427)"
+   ]
+  },
+  {
+   "authority": "emergencyAdmin or owner",
+   "authority_gate_quote": "if (msg.sender != emergencyAdmin && msg.sender != owner()) revert NotAdmin(); (CauldronRegistry.sol:436)",
+   "body_lines": [
+    434,
+    440
+   ],
+   "body_sha1": "60b1599d54b77dbc896836bc3cf1269c1c2aa776",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "Ownable.owner (CauldronRegistry.sol:437), TRUSTED, out-of-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 434,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "setGuardian",
+   "observations": [],
+   "reachability": "Either of the two admin roles may write `guardian` CauldronRegistry.sol:432, and it is not one-shot, so the emergency admin can replace a guardian that would veto it (DERIVED). The guardian's only power is the cancel at `emergencyReadyAt` CauldronRegistry.sol:446.",
+   "reads": [
+    "emergencyAdmin (line 433, immutable)"
+   ],
+   "semantics": "fresh",
+   "signature": "function setGuardian(address who) external",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "guardian (line 432)"
+   ]
+  },
+  {
+   "authority": "guardian",
+   "authority_gate_quote": "if (msg.sender != guardian) revert NotAdmin(); (CauldronRegistry.sol:444)",
+   "body_lines": [
+    444,
+    448
+   ],
+   "body_sha1": "d7886fdbecf0e3ed5db87c98abb3a53a15671513",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 444,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "vetoEmergency",
+   "observations": [],
+   "reachability": "Guardian-only, and the role defaults to address zero until `guardian` CauldronRegistry.sol:445 is set, so an unset guardian means no veto exists (DERIVED). Clearing `emergencyReadyAt` CauldronRegistry.sol:446 both cancels the pending action and re-closes the forced-open redemption exit that `_redeemBlocked` CauldronBase.sol:433 keys off.",
+   "reads": [
+    "guardian (line 445)"
+   ],
+   "semantics": "fresh",
+   "signature": "function vetoEmergency() external",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "emergencyReadyAt (line 446)"
+   ]
+  },
+  {
+   "authority": "emergencyAdmin",
+   "authority_gate_quote": "onlyEmergency (CauldronRegistry.sol:459)",
+   "body_lines": [
+    459,
+    462
+   ],
+   "body_sha1": "760fadf646a2d0080ea861cc0da491352e6a6ba9",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 459,
+   "modifiers": [
+    "onlyEmergency"
+   ],
+   "mutability": "nonpayable",
+   "name": "setRedemptionPaused",
+   "observations": [],
+   "reachability": "Emergency-admin only and deliberately NOT timelocked, so the circuit breaker is immediate in both directions. `redemptionPaused` CauldronRegistry.sol:460 is one half of `_redeemBlocked` CauldronBase.sol:433; the other half is the arming, so pausing while an emergency is armed does not actually block redemptions.",
+   "reads": [
+    "emergencyAdmin (line 370, immutable)"
+   ],
+   "semantics": "fresh",
+   "signature": "function setRedemptionPaused(bool paused) external onlyEmergency",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "redemptionPaused (line 460)"
+   ]
+  },
+  {
+   "authority": "emergencyAdmin",
+   "authority_gate_quote": "onlyEmergency (CauldronRegistry.sol:468)",
+   "body_lines": [
+    468,
+    471
+   ],
+   "body_sha1": "436b348efa406c0ae57124151373cd9cf1b4dbf5",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 468,
+   "modifiers": [
+    "onlyEmergency"
+   ],
+   "mutability": "nonpayable",
+   "name": "setEnchantFeeMult",
+   "observations": [],
+   "reachability": "Emergency-admin only, capped at 1000000 bps (100x) at `bps` CauldronRegistry.sol:468 and written to `enchantFeeMultBps` CauldronRegistry.sol:470. The value is only ever read where the fee is computed, at `enchantFeeMultBps` CauldronRegistry.sol:470, which the dividend contract quotes off-chain and on-chain.",
+   "reads": [
+    "emergencyAdmin (line 370, immutable)"
+   ],
+   "semantics": "fresh",
+   "signature": "function setEnchantFeeMult(uint256 bps) external onlyEmergency",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "enchantFeeMultBps (line 470)"
+   ]
+  },
+  {
+   "authority": "emergencyAdmin",
+   "authority_gate_quote": "onlyEmergency timelocked nonReentrant (CauldronRegistry.sol:475)",
+   "body_lines": [
+    475,
+    484
+   ],
+   "body_sha1": "2b413e674cf871728d8eabfa79e70e35a4911386",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronRegistry._removeLiquidity (CauldronRegistry.sol:476), TRUSTED, in-cluster",
+    "IERC20.transfer (CauldronRegistry.sol:478), TRUSTED, out-of-cluster",
+    "emergencyAdmin.call (CauldronRegistry.sol:480), TRUSTED, out-of-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 475,
+   "modifiers": [
+    "onlyEmergency",
+    "timelocked",
+    "nonReentrant"
+   ],
+   "mutability": "nonpayable",
+   "name": "emergencyWithdrawLP",
+   "observations": [],
+   "reachability": "Break-glass LP pull. Requires the emergency admin (`emergencyAdmin` CauldronRegistry.sol:478) and a prior arming consumed by `_consumeTimelock` CauldronRegistry.sol:412. It tears down the whole generation through `_removeLiquidity` CauldronRegistry.sol:476, which also unwinds the seeder and the rotated legs, then pushes both sides out: the token at `tok` CauldronRegistry.sol:477 and the ether at `emergencyAdmin` CauldronRegistry.sol:478. Effects precede the two external sends, and `nonReentrant` CauldronRegistry.sol:475 covers the whole call.",
+   "reads": [
+    "emergencyReadyAt (line 408)",
+    "emergencyDelay (line 407, immutable)",
+    "generationToken (line 477)",
+    "emergencyAdmin (line 478, immutable)"
+   ],
+   "semantics": "fresh",
+   "signature": "function emergencyWithdrawLP(uint256 gen) external onlyEmergency timelocked nonReentrant",
+   "value": "ERC20 transfer of the generation token `tok` to the emergency admin (line 477); sends native to `emergencyAdmin` (line 478)",
+   "visibility": "external",
+   "writes": [
+    "emergencyReadyAt (line 408)"
+   ]
+  },
+  {
+   "authority": "emergencyAdmin",
+   "authority_gate_quote": "onlyEmergency timelocked nonReentrant (CauldronRegistry.sol:488)",
+   "body_lines": [
+    488,
+    495
+   ],
+   "body_sha1": "bab92a8908a83dc025c124fb6759f02fd97ed8a0",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "emergencyAdmin.call (CauldronRegistry.sol:490), TRUSTED, out-of-cluster",
+    "IERC20.balanceOf (CauldronRegistry.sol:493), UNTRUSTED, out-of-cluster",
+    "IERC20.transfer (CauldronRegistry.sol:493), UNTRUSTED, out-of-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 488,
+   "modifiers": [
+    "onlyEmergency",
+    "timelocked",
+    "nonReentrant"
+   ],
+   "mutability": "nonpayable",
+   "name": "emergencySweep",
+   "observations": [],
+   "reachability": "Emergency-admin only, armed and timelocked through `_consumeTimelock` CauldronRegistry.sol:412. A zero `token` CauldronRegistry.sol:486 sweeps the native balance; anything else is treated as an ERC20 and the token address is fully caller-chosen, so the external calls at `token` CauldronRegistry.sol:486 can reach arbitrary code. No return value is checked on the ERC20 transfer (DERIVED).",
+   "reads": [
+    "emergencyReadyAt (line 408)",
+    "emergencyDelay (line 407, immutable)",
+    "emergencyAdmin (line 490, immutable)"
+   ],
+   "semantics": "fresh",
+   "signature": "function emergencySweep(address token) external onlyEmergency timelocked nonReentrant",
+   "value": "sends the registry's whole native balance to `emergencyAdmin` (line 490); ERC20 transfer of the caller-named `token` to the admin (line 486)",
+   "visibility": "external",
+   "writes": [
+    "emergencyReadyAt (line 408)"
+   ]
+  },
+  {
+   "authority": "emergencyAdmin",
+   "authority_gate_quote": "onlyEmergency (CauldronRegistry.sol:505)",
+   "body_lines": [
+    505,
+    508
+   ],
+   "body_sha1": "7307f3aa35079b7c7c463702ba4e16b1fc3a34a4",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 505,
+   "modifiers": [
+    "onlyEmergency"
+   ],
+   "mutability": "nonpayable",
+   "name": "setSuccessor",
+   "observations": [],
+   "reachability": "Pointer only, not timelocked and not bounded: `successor` CauldronRegistry.sol:506 may be any address, including one with no code. The custody move that uses it is separately armed at `successor` CauldronRegistry.sol:506, so holders still get the forced-open exit window before value can follow the pointer.",
+   "reads": [
+    "emergencyAdmin (line 370, immutable)"
+   ],
+   "semantics": "fresh",
+   "signature": "function setSuccessor(address _successor) external onlyEmergency",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "successor (line 506)"
+   ]
+  },
+  {
+   "authority": "emergencyAdmin",
+   "authority_gate_quote": "onlyEmergency (CauldronRegistry.sol:524)",
+   "body_lines": [
+    524,
+    528
+   ],
+   "body_sha1": "4bebf06085df082f085e5966883135b076f138b2",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronRegistry._consumeTimelock (CauldronRegistry.sol:525), TRUSTED, in-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 524,
+   "modifiers": [
+    "onlyEmergency"
+   ],
+   "mutability": "nonpayable",
+   "name": "setClaimGate",
+   "observations": [],
+   "reachability": "Asymmetric gate: the restricting direction consumes an arming at `_consumeTimelock` CauldronRegistry.sol:525, while clearing `claimGate` CauldronRegistry.sol:526 back to zero is immediate. A non-zero gate closes the three instant 1:1 paths, tested at `claimGate` CauldronRegistry.sol:526 and CauldronRegistry.sol:526, and on the extension side at `claimGate` RedemptionExt.sol:747.",
+   "reads": [
+    "emergencyReadyAt (line 408)",
+    "emergencyDelay (line 407, immutable)",
+    "emergencyAdmin (line 370, immutable)"
+   ],
+   "semantics": "fresh",
+   "signature": "function setClaimGate(address gate) external onlyEmergency",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "emergencyReadyAt (line 408)",
+    "claimGate (line 526)"
+   ]
+  },
+  {
+   "authority": "emergencyAdmin",
+   "authority_gate_quote": "onlyEmergency timelocked nonReentrant (CauldronRegistry.sol:540)",
+   "body_lines": [
+    540,
+    576
+   ],
+   "body_sha1": "8920d4e8cdfb5a74f611dda4f0a24ca2e06b7157",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "IERC721.transferFrom (CauldronRegistry.sol:548), TRUSTED, out-of-cluster",
+    "IERC721.transferFrom (CauldronRegistry.sol:549), TRUSTED, out-of-cluster",
+    "ISeeder.seeding (CauldronRegistry.sol:560), TRUSTED, out-of-cluster",
+    "ISeeder.withdrawAll (CauldronRegistry.sol:561), TRUSTED, out-of-cluster",
+    "IERC20.balanceOf (CauldronRegistry.sol:567), TRUSTED, out-of-cluster",
+    "IERC20.transfer (CauldronRegistry.sol:568), TRUSTED, out-of-cluster",
+    "to.call (CauldronRegistry.sol:572), UNTRUSTED, out-of-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 540,
+   "modifiers": [
+    "onlyEmergency",
+    "timelocked",
+    "nonReentrant"
+   ],
+   "mutability": "nonpayable",
+   "name": "migrateToSuccessor",
+   "observations": [],
+   "reachability": "The largest single custody move in the contract, reachable only by the emergency admin with an armed, elapsed timelock (`_consumeTimelock` CauldronRegistry.sol:412). It requires a pointer set beforehand (`to` CauldronRegistry.sol:541). Liquidity is handed over as position-NFT ownership rather than withdrawn, by the two ERC721 transferFrom calls at `activeId` CauldronRegistry.sol:546 and `reserveId` CauldronRegistry.sol:547, so a progressive generation whose active id is zero contributes nothing there and is instead unwound through `withdrawAll` CauldronRegistry.sol:554. The final native send targets a fully admin-chosen address at `to` CauldronRegistry.sol:568, and it happens after every effect (DERIVED).",
+   "reads": [
+    "emergencyReadyAt (line 408)",
+    "emergencyDelay (line 407, immutable)",
+    "successor (line 538)",
+    "currentGeneration (line 543)",
+    "generationPositionId (line 546)",
+    "generationReservePositionId (line 547)",
+    "positionManager (line 548)",
+    "seeder (line 552)",
+    "generationToken (line 565)"
+   ],
+   "semantics": "fresh",
+   "signature": "function migrateToSuccessor() external onlyEmergency timelocked nonReentrant",
+   "value": "ERC721 ownership of the active position is moved to the successor at `transferFrom` (line 548) and the reserve position at `transferFrom` (line 548) - the positions themselves are never withdrawn; ERC20 transfer of `tok` to the successor (line 565); sends the whole native balance to `to` (line 568)",
+   "visibility": "external",
+   "writes": [
+    "emergencyReadyAt (line 408)"
+   ]
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    578,
+    578
+   ],
+   "body_sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "receive",
+   "line": 578,
+   "modifiers": [],
+   "mutability": "payable",
+   "name": "",
+   "observations": [],
+   "reachability": "A bare payable `receive` CauldronRegistry.sol:578 with an empty body, so any address may push ether in; the hook's reserve pulls, the vault close and the seeder teardown all land here. This contract declares NO fallback, which is why every facet function needs an explicit stub such as `redeemOgFren` CauldronRegistry.sol:1421.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "receive() external payable",
+   "value": "receives native through `receive` (line 578)",
+   "visibility": "",
+   "writes": []
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (CauldronRegistry.sol:585)",
+   "body_lines": [
+    585,
+    587
+   ],
+   "body_sha1": "507d8684c457637621eae5c09c829da76c6cd92c",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 585,
+   "modifiers": [
+    "onlyOwner"
+   ],
+   "mutability": "nonpayable",
+   "name": "setGovernor",
+   "observations": [],
+   "reachability": "Owner-only, unbounded and replaceable: `governor` CauldronRegistry.sol:584 accepts any address including zero. Relaunch reads it twice, for the liveness gate at `governor` CauldronRegistry.sol:586 and for the winning spec at `winner` CauldronRegistry.sol:903, so a swapped governor changes what the next rebirth launches.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function setGovernor(address _governor) external onlyOwner",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "governor (line 584)"
+   ]
+  },
+  {
+   "authority": "emergencyAdmin",
+   "authority_gate_quote": "onlyEmergency (CauldronRegistry.sol:590)",
+   "body_lines": [
+    590,
+    592
+   ],
+   "body_sha1": "20e3a715985c0136edf58d6b92432efdc201c96a",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 590,
+   "modifiers": [
+    "onlyEmergency"
+   ],
+   "mutability": "nonpayable",
+   "name": "setMinLifetime",
+   "observations": [],
+   "reachability": "Emergency-admin only and unbounded in both directions: `minLifetime` CauldronRegistry.sol:591 takes any value, including zero (removing the grace period entirely) or a value large enough to make the check at `minLifetime` CauldronRegistry.sol:591 unsatisfiable in practice (DERIVED).",
+   "reads": [
+    "emergencyAdmin (line 370, immutable)"
+   ],
+   "semantics": "fresh",
+   "signature": "function setMinLifetime(uint256 _seconds) external onlyEmergency",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "minLifetime (line 591)"
+   ]
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (CauldronRegistry.sol:595)",
+   "body_lines": [
+    595,
+    597
+   ],
+   "body_sha1": "f28eeff39d0eb1882c7ac9dfb7371f7c7ada2d95",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 595,
+   "modifiers": [
+    "onlyOwner"
+   ],
+   "mutability": "nonpayable",
+   "name": "setFactory",
+   "observations": [],
+   "reachability": "Owner-only with no validation on `factory` CauldronRegistry.sol:594. It is called from inside the rebirth at `deployBrew` CauldronRegistry.sol:1217 and at `deployVault` CauldronRegistry.sol:1255, both outside any try/catch, so the configured factory is on the critical path of every relaunch (DERIVED).",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function setFactory(address _factory) external onlyOwner",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "factory (line 594)"
+   ]
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (CauldronRegistry.sol:600)",
+   "body_lines": [
+    600,
+    603
+   ],
+   "body_sha1": "be0c84b92d8568c3cf269464dc04a0e21922b3f8",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 600,
+   "modifiers": [
+    "onlyOwner"
+   ],
+   "mutability": "nonpayable",
+   "name": "setNftMaxSupply",
+   "observations": [],
+   "reachability": "Owner-only, bounded to 1..MAX_NFT_SUPPLY at `MAX_NFT_SUPPLY` CauldronRegistry.sol:601 before writing `nftMaxSupply` CauldronRegistry.sol:602. The same ceiling is re-applied to the proposer's requested supply inside the rebirth at `MAX_NFT_SUPPLY` CauldronRegistry.sol:601, this time by clamping rather than reverting.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function setNftMaxSupply(uint256 _max) external onlyOwner",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "nftMaxSupply (line 602)"
+   ]
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (CauldronRegistry.sol:607)",
+   "body_lines": [
+    607,
+    611
+   ],
+   "body_sha1": "11699653a1660a2f272f882be4651ff0ac5aea67",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 607,
+   "modifiers": [
+    "onlyOwner"
+   ],
+   "mutability": "nonpayable",
+   "name": "setRoyalty",
+   "observations": [],
+   "reachability": "Owner-only. Capped at 1000 bps at `_bps` CauldronRegistry.sol:607, then stored in `royaltyDividend` CauldronRegistry.sol:609 and `royaltyBps` CauldronRegistry.sol:610. Both are only consumed when a brew's collection is deployed, at `royaltyReceiver` CauldronRegistry.sol:1227, so a change applies to future collections only (DERIVED).",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function setRoyalty(address _dividend, uint96 _bps) external onlyOwner",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "royaltyDividend (line 609)",
+    "royaltyBps (line 610)"
+   ]
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (CauldronRegistry.sol:616)",
+   "body_lines": [
+    618,
+    622
+   ],
+   "body_sha1": "ae27afb336c67735063064f5c0aa04dca1af541e",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 615,
+   "modifiers": [
+    "onlyOwner"
+   ],
+   "mutability": "nonpayable",
+   "name": "setGenesisMetadata",
+   "observations": [],
+   "reachability": "Owner-only, no bound on the string length or the renderer address (`genesisBaseURI` CauldronRegistry.sol:620, `genesisRenderer` CauldronRegistry.sol:621). These three are the defaults a rebirth loads at `genesisMode` CauldronRegistry.sol:619 before the winning proposal overwrites them at `mode` CauldronRegistry.sol:619, so after iteration one they matter only as the values used when a spec leaves them empty (DERIVED).",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function setGenesisMetadata(MetadataMode mode, string calldata baseURI, address renderer) external onlyOwner",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "genesisMode (line 619)",
+    "genesisBaseURI (line 620)",
+    "genesisRenderer (line 621)"
+   ]
+  },
+  {
+   "authority": "caller satisfying `onlyOwner`",
+   "authority_gate_quote": "onlyOwner (CauldronRegistry.sol:640)",
+   "body_lines": [
+    648,
+    652
+   ],
+   "body_sha1": "92c5aabfca94e1f6c4cc6bfa7df4719715ff8f5b",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "ICollectionMetadata.setMetadata (CauldronRegistry.sol:651), UNTRUSTED, out-of-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 643,
+   "modifiers": [
+    "onlyOwner"
+   ],
+   "mutability": "nonpayable",
+   "name": "setCollectionMetadata",
+   "observations": [],
+   "reachability": "`setCollectionMetadata` is declared at CauldronRegistry.sol:643; caller satisfying `onlyOwner`.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function setCollectionMetadata( uint256 gen, MetadataMode mode, address renderer, string calldata baseURI ) external onlyOwner",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (CauldronRegistry.sol:662)",
+   "body_lines": [
+    664,
+    671
+   ],
+   "body_sha1": "1ec009aa488b4af62233b5ee05d1311ca7558706",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 661,
+   "modifiers": [
+    "onlyOwner"
+   ],
+   "mutability": "nonpayable",
+   "name": "setGenesisBonus",
+   "observations": [],
+   "reachability": "Owner-only and pre-ignition only: it reverts once `summoned` CauldronRegistry.sol:665 is set. The bonus is capped at 3000 bps at `_bonusBps` CauldronRegistry.sol:661 and both other fields must be non-zero at `_shares` CauldronRegistry.sol:659. `genesisShares` CauldronRegistry.sol:670 becomes the divisor of the live floor in `floorPerFren` CauldronBase.sol:423 and the OG/forged split boundary used throughout redemption.",
+   "reads": [
+    "summoned (line 665)"
+   ],
+   "semantics": "fresh",
+   "signature": "function setGenesisBonus(address _mifrens, uint256 _bonusBps, uint256 _shares) external onlyOwner",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "mifrens (line 668)",
+    "genesisBonusBps (line 669)",
+    "genesisShares (line 670)"
+   ]
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (CauldronRegistry.sol:676)",
+   "body_lines": [
+    676,
+    682
+   ],
+   "body_sha1": "5c052d94cd6e8de9f5be972fb53867c55ed593a1",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 676,
+   "modifiers": [
+    "onlyOwner"
+   ],
+   "mutability": "nonpayable",
+   "name": "setAirdropReserve",
+   "observations": [],
+   "reachability": "Owner-only, pre-ignition only (`summoned` CauldronRegistry.sol:677), non-zero wallet required at `_wallet` CauldronRegistry.sol:674 and capped at 20 percent of supply at `_amount` CauldronRegistry.sol:676. The reserve is paid out exactly once, off-LP, during ignition at `airdropReserve` CauldronRegistry.sol:681.",
+   "reads": [
+    "summoned (line 677)"
+   ],
+   "semantics": "fresh",
+   "signature": "function setAirdropReserve(address _wallet, uint256 _amount) external onlyOwner",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "airdropWallet (line 680)",
+    "airdropReserve (line 681)"
+   ]
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (CauldronRegistry.sol:685)",
+   "body_lines": [
+    685,
+    688
+   ],
+   "body_sha1": "00ebd2f2efa252e2d3bcf43918919ef7525af2a6",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 685,
+   "modifiers": [
+    "onlyOwner"
+   ],
+   "mutability": "nonpayable",
+   "name": "setPrimeFunder",
+   "observations": [],
+   "reachability": "Owner-only and pre-ignition only (`summoned` CauldronRegistry.sol:686). `primeFunder` CauldronRegistry.sol:687 is the sole gate on both prime-buy entries, at `primeFunder` CauldronRegistry.sol:687 and CauldronRegistry.sol:687, and it can never be changed after ignition (DERIVED).",
+   "reads": [
+    "summoned (line 686)"
+   ],
+   "semantics": "fresh",
+   "signature": "function setPrimeFunder(address who) external onlyOwner",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "primeFunder (line 687)"
+   ]
+  },
+  {
+   "authority": "primeFunder",
+   "authority_gate_quote": "if (msg.sender != primeFunder) revert NotAdmin(); (CauldronRegistry.sol:695)",
+   "body_lines": [
+    695,
+    698
+   ],
+   "body_sha1": "15839775e0a00b8bbaebe59c3e4cb2d7552c7cee",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 695,
+   "modifiers": [],
+   "mutability": "payable",
+   "name": "fundPrimeBuy",
+   "observations": [],
+   "reachability": "Only the configured funder may pay in (`primeFunder` CauldronRegistry.sol:694). The balance accrues in `primeBuyEth` CauldronRegistry.sol:697 as a counter alongside the registry's real ether balance, and it is spent in one shot during ignition at `primeBuyEth` CauldronRegistry.sol:697. With `primeFunder` CauldronRegistry.sol:694 unset the function is unreachable, since the zero address cannot call (DERIVED).",
+   "reads": [
+    "primeFunder (line 694)",
+    "primeBuyEth (line 697)"
+   ],
+   "semantics": "fresh",
+   "signature": "function fundPrimeBuy() external payable",
+   "value": "receives native, accumulated into `primeBuyEth` (line 697)",
+   "visibility": "external",
+   "writes": [
+    "primeBuyEth (line 697)"
+   ]
+  },
+  {
+   "authority": "primeFunder",
+   "authority_gate_quote": "if (msg.sender != primeFunder) revert NotAdmin(); (CauldronRegistry.sol:701)",
+   "body_lines": [
+    701,
+    707
+   ],
+   "body_sha1": "c4dcc45dbf8e217d109454ded250036a4c732de7",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "msg.sender.call (CauldronRegistry.sol:705), UNTRUSTED, out-of-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 701,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "sweepPrimeBuy",
+   "observations": [],
+   "reachability": "Funder-only reclaim. The counter is zeroed at `primeBuyEth` CauldronRegistry.sol:703 before the send at `amt` CauldronRegistry.sol:703, so the ordering is effects-then-interaction even though there is no reentrancy guard here. The amount paid out is the COUNTER, not a measured balance, and it is paid from whatever ether the registry holds (DERIVED).",
+   "reads": [
+    "primeFunder (line 702)",
+    "primeBuyEth (line 703)"
+   ],
+   "semantics": "fresh",
+   "signature": "function sweepPrimeBuy() external",
+   "value": "sends native equal to `amt` back to the funder (line 703)",
+   "visibility": "external",
+   "writes": [
+    "primeBuyEth (line 703)"
+   ]
+  },
+  {
+   "authority": "owner or igniter",
+   "authority_gate_quote": "if (msg.sender != owner() && msg.sender != igniter) revert NotAdmin(); (CauldronRegistry.sol:730)",
+   "body_lines": [
+    727,
+    800
+   ],
+   "body_sha1": "184734f016e011356c5c22bb1c91499ee2ce92ed",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "Ownable.owner (CauldronRegistry.sol:731), TRUSTED, out-of-cluster",
+    "PoolOps.creatureFor (CauldronRegistry.sol:741), TRUSTED, library",
+    "LaunchLib.displayName (CauldronRegistry.sol:742), TRUSTED, library",
+    "CauldronRegistry._deployToken (CauldronRegistry.sol:745), TRUSTED, in-cluster",
+    "IERC20.transfer (CauldronRegistry.sol:769), TRUSTED, out-of-cluster",
+    "CauldronRegistry._seedGeneration (CauldronRegistry.sol:778), TRUSTED, in-cluster",
+    "PoolOps.primeBuy (CauldronRegistry.sol:792), TRUSTED, library",
+    "CauldronRegistry._deployCollection (CauldronRegistry.sol:797), TRUSTED, in-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 722,
+   "modifiers": [
+    "nonReentrant"
+   ],
+   "mutability": "payable",
+   "name": "summon",
+   "observations": [
+    "comment at `CREATE` CauldronRegistry.sol:744 says the generation token is deployed with plain CREATE; code reached from `_deployToken` CauldronRegistry.sol:745 deploys it with CREATE2 from a mined salt at `salt` PoolOps.sol:742, using plain CREATE only in the unmined fallback at `CauldronToken` PoolOps.sol:767."
+   ],
+   "reachability": "The one-time ignition. Two callers are accepted, the owner and the delegated igniter, at `igniter` CauldronRegistry.sol:728; it is one-shot either way because `summoned` CauldronRegistry.sol:730 is set immediately and re-entry is refused at `summoned` CauldronRegistry.sol:730. Non-zero msg.value is mandatory at `InsufficientETH` CauldronRegistry.sol:733. Generation one is always native-quoted: nothing writes `generationQuote` here, and the mapping's zero default is what the pool is built against (DERIVED). The genesis bonus is sized only if both `genesisBonusBps` CauldronRegistry.sol:757 and the share count are non-zero, fixing `genesisSharePerFren` CauldronRegistry.sol:759 for the life of the machine. The active band is the fixed 80 percent constant at `GEN1_ACTIVE_TOKENS` CauldronRegistry.sol:765 and the reserve is the remainder minus the airdrop. The prime buy runs AFTER the seed so it hits the intended starting price, with the callback window opened and closed around it at `_seedBuyUnlocked` CauldronRegistry.sol:791 and CauldronRegistry.sol:791.",
+   "reads": [
+    "igniter (line 728)",
+    "summoned (line 730)",
+    "genesisBonusBps (line 757)",
+    "genesisShares (line 757)",
+    "airdropReserve (line 767)",
+    "airdropWallet (line 767)",
+    "primeBuyEth (line 786)",
+    "primeFunder (line 790)",
+    "poolManager (line 792)",
+    "generationPoolKey (line 792)",
+    "genesisMode (line 797)",
+    "genesisBaseURI (line 797)",
+    "genesisRenderer (line 797)",
+    "nftMaxSupply (line 797)"
+   ],
+   "semantics": "fresh",
+   "signature": "function summon() external payable nonReentrant returns (address token, PoolId poolId)",
+   "value": "receives native as the entire genesis pairing, which `_seedGeneration` places into the pool (line 776); ERC20 transfer of the freshly minted token to `airdropWallet` (line 767); spends the accumulated prime ether inside `primeBuy` (line 792)",
+   "visibility": "external",
+   "writes": [
+    "summoned (line 730)",
+    "currentGeneration (line 736)",
+    "lastSummonAt (line 737)",
+    "currentToken (line 746)",
+    "generationToken (line 747)",
+    "genesisSharePerFren (line 759)",
+    "genesisReserveOutstanding (line 760)",
+    "primeBuyEth (line 786)",
+    "_seedBuyUnlocked (line 791)",
+    "_seedBuyUnlocked (line 791)"
+   ]
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    825,
+    1154
+   ],
+   "body_sha1": "be72f418d2d61ceb2916537ceff2591de22e75ec",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronHook.isDead (CauldronRegistry.sol:833), UNTRUSTED, out-of-cluster",
+    "ICauldronGovernor.hasProposals (CauldronRegistry.sol:841), UNTRUSTED, out-of-cluster",
+    "CauldronToken.burn (CauldronRegistry.sol:865), UNTRUSTED, out-of-cluster",
+    "CauldronHook.resolveTickets (CauldronRegistry.sol:876), UNTRUSTED, out-of-cluster",
+    "ICauldronGovernor.winner (CauldronRegistry.sol:903), UNTRUSTED, out-of-cluster",
+    "LaunchLib.displayName (CauldronRegistry.sol:967), TRUSTED, library",
+    "PoolOps.seedFunding (CauldronRegistry.sol:1002), TRUSTED, out-of-cluster",
+    "ICauldronGovernor.winner (CauldronRegistry.sol:903), UNTRUSTED, out-of-cluster",
+    "ICauldronGovernor.markConsumed (CauldronRegistry.sol:1031), UNTRUSTED, out-of-cluster",
+    "CauldronHook.setActiveProposer (CauldronRegistry.sol:1043), UNTRUSTED, out-of-cluster",
+    "PoolOps.crystallizeCollection (CauldronRegistry.sol:1092), TRUSTED, out-of-cluster",
+    "ICollectionLedger.totalEntitled (CauldronRegistry.sol:1096), UNTRUSTED, out-of-cluster",
+    "CauldronHook.setNftCurveFrom (CauldronRegistry.sol:1146), UNTRUSTED, out-of-cluster",
+    "CauldronRegistry._perpHousekeep (CauldronRegistry.sol:855), TRUSTED, in-cluster",
+    "CauldronRegistry._removeLiquidity (CauldronRegistry.sol:858), TRUSTED, in-cluster",
+    "CauldronRegistry._deployToken (CauldronRegistry.sol:970), TRUSTED, in-cluster",
+    "CauldronRegistry._flushLegacyAtRelaunch (CauldronRegistry.sol:1091), TRUSTED, in-cluster",
+    "CauldronRegistry._seedGeneration (CauldronRegistry.sol:1131), TRUSTED, in-cluster",
+    "CauldronRegistry._continueMiFrens (CauldronRegistry.sol:1139), TRUSTED, in-cluster",
+    "CauldronRegistry._deployCollection (CauldronRegistry.sol:1141), TRUSTED, in-cluster",
+    "CauldronRegistry._perpHousekeep (CauldronRegistry.sol:1151), TRUSTED, in-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 821,
+   "modifiers": [
+    "nonReentrant"
+   ],
+   "mutability": "nonpayable",
+   "name": "relaunch",
+   "observations": [],
+   "reachability": "`relaunch` is declared at CauldronRegistry.sol:821; anyone.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function relaunch() external nonReentrant returns (address token, PoolId poolId)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "internal (callers: relaunch)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    1160,
+    1195
+   ],
+   "body_sha1": "d0d5e8c4f1b343cbbe470b8079053c6024ca221d",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronHook.perpEngine (CauldronRegistry.sol:1162), TRUSTED, out-of-cluster",
+    "IPerpSync.syncGeneration (CauldronRegistry.sol:1163), TRUSTED, out-of-cluster",
+    "CauldronHook.forceClosePerps (CauldronRegistry.sol:1192), TRUSTED, out-of-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1160,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "_perpHousekeep",
+   "observations": [],
+   "reachability": "Private, reached only from the two calls inside the rebirth at `_perpHousekeep` CauldronRegistry.sol:1160 and CauldronRegistry.sol:1160. The two branches are not symmetric in failure handling: the sync branch swallows everything in a try/catch at `syncGeneration` CauldronRegistry.sol:1163, while the force-close branch calls `forceClosePerps` CauldronRegistry.sol:1182 bare, so a revert there propagates and rolls the whole relaunch back. Both are gas-capped, the close against `RELAUNCH_TAIL_RESERVE` CauldronRegistry.sol:1191, and the engine address is read off the hook rather than stored here (`perpEngine` CauldronRegistry.sol:1162). When the cap check fails because `g` CauldronRegistry.sol:1190 is below the reserve, the close is skipped entirely and the rebirth continues with the book untouched (DERIVED).",
+   "reads": [
+    "hook (line 1162)",
+    "RELAUNCH_TAIL_RESERVE (line 1191, constant)",
+    "hook (line 1162)"
+   ],
+   "semantics": "fresh",
+   "signature": "function _perpHousekeep(bool sync) private",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal (callers: summon, relaunch)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    1209,
+    1239
+   ],
+   "body_sha1": "5b8eff665d301c33bb3d35b958163e7061a084f3",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "ICauldronFactory.deployBrew (CauldronRegistry.sol:1217), TRUSTED, out-of-cluster",
+    "CauldronHook.setCollection (CauldronRegistry.sol:1233), TRUSTED, out-of-cluster",
+    "CauldronHook.setVault (CauldronRegistry.sol:1237), TRUSTED, out-of-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1201,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "_deployCollection",
+   "observations": [],
+   "reachability": "Private; reached from ignition at `_deployCollection` CauldronRegistry.sol:1201 and from every non-continuation rebirth at CauldronRegistry.sol:1201. It cannot revert on missing metadata because an empty base URI falls back to a literal at `baseURI` CauldronRegistry.sol:1212 and a zero cap falls back to `nftMaxSupply` CauldronRegistry.sol:1215. The factory call at `deployBrew` CauldronRegistry.sol:1217 is NOT wrapped, so a broken or unset factory reverts the whole rebirth (DERIVED). The hook is then repointed at the new collection (`setCollection` CauldronRegistry.sol:1233) and its vault sink is deliberately zeroed (`setVault` CauldronRegistry.sol:1235), routing the floor share into the token buyback instead.",
+   "reads": [
+    "nftMaxSupply (line 1215)",
+    "factory (line 1217)",
+    "hook (line 1221)",
+    "royaltyDividend (line 1227)",
+    "royaltyBps (line 1228)"
+   ],
+   "semantics": "fresh",
+   "signature": "function _deployCollection( uint256 gen, string memory name, string memory symbol, MetadataMode mode, string memory baseURI, address renderer, uint256 maxSupply ) private",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": [
+    "generationCollection (line 1231)",
+    "generationVault (line 1232)"
+   ]
+  },
+  {
+   "authority": "internal (callers: relaunch)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    1250,
+    1263
+   ],
+   "body_sha1": "6eebc8102065098d08be0bf2243880cfe6d24fc9",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "ICauldronFactory.deployVault (CauldronRegistry.sol:1255), TRUSTED, out-of-cluster",
+    "IMiFrensContinuable.setVault (CauldronRegistry.sol:1258), TRUSTED, out-of-cluster",
+    "IMiFrensContinuable.setMinter (CauldronRegistry.sol:1259), TRUSTED, out-of-cluster",
+    "CauldronHook.setCollection (CauldronRegistry.sol:1260), TRUSTED, out-of-cluster",
+    "CauldronHook.setVault (CauldronRegistry.sol:1261), TRUSTED, out-of-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1250,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "_continueMiFrens",
+   "observations": [],
+   "reachability": "Private and reachable exactly once in the machine's life, from the iteration-two branch at `_continueMiFrens` CauldronRegistry.sol:1250, which requires `mifrens` CauldronRegistry.sol:1251 to be wired. No new collection is deployed; only a fresh floor vault at `deployVault` CauldronRegistry.sol:1255, whose offset is `genesisShares` CauldronRegistry.sol:1252 so the forged tranche cannot draw the OG floor. It then takes over the canonical collection by pointing its minter at the hook (`setMinter` CauldronRegistry.sol:1259), which requires this registry to already hold that authority on the collection (DERIVED).",
+   "reads": [
+    "mifrens (line 1251)",
+    "factory (line 1255)",
+    "genesisShares (line 1252)",
+    "hook (line 1259)"
+   ],
+   "semantics": "fresh",
+   "signature": "function _continueMiFrens(uint256 gen) private",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": [
+    "generationCollection (line 1256)",
+    "generationVault (line 1257)"
+   ]
+  },
+  {
+   "authority": "anyone (holders of a previous generation's token); blocked for ordinary callers while a vesting gate is set",
+   "authority_gate_quote": "if (claimGate != address(0) && msg.sender != claimGate && msg.sender != hook.perpEngine()) { (CauldronRegistry.sol:1299)",
+   "body_lines": [
+    1294,
+    1315
+   ],
+   "body_sha1": "804750a3933586aa70b1a43f41207720ebc5127c",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronHook.perpEngine (CauldronRegistry.sol:1300), TRUSTED, out-of-cluster",
+    "IERC20.balanceOf (CauldronRegistry.sol:1305), TRUSTED, out-of-cluster",
+    "PoolOps.migrateOne (CauldronRegistry.sol:1310), TRUSTED, library"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1291,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "claimByBurn",
+   "observations": [
+    "comment at `claimTokens` CauldronRegistry.sol:44 names the migration entry point as claimTokens(gen); code exposes it as `claimByBurn` CauldronRegistry.sol:1291 and `claimByBurnUpTo` CauldronRegistry.sol:1336, and no function of the documented name exists in this file."
+   ],
+   "reachability": "Open to any holder of a strictly earlier generation (`currentGeneration` CauldronRegistry.sol:1295). When a vesting escrow is configured the direct path is closed to everyone except the escrow itself and the perp engine (`claimGate` CauldronRegistry.sol:1300). The source generation must be known (`prevToken` CauldronRegistry.sol:1303) and the caller must actually hold the amount (`balanceOf` CauldronRegistry.sol:1305). It deliberately carries no reentrancy guard, which is what lets the engine migrate its inventory while the rebirth already holds the lock (`migrateOne` CauldronRegistry.sol:1310). The release is strict: a reserve that cannot cover the amount reverts and un-burns atomically.",
+   "reads": [
+    "currentGeneration (line 1295)",
+    "claimGate (line 1300)",
+    "hook (line 1300)",
+    "generationToken (line 1303)",
+    "currentGeneration (line 1295)",
+    "positionManager (line 1311)",
+    "generationReservePositionId (line 1312)",
+    "generationPoolKey (line 1312)",
+    "reserveTickLower (line 1312)",
+    "reserveTickUpper (line 1312)"
+   ],
+   "semantics": "fresh",
+   "signature": "function claimByBurn(uint256 fromGen, uint256 amount) external returns (uint256 claimedAmount)",
+   "value": "burns the caller's previous-generation balance and releases the same amount of the live token out of the reserve position, both inside `migrateOne` (line 1310)",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "any holder of an earlier generation, unless a claim gate is set, in which case only the gate itself or the perp engine; the gate is enforced facet-side",
+   "authority_gate_quote": "if (claimGate != address(0) && msg.sender != claimGate && msg.sender != hook.perpEngine()) { (RedemptionExt.sol:746)",
+   "body_lines": [
+    1336,
+    1338
+   ],
+   "body_sha1": "9d5aae3209f78c6a79992368fb811104a5954f83",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronRegistry._forwardToExt (CauldronRegistry.sol:1337), TRUSTED, in-cluster",
+    "RedemptionExt.claimByBurnUpTo (RedemptionExt.sol:758), TRUSTED, delegatecall"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1336,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "claimByBurnUpTo",
+   "observations": [],
+   "reachability": "Selector-preserving forwarder: the body moved to `claimByBurnUpTo` RedemptionExt.sol:742 and this stub keeps the ABI (comment at `claimByBurnUpTo` CauldronRegistry.sol:1336 gives EIP-170 headroom as the reason). Body is `_forwardToExt` CauldronRegistry.sol:1337, a delegatecall, so the facet executes on this registry's storage and custody. Every gate is facet-side: earlier generations only at `currentGeneration` RedemptionExt.sol:725, the escrow/engine exemption at `claimGate` RedemptionExt.sol:747, a known source token at `prevToken` RedemptionExt.sol:750 and a real balance at `balanceOf` RedemptionExt.sol:753; the capacity-aware migration itself is `migrateUpTo` RedemptionExt.sol:758, which sizes to what the reserve can deliver instead of reverting. The strict sibling `claimByBurn` CauldronRegistry.sol:1291 still holds its own copy of the same gate on this side.",
+   "reads": [
+    "redemptionExt (line 1501)"
+   ],
+   "semantics": "fresh",
+   "signature": "function claimByBurnUpTo(uint256, uint256) external returns (uint256)",
+   "value": "NONE in this stub; the burn and the reserve withdrawal happen inside the delegatecalled facet, on this registry's own storage and custody",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone (free for any MiFren holder, otherwise a fee is required)",
+   "authority_gate_quote": "if (msg.value < AUTO_MIGRATE_FEE) revert Fee(); (CauldronRegistry.sol:1359)",
+   "body_lines": [
+    1354,
+    1364
+   ],
+   "body_sha1": "8e18a8fb059454aea5c7c487c3ab320a4bbcbab4",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "IERC721.balanceOf (CauldronRegistry.sol:1359), TRUSTED, out-of-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1354,
+   "modifiers": [],
+   "mutability": "payable",
+   "name": "enableAutoMigrate",
+   "observations": [],
+   "reachability": "Open to anyone. The fren check is skipped entirely when `mifrens` CauldronRegistry.sol:1356 is unset, in which case everyone pays. Overpayment is not refunded: the comparison at `msg` CauldronRegistry.sol:1359 is a minimum, and no change is returned (DERIVED). The flag written at `autoMigrate` CauldronRegistry.sol:1362 is the only thing that authorises a keeper to burn that wallet's old-generation balance later, and it is revocable at `autoMigrate` CauldronRegistry.sol:1362.",
+   "reads": [
+    "mifrens (line 1356)"
+   ],
+   "semantics": "fresh",
+   "signature": "function enableAutoMigrate() external payable",
+   "value": "receives native: the opt-in fee is required only when the caller holds no fren, checked at `AUTO_MIGRATE_FEE` (line 1360), and any ether sent stays in this registry",
+   "visibility": "external",
+   "writes": [
+    "autoMigrate (line 1362)"
+   ]
+  },
+  {
+   "authority": "anyone (for their own wallet only)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    1382,
+    1385
+   ],
+   "body_sha1": "c775be83532b598b09d057f5bd72c63990124453",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1382,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "disableAutoMigrate",
+   "observations": [],
+   "reachability": "Open and free: a caller can only ever clear their own slot, since the key is msg.sender at `autoMigrate` CauldronRegistry.sol:1383. It takes effect immediately because the keeper path re-reads the flag per holder inside `autoMigrateBatch` CauldronRegistry.sol:1380. Re-enabling costs the fee again at `AUTO_MIGRATE_FEE` CauldronRegistry.sol:1344 (DERIVED).",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function disableAutoMigrate() external",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "autoMigrate (line 1383)"
+   ]
+  },
+  {
+   "authority": "anyone (permissionless keeper)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    1397,
+    1410
+   ],
+   "body_sha1": "76f47a41001fc0779150f180f124cf03cbeb866d",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "PoolOps.autoMigrateBatch (CauldronRegistry.sol:1406), TRUSTED, library"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1394,
+   "modifiers": [
+    "nonReentrant"
+   ],
+   "mutability": "nonpayable",
+   "name": "autoMigrateBatch",
+   "observations": [],
+   "reachability": "Permissionless. Three state conditions: an earlier source generation at `currentGeneration` CauldronRegistry.sol:1398, no vesting escrow at all (`claimGate` CauldronRegistry.sol:1402 closes this path for everyone, unlike the per-caller exemption on the direct claims), and a known source token at `prevToken` CauldronRegistry.sol:1403. The holder list is caller-supplied and its length is the loop bound, so the only limit is the block gas limit (`holders` CauldronRegistry.sol:1394). Per-holder consent is checked inside the library, and the burn primitive it uses needs no allowance, so the opt-in flag at `autoMigrate` CauldronRegistry.sol:1344 is the whole authorisation.",
+   "reads": [
+    "currentGeneration (line 1398)",
+    "claimGate (line 1402)",
+    "generationToken (line 1403)",
+    "currentGeneration (line 1398)",
+    "positionManager (line 1407)",
+    "generationReservePositionId (line 1408)",
+    "generationPoolKey (line 1408)",
+    "reserveTickLower (line 1408)",
+    "reserveTickUpper (line 1408)"
+   ],
+   "semantics": "fresh",
+   "signature": "function autoMigrateBatch(uint256 fromGen, address[] calldata holders) external nonReentrant",
+   "value": "burns each opted-in holder's whole previous-generation balance and releases the same amount of the live token from the reserve, inside `autoMigrateBatch` (line 1394)",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone holding a genesis fren; the facet holds the gate (RedemptionExt checks OG ownership and the redemption circuit-breaker)",
+   "authority_gate_quote": "if (IERC721(mifrens).ownerOf(mifrenTokenId) != msg.sender) revert NotOwnerOf(); (RedemptionExt.sol:85)",
+   "body_lines": [
+    1437,
+    1439
+   ],
+   "body_sha1": "9d5aae3209f78c6a79992368fb811104a5954f83",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronRegistry._forwardToExt (CauldronRegistry.sol:1438), TRUSTED, in-cluster",
+    "RedemptionExt.redeemOgFren (CauldronRegistry.sol:1437), TRUSTED, delegatecall"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1437,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "redeemOgFren",
+   "observations": [],
+   "reachability": "Thin stub; the body is `_forwardToExt` CauldronRegistry.sol:1438 and the code that runs is `redeemOgFren` RedemptionExt.sol:78, executing on this registry's storage and custody. Every gate is facet-side: the circuit-breaker at `_redeemBlocked` RedemptionExt.sol:79, ignition at `summoned` RedemptionExt.sol:80, the OG-only id range at `genesisShares` RedemptionExt.sol:83 and ownership at `ownerOf` RedemptionExt.sol:84. The facet's own nonReentrant runs against this registry's guard slot, which is why the stub must not carry one (`nonReentrant` RedemptionExt.sol:78).",
+   "reads": [
+    "redemptionExt (line 1501)"
+   ],
+   "semantics": "fresh",
+   "signature": "function redeemOgFren(uint256) external returns (uint256)",
+   "value": "NONE in this stub; the facet pays the live floor out of this registry's reserve position and takes custody of the fren",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone; the facet holds the gate (the fren must currently sit in this registry's treasury)",
+   "authority_gate_quote": "if (IERC721(mifrens).ownerOf(mifrenTokenId) != address(this)) revert NotOwnerOf(); (RedemptionExt.sol:120)",
+   "body_lines": [
+    1443,
+    1445
+   ],
+   "body_sha1": "9d5aae3209f78c6a79992368fb811104a5954f83",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronRegistry._forwardToExt (CauldronRegistry.sol:1444), TRUSTED, in-cluster",
+    "RedemptionExt.buyTreasuryOgFren (CauldronRegistry.sol:1443), TRUSTED, delegatecall"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1443,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "buyTreasuryOgFren",
+   "observations": [],
+   "reachability": "Stub whose body is `_forwardToExt` CauldronRegistry.sol:1444, reaching `buyTreasuryOgFren` RedemptionExt.sol:115. Facet-side conditions: ignition at `summoned` RedemptionExt.sol:116, the OG id range at `genesisShares` RedemptionExt.sol:117, and treasury custody at `ownerOf` RedemptionExt.sol:119. The price is derived, not quoted: twice `floorPerFren` RedemptionExt.sol:121, so it moves with the reserve.",
+   "reads": [
+    "redemptionExt (line 1501)"
+   ],
+   "semantics": "fresh",
+   "signature": "function buyTreasuryOgFren(uint256) external returns (uint256)",
+   "value": "NONE in this stub; the facet pulls twice the live floor in the current token from the buyer and grows the reserve with it",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    1449,
+    1451
+   ],
+   "body_sha1": "9d5aae3209f78c6a79992368fb811104a5954f83",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronRegistry._forwardToExt (CauldronRegistry.sol:1450), TRUSTED, in-cluster",
+    "RedemptionExt.donateToReserve (CauldronRegistry.sol:1449), TRUSTED, delegatecall"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1449,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "donateToReserve",
+   "observations": [],
+   "reachability": "Stub forwarding to `donateToReserve` RedemptionExt.sol:136, which has no caller gate at all; it only requires ignition at `summoned` RedemptionExt.sol:137 and a non-zero amount at `amount` RedemptionExt.sol:138. The pull is by transferFrom, so the caller must have approved this registry first (DERIVED). This is the path the dividend contract routes re-enchant fees through, which is why the fee quote at `enchantFee` CauldronRegistry.sol:365 lives on the registry.",
+   "reads": [
+    "redemptionExt (line 1501)"
+   ],
+   "semantics": "fresh",
+   "signature": "function donateToReserve(uint256) external",
+   "value": "NONE in this stub; the facet pulls the donated amount of the current token from the caller into the reserve",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone (permissionless keeper)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    1455,
+    1457
+   ],
+   "body_sha1": "9d5aae3209f78c6a79992368fb811104a5954f83",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronRegistry._forwardToExt (CauldronRegistry.sol:1456), TRUSTED, in-cluster",
+    "RedemptionExt.materializeLegacyReserve (CauldronRegistry.sol:1455), TRUSTED, delegatecall"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1455,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "materializeLegacyReserve",
+   "observations": [],
+   "reachability": "Stub forwarding to `materializeLegacyReserve` RedemptionExt.sol:147. No caller gate; the only precondition is ignition at `summoned` RedemptionExt.sol:148. It deposits and credits in one step so a ledger credit can never out-run the reserve backing it (`materializeLegacy` RedemptionExt.sol:151). The rebirth performs the same flush for the dying generation on the burn path at `_flushLegacyAtRelaunch` CauldronRegistry.sol:1548, so an uncalled keeper does not lose the value.",
+   "reads": [
+    "redemptionExt (line 1501)"
+   ],
+   "semantics": "fresh",
+   "signature": "function materializeLegacyReserve() external returns (uint256)",
+   "value": "NONE in this stub; the facet sweeps the hook's held buyback tokens into this registry's reserve position",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    1472,
+    1474
+   ],
+   "body_sha1": "6f15d2947f90aff1b01ae8ebee2a24667216cffb",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronRegistry._forwardToExtView (CauldronRegistry.sol:1473), TRUSTED, in-cluster",
+    "RedemptionExt.floorClaimableNow (RedemptionExt.sol:739), TRUSTED, delegatecall"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1472,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "floorClaimableNow",
+   "observations": [
+    "comment at `fallback` RedemptionExt.sol:698 says this view is reached through the registry's fallback; code at `floorClaimableNow` CauldronRegistry.sol:1472 is an explicit stub and `receive` CauldronRegistry.sol:578 is the only special function the registry declares."
+   ],
+   "reachability": "A read that cannot be declared view because Solidity refuses delegatecall in a view body, so it is nonpayable and an eth_call serves it unchanged. It reaches `floorClaimableNow` RedemptionExt.sol:723, which reads the live tick and compares it with the reserve band at `reserveTickUpper` RedemptionExt.sol:728. Ungated on both sides.",
+   "reads": [
+    "redemptionExt (line 1501)"
+   ],
+   "semantics": "fresh",
+   "signature": "function floorClaimableNow() external returns (bool, uint256)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    1477,
+    1479
+   ],
+   "body_sha1": "6f15d2947f90aff1b01ae8ebee2a24667216cffb",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronRegistry._forwardToExtView (CauldronRegistry.sol:1478), TRUSTED, in-cluster",
+    "RedemptionExt.legCount (RedemptionExt.sol:782), TRUSTED, delegatecall"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1477,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "legCount",
+   "observations": [
+    "comment at `fallback` CauldronBase.sol:535 says legCount and legAt are reached through the registry's fallback; code at `legCount` CauldronRegistry.sol:1477 and `legAt` CauldronRegistry.sol:1482 are explicit stubs, and the registry declares no fallback (`receive` CauldronRegistry.sol:578)."
+   ],
+   "reachability": "Ungated read forwarded to `legCount` RedemptionExt.sol:766, which returns the length of the rotated-leg array for that generation from this registry's own storage (`generationLegs` RedemptionExt.sol:767). Nonpayable rather than view for the same delegatecall reason as the other two readers (`_forwardToExtView` CauldronRegistry.sol:1478).",
+   "reads": [
+    "redemptionExt (line 1501)"
+   ],
+   "semantics": "fresh",
+   "signature": "function legCount(uint256) external returns (uint256)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    1482,
+    1484
+   ],
+   "body_sha1": "6f15d2947f90aff1b01ae8ebee2a24667216cffb",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronRegistry._forwardToExtView (CauldronRegistry.sol:1483), TRUSTED, in-cluster",
+    "RedemptionExt.legAt (RedemptionExt.sol:787), TRUSTED, delegatecall"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1482,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "legAt",
+   "observations": [],
+   "reachability": "Ungated read forwarded to `legAt` RedemptionExt.sol:771. There is no explicit bounds check; an out-of-range index reverts on the array access at `generationLegs` RedemptionExt.sol:767 (DERIVED). Callers are expected to page it against the count from `legCount` CauldronRegistry.sol:1477.",
+   "reads": [
+    "redemptionExt (line 1501)"
+   ],
+   "semantics": "fresh",
+   "signature": "function legAt(uint256, uint256) external returns (address, uint256, PoolKey memory)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "internal (callers: floorClaimableNow, legCount, legAt)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    1495,
+    1497
+   ],
+   "body_sha1": "9d5aae3209f78c6a79992368fb811104a5954f83",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronRegistry._forwardToExt (CauldronRegistry.sol:1496), TRUSTED, in-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1495,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "_forwardToExtView",
+   "observations": [],
+   "reachability": "A one-line alias over `_forwardToExt` CauldronRegistry.sol:1496 that exists only to document why the three read stubs are not `view` CauldronRegistry.sol:1493. It adds no gate and no state of its own, so the three readers inherit exactly the facet's behaviour (DERIVED).",
+   "reads": [
+    "redemptionExt (line 1501)"
+   ],
+   "semantics": "fresh",
+   "signature": "function _forwardToExtView() private",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal (callers: rotateSlice, rotateSliceFrom, setRotationWiring, sweepLegProceeds, redeemOgFren, buyTreasuryOgFren, donateToReserve, materializeLegacyReserve, _forwardToExtView)",
+   "authority_gate_quote": "if (ext == address(0)) revert NotConfigured(); (CauldronRegistry.sol:1506)",
+   "body_lines": [
+    1505,
+    1516
+   ],
+   "body_sha1": "195063922bd1dedccc4f7e09ad4f17e87f6aa22c",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "ext.delegatecall (CauldronRegistry.sol:1510), TRUSTED, delegatecall"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1505,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "_forwardToExt",
+   "observations": [
+    "comment at `fallback` CauldronRegistry.sol:1832 says the fallback delegatecalls any unknown selector to the facet; code at `receive` CauldronRegistry.sol:578 declares only a receive function and each facet entry is an explicit stub such as `floorClaimableNow` CauldronRegistry.sol:1472, which the note at `fallback` CauldronRegistry.sol:1461 also states."
+   ],
+   "reachability": "The single door to the facet. It rejects an unset target at `ext` CauldronRegistry.sol:1506, because a delegatecall to an empty account would return success with empty data and silently no-op. The full calldata is copied verbatim at `calldatasize` CauldronRegistry.sol:1509 and returndata or revert data is bubbled unchanged at `returndatasize` CauldronRegistry.sol:1511. The target is whatever was frozen in at `redemptionExt` CauldronRegistry.sol:1506, and it has unrestricted write access to every slot of this contract (DERIVED). It forwards all remaining gas (`gas` CauldronRegistry.sol:1510).",
+   "reads": [
+    "redemptionExt (line 1506)"
+   ],
+   "semantics": "fresh",
+   "signature": "function _forwardToExt() private",
+   "value": "NONE directly; the delegatecalled code executes with this registry's balances and position custody",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (CauldronRegistry.sol:1527)",
+   "body_lines": [
+    1527,
+    1529
+   ],
+   "body_sha1": "fabd88c1bf238a153eab3044d37fd20cd6d6aaf4",
+   "contract": "CauldronRegistry",
+   "edges": [],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1527,
+   "modifiers": [
+    "onlyOwner"
+   ],
+   "mutability": "nonpayable",
+   "name": "setCollectionLedger",
+   "observations": [],
+   "reachability": "Owner-only, unvalidated and replaceable despite the one-time wording: `collectionLedger` CauldronRegistry.sol:1528 accepts any address and can be written again. Zero keeps the legacy floor off, which is what the two collection paths test at `collectionLedger` CauldronRegistry.sol:1528 and CauldronRegistry.sol:1528, and what the rebirth tests at `collectionLedger` CauldronRegistry.sol:1528.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function setCollectionLedger(address ledger) external onlyOwner",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "collectionLedger (line 1528)"
+   ]
+  },
+  {
+   "authority": "internal (callers: relaunch)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    1548,
+    1556
+   ],
+   "body_sha1": "f28cf763c52665369a3dd5aa80e2ccd01eaf66e2",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "PoolOps.materializeLegacy (CauldronRegistry.sol:1550), TRUSTED, library"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1548,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "_flushLegacyAtRelaunch",
+   "observations": [
+    "comment at `Hook` CauldronRegistry.sol:1533 documents a hook-called recorder that is hook-only and no-ops without a ledger; code declares no such function here, and the next declaration is the private `_flushLegacyAtRelaunch` CauldronRegistry.sol:1548 reachable only from the rebirth."
+   ],
+   "reachability": "Private and called from exactly one place, the ledger branch of the rebirth at `_flushLegacyAtRelaunch` CauldronRegistry.sol:1548, which itself only runs when `collectionLedger` CauldronRegistry.sol:1552 is non-zero. The burn path is selected by the trailing false argument at `empty` CauldronRegistry.sol:1549, so the reserve reference is unused. The OG share it returns is accumulated into `genesisPending` CauldronRegistry.sol:1555, which the same rebirth folds into the genesis reserve a few lines earlier in program order at `genesisPending` CauldronRegistry.sol:1555 \u2014 the fold happens BEFORE this flush in the source, so a flush's OG share lands in the NEXT rebirth's sizing (DERIVED).",
+   "reads": [
+    "positionManager (line 1551)",
+    "hook (line 1551)",
+    "collectionLedger (line 1552)",
+    "mifrens (line 1552)",
+    "genesisShares (line 1552)",
+    "generationCollection (line 1552)",
+    "genesisPending (line 1555)"
+   ],
+   "semantics": "fresh",
+   "signature": "function _flushLegacyAtRelaunch(uint256 oldGen, address oldToken) private",
+   "value": "NONE at this level; the library sweeps the hook's un-materialized buyback tokens for the dying generation and, with the deposit flag false, credits the ledger as a NUMBER instead of depositing them, inside `materializeLegacy` (line 1550)",
+   "visibility": "private",
+   "writes": [
+    "genesisPending (line 1555)"
+   ]
+  },
+  {
+   "authority": "anyone owning the collection NFT (ownership enforced in the library)",
+   "authority_gate_quote": "if (ICollectionOps(collection).ownerOf(tokenId) != caller) revert(\"not owner\"); (PoolOps.sol:1580)",
+   "body_lines": [
+    1564,
+    1578
+   ],
+   "body_sha1": "b7dc0b581c8ed657237d12ac4ca9672ecc99cb3b",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronBase._redeemBlocked (CauldronRegistry.sol:1565), TRUSTED, out-of-cluster",
+    "PoolOps.recycleCollection (CauldronRegistry.sol:1572), TRUSTED, library"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1562,
+   "modifiers": [
+    "nonReentrant"
+   ],
+   "mutability": "nonpayable",
+   "name": "recycleCollectionNFT",
+   "observations": [],
+   "reachability": "Open to the NFT's owner. The circuit-breaker applies here (`_redeemBlocked` CauldronRegistry.sol:1565), and both the ledger and the generation's collection must be wired (`collectionLedger` CauldronRegistry.sol:1570). Payment is made in the CURRENT generation's token from the shared reserve position, read at `currentGeneration` CauldronRegistry.sol:1571, not in the token of the generation the NFT belongs to. The OG-tranche exclusion and the ownership check both live in the library at `recycleCollection` CauldronRegistry.sol:1568, and the reserve-short rollback is enforced there too.",
+   "reads": [
+    "generationCollection (line 1566)",
+    "collectionLedger (line 1570)",
+    "currentGeneration (line 1571)",
+    "positionManager (line 1573)",
+    "generationReservePositionId (line 1575)",
+    "generationPoolKey (line 1575)",
+    "reserveTickLower (line 1575)",
+    "reserveTickUpper (line 1575)"
+   ],
+   "semantics": "fresh",
+   "signature": "function recycleCollectionNFT(uint256 gen, uint256 tokenId) external nonReentrant returns (uint256 amount)",
+   "value": "releases the collection's floor entitlement in the LIVE generation's token out of the shared reserve to the caller, and moves the NFT into this registry's custody, inside `recycleCollection` (line 1568)",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone (the NFT must currently sit in this registry's treasury)",
+   "authority_gate_quote": "if (ICollectionOps(collection).ownerOf(tokenId) != address(this)) revert(\"not treasury\"); (PoolOps.sol:1630)",
+   "body_lines": [
+    1585,
+    1595
+   ],
+   "body_sha1": "7cbc9fe3f84332fab3b38b03d94fb4ef5d1ebff5",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "PoolOps.buyCollection (CauldronRegistry.sol:1589), TRUSTED, library"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1583,
+   "modifiers": [
+    "nonReentrant"
+   ],
+   "mutability": "nonpayable",
+   "name": "buyCollectionNFT",
+   "observations": [],
+   "reachability": "Open to anyone. Unlike the recycle side it does NOT consult the redemption circuit-breaker: there is no `_redeemBlocked` CauldronRegistry.sol:1565 equivalent in this body (DERIVED). Preconditions are only a wired ledger and a known collection at `collectionLedger` CauldronRegistry.sol:1587. The payment token is the LIVE generation's, read at `generationToken` CauldronRegistry.sol:1591, and the price is derived from the ledger floor inside the library rather than supplied by the caller.",
+   "reads": [
+    "generationCollection (line 1586)",
+    "collectionLedger (line 1587)",
+    "currentGeneration (line 1588)",
+    "positionManager (line 1590)",
+    "generationToken (line 1591)",
+    "generationReservePositionId (line 1592)",
+    "generationPoolKey (line 1592)",
+    "reserveTickLower (line 1592)",
+    "reserveTickUpper (line 1592)"
+   ],
+   "semantics": "fresh",
+   "signature": "function buyCollectionNFT(uint256 gen, uint256 tokenId) external nonReentrant returns (uint256 paid)",
+   "value": "pulls twice the NFT's floor in the live token from the buyer into the reserve and hands the NFT over, inside `buyCollection` (line 1589)",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "internal (callers: relaunch, emergencyWithdrawLP)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    1609,
+    1668
+   ],
+   "body_sha1": "477dd077cac5646387b5d7b795bb28f179b150fc",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "PoolOps.removeAll (CauldronRegistry.sol:1618), TRUSTED, library",
+    "PoolOps.removeAll (CauldronRegistry.sol:1623), TRUSTED, library",
+    "ISeeder.seeding (CauldronRegistry.sol:1635), TRUSTED, out-of-cluster",
+    "ISeeder.withdrawAll (CauldronRegistry.sol:1636), TRUSTED, out-of-cluster",
+    "ext.delegatecall (CauldronRegistry.sol:1661), TRUSTED, delegatecall",
+    "RedemptionExt.recoverLegs (RedemptionExt.sol:878), TRUSTED, delegatecall"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1606,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "_removeLiquidity",
+   "observations": [],
+   "reachability": "Private, reached from the rebirth at `_removeLiquidity` CauldronRegistry.sol:1606 and from the break-glass pull at CauldronRegistry.sol:1606. Four recovery sources are summed into ONE pair of totals: the active position, skipped when its id is zero on a streamed generation (`activeId` CauldronRegistry.sol:1616); the reserve position (`rid` CauldronRegistry.sol:1621); the seeder's bands, only while it reports itself active (`seeding` CauldronRegistry.sol:1635); and the rotated legs via a delegatecall whose failure is deliberately swallowed at `ok` CauldronRegistry.sol:1658. The leg selector is compiler-computed at `RECOVER_LEGS` CauldronRegistry.sol:1661 rather than hand-written, because a wrong selector would fail silently through that same swallow. The totals are denominated in the PRIMARY pair's currency0, which is why only legs in that same asset may be added to them (`recoverLegs` RedemptionExt.sol:834).",
+   "reads": [
+    "generationPoolKey (line 1610)",
+    "generationToken (line 1611)",
+    "positionManager (line 1612)",
+    "generationPositionId (line 1616)",
+    "generationReservePositionId (line 1621)",
+    "seeder (line 1614)",
+    "redemptionExt (line 1653)",
+    "RECOVER_LEGS (line 1661, constant)"
+   ],
+   "semantics": "fresh",
+   "signature": "function _removeLiquidity(uint256 gen) private returns (uint256 ethRecovered, uint256 tokensRecovered)",
+   "value": "recovers both sides of the active and reserve positions into this registry through `removeAll` (line 1618) and (line 1618); recovers the streamed book through `withdrawAll` (line 1636); recovers every rotated leg through the delegatecall at `RECOVER_LEGS` (line 1661)",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal (callers: summon, relaunch)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    1685,
+    1696
+   ],
+   "body_sha1": "08d7fecb359d86f2588f442f04f0ac9d62f17611",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "PoolOps.deployTokenAbove (CauldronRegistry.sol:1695), TRUSTED, library"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1680,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "_deployToken",
+   "observations": [
+    "comment at `CREATE2` CauldronRegistry.sol:1689 says this uses plain CREATE and NOT CREATE2 because a predictable address could be squatted; code at `salt` PoolOps.sol:742 deploys with CREATE2 from a mined salt, and the note two lines below at `CREATE2` CauldronRegistry.sol:1689 calls the registry the CREATE2 deployer."
+   ],
+   "reachability": "Private, called once per generation from `_deployToken` CauldronRegistry.sol:1680 and CauldronRegistry.sol:1680. It is delegatecalled into the library so `address(this)` stays this registry, making the registry both the deployer and the holder of the whole supply. It returns the quote that was ACTUALLY achievable rather than the one requested (`quoteUsed` CauldronRegistry.sol:1685), and the caller records that value, which is why a mining failure downgrades the generation to native ether instead of reverting.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _deployToken( string memory name, string memory symbol, uint256 gen, address want ) private returns (address token, address quoteUsed)",
+   "value": "NONE; the deployed token mints its entire fixed supply to this registry inside its own constructor",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal (callers: _seedGeneration)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    1731,
+    1742
+   ],
+   "body_sha1": "542144f7e18fcb937d24ae2914af4398b3837d3c",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "PoolOps.createAndSeedWithBuy (CauldronRegistry.sol:1735), TRUSTED, library",
+    "CauldronRegistry._recordSeed (CauldronRegistry.sol:1741), TRUSTED, in-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1725,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "_createPoolAndSeedWithBuy",
+   "observations": [],
+   "reachability": "Private, reached only from the atomic branch at `_createPoolAndSeedWithBuy` CauldronRegistry.sol:1725. It does NOT arm the callback window itself; the caller hoisted that, so it relies on `_seedBuyUnlocked` CauldronRegistry.sol:1733 already being set. The per-iteration ceiling comes from `nextReserveCeilingOffset` CauldronRegistry.sol:1738 and the pair from `generationQuote` CauldronRegistry.sol:1739, which the rebirth wrote before seeding at CauldronRegistry.sol:1739.",
+   "reads": [
+    "poolManager (line 1736)",
+    "positionManager (line 1736)",
+    "hook (line 1736)",
+    "nextReserveCeilingOffset (line 1738)",
+    "generationQuote (line 1739)"
+   ],
+   "semantics": "fresh",
+   "signature": "function _createPoolAndSeedWithBuy( address token, uint256 activeTokens, uint256 ethAmount, uint256 reserveTokens, uint256 gen ) private returns (PoolId poolId)",
+   "value": "pays the whole funded amount and the active token tranche into the new pool, then buys the reserve back out as a visible first-block trade, inside `createAndSeedWithBuy` (line 1735)",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal (callers: summon, relaunch)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    1763,
+    1789
+   ],
+   "body_sha1": "c05a9f34932d3afe94299dc97e13213154523ede",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "PoolOps.createAndSeedProgressive (CauldronRegistry.sol:1777), TRUSTED, library",
+    "CauldronRegistry._recordSeed (CauldronRegistry.sol:1784), TRUSTED, in-cluster",
+    "CauldronRegistry._createPoolAndSeedWithBuy (CauldronRegistry.sol:1786), TRUSTED, in-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1757,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "_seedGeneration",
+   "observations": [
+    "comment at `_createPoolAndSeedWithBuy` CauldronRegistry.sol:1773 says BOTH genesis and relaunch now use the green-candle seed; code at `createAndSeedProgressive` CauldronRegistry.sol:1765 takes a different library entry whenever a seeder is set and `nextSeedWindow` CauldronRegistry.sol:1776 is non-zero."
+   ],
+   "reachability": "Private, the single seed dispatcher for both ignition (`_seedGeneration` CauldronRegistry.sol:1757) and every rebirth (CauldronRegistry.sol:1757). It arms the PoolManager callback window for BOTH branches at `_seedBuyUnlocked` CauldronRegistry.sol:1775 and clears it unconditionally at CauldronRegistry.sol:1775, so the window is open for the whole seed rather than just the buy. The branch is taken only when a seeder is set AND the window is non-zero (`nextSeedWindow` CauldronRegistry.sol:1776); anything else falls through to the atomic path at `_createPoolAndSeedWithBuy` CauldronRegistry.sol:1773. A non-native generation is handled inside the library rather than here (`createAndSeedProgressive` CauldronRegistry.sol:1765).",
+   "reads": [
+    "seeder (line 1755)",
+    "nextSeedWindow (line 1776)",
+    "poolManager (line 1778)",
+    "positionManager (line 1778)",
+    "hook (line 1778)",
+    "nextReserveCeilingOffset (line 1780)",
+    "seeder (line 1755)",
+    "nextSeedWindow (line 1776)",
+    "generationQuote (line 1782)"
+   ],
+   "semantics": "fresh",
+   "signature": "function _seedGeneration( address token, uint256 activeTokens, uint256 ethAmount, uint256 reserveTokens, uint256 gen ) private returns (PoolId poolId)",
+   "value": "hands the active tranche plus the funding to either the streaming seeder or the atomic green-candle seed; on the progressive branch the token side leaves this registry for the seeder inside `createAndSeedProgressive` (line 1765)",
+   "visibility": "private",
+   "writes": [
+    "_seedBuyUnlocked (line 1775)",
+    "_seedBuyUnlocked (line 1775)"
+   ]
+  },
+  {
+   "authority": "internal (callers: _seedGeneration, _createPoolAndSeedWithBuy)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    1794,
+    1803
+   ],
+   "body_sha1": "2d05ccff67e594d3b2952dd67ff7e036734caf42",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "CauldronHook.setLiveKey (CauldronRegistry.sol:1802), TRUSTED, out-of-cluster"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1794,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "_recordSeed",
+   "observations": [],
+   "reachability": "Private bookkeeping, reached from both seed branches at `_recordSeed` CauldronRegistry.sol:1794 and CauldronRegistry.sol:1794. It is the only writer of the six per-generation position fields, including `generationPositionId` CauldronRegistry.sol:1798, which stays zero for a streamed generation and is what the teardown checks at `activeId` CauldronRegistry.sol:1616. It then pushes the live key to the hook at `setLiveKey` CauldronRegistry.sol:1802 so the legacy buyback can only spend into the current pool; that call is not wrapped, so a hook that refuses the key reverts the seed (DERIVED).",
+   "reads": [
+    "hook (line 1792)"
+   ],
+   "semantics": "fresh",
+   "signature": "function _recordSeed(SeedResult memory r, uint256 gen) private returns (PoolId poolId)",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": [
+    "generationPoolId (line 1796)",
+    "generationPoolKey (line 1797)",
+    "generationPositionId (line 1798)",
+    "generationReservePositionId (line 1799)",
+    "reserveTickLower (line 1800)",
+    "reserveTickUpper (line 1801)"
+   ]
+  },
+  {
+   "authority": "poolManager, and only while the seed-buy window is armed",
+   "authority_gate_quote": "if (msg.sender != address(poolManager)) revert NotPoolManager(); (CauldronRegistry.sol:1812)",
+   "body_lines": [
+    1812,
+    1816
+   ],
+   "body_sha1": "b0ce2f488ec9e12e78774f0897663072fde906f5",
+   "contract": "CauldronRegistry",
+   "edges": [
+    "PoolOps.executeBuy (CauldronRegistry.sol:1815), TRUSTED, library"
+   ],
+   "file": "CauldronRegistry.sol",
+   "kind": "function",
+   "line": 1812,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "unlockCallback",
+   "observations": [
+    "comment at `relaunch` CauldronRegistry.sol:1752 says the callback is accepted ONLY while a relaunch buy is armed; code at `_seedBuyUnlocked` CauldronRegistry.sol:1814 accepts it whenever the flag is set, and ignition also sets it, at `_seedBuyUnlocked` CauldronRegistry.sol:1814 and CauldronRegistry.sol:1814."
+   ],
+   "reachability": "Two independent conditions, both mandatory: the caller must be the PoolManager (`poolManager` CauldronRegistry.sol:1813) and the transient window must be open (`_seedBuyUnlocked` CauldronRegistry.sol:1814). The window is opened by the seed dispatcher at `_seedBuyUnlocked` CauldronRegistry.sol:1814 and by the ignition prime buy at `_seedBuyUnlocked` CauldronRegistry.sol:1814, and it is a plain storage bool rather than a transient slot, so it is set and cleared within the same transaction (DERIVED). The swap encoding lives entirely in the delegatecalled library at `executeBuy` CauldronRegistry.sol:1815, so it runs on this registry's balances.",
+   "reads": [
+    "poolManager (line 1813)",
+    "_seedBuyUnlocked (line 1814)"
+   ],
+   "semantics": "fresh",
+   "signature": "function unlockCallback(bytes calldata data) external returns (bytes memory)",
+   "value": "spends this registry's quote side and receives the bought token, inside `executeBuy` (line 1815)",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "deployer (the registry, acting through the delegatecalled PoolOps deploy)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    42,
+    47
+   ],
+   "body_sha1": "a7cfb3932218e34b64f18f407ac8e8de7f40fc11",
+   "contract": "CauldronToken",
+   "edges": [],
+   "file": "CauldronToken.sol",
+   "kind": "constructor",
+   "line": 36,
+   "modifiers": [
+    "ERC20(_name, _symbol)"
+   ],
+   "mutability": "nonpayable",
+   "name": "",
+   "observations": [
+    "comment at `TOTAL_SUPPLY` CauldronToken.sol:29 declares a fixed 777 million supply as a constant; code at `_initialSupply` CauldronToken.sol:46 mints whatever amount the deployer passes and never compares it with that constant."
+   ],
+   "reachability": "Reached only from the generation deploy inside the linked library, at `CauldronToken` PoolOps.sol:668 for the mined CREATE2 path and `CauldronToken` PoolOps.sol:767 for the unmined fallback. Because the library is delegatecalled, address(this) is the registry, so the `registry` CauldronToken.sol:45 recorded here and the mint recipient are the same contract that orchestrates the generation. There is no minting function afterwards, so supply can only ever fall (DERIVED).",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "constructor( string memory _name, string memory _symbol, uint256 _generation, address _registry, uint256 _initialSupply ) ERC20(_name, _symbol)",
+   "value": "NONE in native terms; the entire initial supply is minted to the registry at `_mint` (line 46)",
+   "visibility": "",
+   "writes": [
+    "generation (line 43, immutable)",
+    "birthBlock (line 44, immutable)",
+    "registry (line 45, immutable)"
+   ]
+  },
+  {
+   "authority": "internal (callers: burn)",
+   "authority_gate_quote": "if (msg.sender != registry) revert NotRegistry(); (CauldronToken.sol:49)",
+   "body_lines": [
+    49,
+    52
+   ],
+   "body_sha1": "21866400f62eb331140936fc9a1c76e1bc6cdabf",
+   "contract": "CauldronToken",
+   "edges": [],
+   "file": "CauldronToken.sol",
+   "kind": "modifier",
+   "line": 49,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "onlyRegistry",
+   "observations": [],
+   "reachability": "The token's only access control. `registry` CauldronToken.sol:50 is immutable, fixed at construction from the deploying contract at CauldronToken.sol:50, so the role can never be transferred or revoked (DERIVED). It guards exactly one function, `burn` CauldronToken.sol:58.",
+   "reads": [
+    "registry (line 50, immutable)"
+   ],
+   "semantics": "fresh",
+   "signature": "modifier onlyRegistry()",
+   "value": "NONE",
+   "visibility": "",
+   "writes": []
+  },
+  {
+   "authority": "registry",
+   "authority_gate_quote": "onlyRegistry (CauldronToken.sol:58)",
+   "body_lines": [
+    58,
+    60
+   ],
+   "body_sha1": "13961bc4c07977dbadac1b5e033eacd5b1f56044",
+   "contract": "CauldronToken",
+   "edges": [],
+   "file": "CauldronToken.sol",
+   "kind": "function",
+   "line": 58,
+   "modifiers": [
+    "onlyRegistry"
+   ],
+   "mutability": "nonpayable",
+   "name": "burn",
+   "observations": [
+    "comment at `leftovers` CauldronToken.sol:56 lists burning unclaimed migration leftovers as a use of this function; code at `burnUnclaimed` CauldronRegistry.sol:1412 records that path as obsolete in the reserve-LP model, and no such caller remains in the registry."
+   ],
+   "reachability": "Callable only by the immutable registry (`onlyRegistry` CauldronToken.sol:58). It needs no allowance and names an arbitrary holder, so it is the primitive behind both the dead-LP burn at `burn` CauldronRegistry.sol:865 and the 1:1 migration burns issued through the library at `burn` PoolOps.sol:1386 and PoolOps.sol:1386. The keeper batch reaches it for an opted-in wallet without that wallet signing anything, which is why the opt-in flag is revocable at `autoMigrate` CauldronRegistry.sol:1344.",
+   "reads": [
+    "registry (line 50, immutable)"
+   ],
+   "semantics": "fresh",
+   "signature": "function burn(address from, uint256 amount) external onlyRegistry",
+   "value": "destroys `amount` of the named holder's balance, reducing total supply (line 59)",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone (view on a proposer-supplied renderer contract)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "ICollectionRenderer (declared in ICauldron.sol)",
+   "edges": [],
+   "file": "cauldron/ICauldron.sol",
+   "kind": "function",
+   "line": 12,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "tokenURI",
+   "observations": [],
+   "reachability": "Declaration only; no body here. It is consumed by the collections' metadata path at `tokenURI` CauldronCollection.sol:379 and `tokenURI` MiFrensGenesis.sol:745, and for badges at `tokenURI` CauldronCollection.sol:379. The address comes from the winning proposal, copied at `renderer` CauldronRegistry.sol:900 and handed to the factory config at `renderer` CauldronRegistry.sol:1207, so it is proposer-controlled code (DERIVED).",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function tokenURI(uint256 tokenId) external view returns (string memory)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "internal (callers: summon, relaunch)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    38,
+    40
+   ],
+   "body_sha1": "97b69ba948c6e681302eaee5be817f6ca586c3a9",
+   "contract": "LaunchLib (declared in ICauldron.sol)",
+   "edges": [],
+   "file": "cauldron/ICauldron.sol",
+   "kind": "function",
+   "line": 38,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "displayName",
+   "observations": [],
+   "reachability": "Pure and internal, so it is inlined into its callers: ignition at `displayName` CauldronRegistry.sol:742 and every rebirth at `displayName` CauldronRegistry.sol:967. The suffix is the file constant read at `GUILD_SUFFIX` ICauldron.sol:39, never a parameter, so a proposer controls only the prefix. The proposer's raw name is unbounded in length, and this concatenation is what the token and collection are then constructed with (DERIVED).",
+   "reads": [
+    "GUILD_SUFFIX (line 39, constant)"
+   ],
+   "semantics": "fresh",
+   "signature": "function displayName(string memory name) internal pure returns (string memory)",
+   "value": "NONE",
+   "visibility": "internal",
+   "writes": []
+  },
+  {
+   "authority": "anyone (view); the registry is its only in-tree caller",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "ICauldronGovernor (declared in ICauldron.sol)",
+   "edges": [],
+   "file": "cauldron/ICauldron.sol",
+   "kind": "function",
+   "line": 45,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "winner",
+   "observations": [],
+   "reachability": "Declaration of the read the rebirth takes at `winner` CauldronRegistry.sol:903. The implementation at `winner` CauldronGovernor.sol:340 selects the best unconsumed proposal at `_bestUnconsumed` CauldronGovernor.sol:192 and reverts when there is none, which is why the rebirth checks liveness first at `hasProposals` CauldronRegistry.sol:841. Everything in the returned spec is proposer-authored, including the quote and the renderer (DERIVED).",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function winner() external view returns (uint256 proposalId, BrewSpec memory spec)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "registry (the implementation restricts the caller)",
+   "authority_gate_quote": "if (msg.sender != registry) revert NotRegistry(); (CauldronGovernor.sol:763)",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "ICauldronGovernor (declared in ICauldron.sol)",
+   "edges": [],
+   "file": "cauldron/ICauldron.sol",
+   "kind": "function",
+   "line": 46,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "markConsumed",
+   "observations": [],
+   "reachability": "Declaration of the one state-changing governor call the registry makes, at `markConsumed` CauldronRegistry.sol:1011. The implementation at `markConsumed` CauldronGovernor.sol:529 accepts only the wired registry and refuses a second consumption at `consumed` CauldronGovernor.sol:622. Its placement in the rebirth is load-bearing: anything that reverts after it rolls the consumption back with the transaction, which is why the only remaining revert sits immediately before it at `totalETH` CauldronRegistry.sol:992.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function markConsumed(uint256 proposalId) external",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone (view)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "ICauldronGovernor (declared in ICauldron.sol)",
+   "edges": [],
+   "file": "cauldron/ICauldron.sol",
+   "kind": "function",
+   "line": 47,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "hasProposals",
+   "observations": [],
+   "reachability": "Declaration of the liveness gate the rebirth applies at `hasProposals` CauldronRegistry.sol:841, alongside a zero-address check on the governor itself. The implementation at `hasProposals` CauldronGovernor.sol:336 simply reports whether an unconsumed proposal exists at `_bestUnconsumed` CauldronGovernor.sol:740.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function hasProposals() external view returns (bool)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "the collection's wired minter (the volume hook)",
+   "authority_gate_quote": "if (msg.sender != minter) revert OnlyMinter(); (CauldronCollection.sol:208)",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "ICauldronCollection (declared in ICauldron.sol)",
+   "edges": [],
+   "file": "cauldron/ICauldron.sol",
+   "kind": "function",
+   "line": 52,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "mint",
+   "observations": [],
+   "reachability": "Declaration of the mint the hook performs when a play wins, at `mint` CauldronHook.sol:2448. The implementation at `mint` CauldronCollection.sol:207 accepts only the wired minter and refuses once the cap is reached at `maxSupply` CauldronCollection.sol:209. The registry is what wires the hook in, at `setCollection` CauldronRegistry.sol:1233 for a fresh brew and at `setMinter` CauldronRegistry.sol:1259 for the continuation.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function mint(address to) external returns (uint256 tokenId)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone (view)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "ICauldronCollection (declared in ICauldron.sol)",
+   "edges": [],
+   "file": "cauldron/ICauldron.sol",
+   "kind": "function",
+   "line": 53,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "totalMinted",
+   "observations": [],
+   "reachability": "Declaration satisfied by a public state variable rather than a written function: the counter is incremented in place at `totalMinted` CauldronCollection.sol:210, so the interface is served by the compiler-generated getter (DERIVED). The hook reads it for the curve anchor at `totalMinted` CauldronHook.sol:2189 and for mint-out checks at `totalMinted` CauldronHook.sol:2189.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function totalMinted() external view returns (uint256)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone (view)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "ICauldronCollection (declared in ICauldron.sol)",
+   "edges": [],
+   "file": "cauldron/ICauldron.sol",
+   "kind": "function",
+   "line": 54,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "maxSupply",
+   "observations": [],
+   "reachability": "Declaration of the per-brew cap the hook compares against at `maxSupply` CauldronHook.sol:2304 and CauldronHook.sol:2304. The value originates in the registry, either from the owner setting at `nftMaxSupply` CauldronRegistry.sol:602 or from the proposer's request clamped at `MAX_NFT_SUPPLY` CauldronRegistry.sol:962, and it is fixed when the collection is constructed (DERIVED).",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function maxSupply() external view returns (uint256)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone (view on a pluggable module)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "IDeathChecker",
+   "edges": [],
+   "file": "cauldron/IDeathChecker.sol",
+   "kind": "function",
+   "line": 27,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "isDead",
+   "observations": [
+    "comment at `owner` IDeathChecker.sol:13 says the hook owner points the hook at a new checker; code at `registry` CauldronHook.sol:1888 accepts the registry address as well as the owner."
+   ],
+   "reachability": "Declaration of the swappable death rule. The hook calls it only when one is wired, inside a try/catch at `isDead` CauldronHook.sol:1651, and falls back to the built-in volume comparison at `deathThreshold` CauldronHook.sol:1804 on any revert, so a broken module cannot brick the rebirth. The volume it is handed is summed across a generation's sibling pools at `getVolume24h` CauldronHook.sol:1677. The registry's rebirth gate consumes the answer at `isDead` CauldronRegistry.sol:833.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function isDead(PoolId id, uint256 volume24h, uint256 deathThreshold) external view returns (bool dead)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "the collection's wired liquidatorMinter (the perp engine)",
+   "authority_gate_quote": "if (msg.sender != liquidatorMinter) revert OnlyLiquidatorMinter(); (CauldronCollection.sol:409)",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "ILiquidatorMintable",
+   "edges": [],
+   "file": "cauldron/ILiquidatorMintable.sol",
+   "kind": "function",
+   "line": 38,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "mintLiquidatorWithStats",
+   "observations": [],
+   "reachability": "Declaration only. The implementation at `mintLiquidatorWithStats` CauldronCollection.sol:402 forwards to `_mintLiquidator` CauldronCollection.sol:397, where the single caller check lives. Badge ids come from a separate range at `LIQUIDATOR_ID_BASE` CauldronCollection.sol:394, so the art tranche's counters are untouched, and the stats write is skipped entirely for a zero victim at `victim` CauldronCollection.sol:415.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function mintLiquidatorWithStats(address to, LiqStats calldata s) external returns (uint256 tokenId)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "the collection's wired liquidatorMinter (the perp engine)",
+   "authority_gate_quote": "if (msg.sender != liquidatorMinter) revert OnlyLiquidatorMinter(); (CauldronCollection.sol:409)",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "ILiquidatorMintable",
+   "edges": [],
+   "file": "cauldron/ILiquidatorMintable.sol",
+   "kind": "function",
+   "line": 44,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "mintLiquidator",
+   "observations": [],
+   "reachability": "The stats-free form, kept for an engine deployed before the stats existed. The implementation at `mintLiquidator` CauldronCollection.sol:396 passes an all-zero record into the same internal path at `_mintLiquidator` CauldronCollection.sol:397, so the gate and the id range are identical to the stats form (`liquidatorMinter` CauldronCollection.sol:353).",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function mintLiquidator(address to) external returns (uint256 tokenId)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone (view)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "ILiquidatorMintable",
+   "edges": [],
+   "file": "cauldron/ILiquidatorMintable.sol",
+   "kind": "function",
+   "line": 47,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "liqStats",
+   "observations": [],
+   "reachability": "Open read of what a badge commemorates, implemented at `liqStats` CauldronCollection.sol:421 over the mapping the mint writes at `_liqStats` CauldronCollection.sol:415. A stats-free mint leaves the record zeroed, so the reader cannot distinguish absent from zero (DERIVED).",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function liqStats(uint256 tokenId) external view returns (LiqStats memory)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone (view on a pluggable module)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "ISurtaxPolicy (declared in IPolicies.sol)",
+   "edges": [],
+   "file": "cauldron/IPolicies.sol",
+   "kind": "function",
+   "line": 25,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "surtaxBps",
+   "observations": [],
+   "reachability": "Declaration of the anti-sniper surtax rule. The hook consults it only when wired, through the linked library, inside a try/catch at `surtaxBps` SurtaxLib.sol:46, with the hook passing its own configured peak and window at `MAX_SNIPE_BPS` CauldronHook.sol:1567 so a simple module can reuse them. The module is installed by the owner or the registry at `surtaxPolicy` CauldronHook.sol:2085. It returns a number and never custodies funds, so a malicious module's blast radius is the fee rate it reports (DERIVED).",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function surtaxBps(PoolId id, uint256 initBlock, uint256 maxBps, uint256 windowBlocks) external view returns (uint256 bps)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone (view on a pluggable module)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "IOddsPolicy (declared in IPolicies.sol)",
+   "edges": [],
+   "file": "cauldron/IPolicies.sol",
+   "kind": "function",
+   "line": 37,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "oddsBps",
+   "observations": [],
+   "reachability": "Declaration of the gacha win-probability rule, consulted inside a try/catch at `oddsBps` CauldronHook.sol:2367 and installed alongside the other two modules at `oddsPolicy` CauldronHook.sol:2086. The play size it receives is denominated in the units the hook measures a play in, which is the same unit its own configured full-volume threshold uses (DERIVED).",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function oddsBps(uint256 playWei, uint256 maxBps, uint256 fullVolumeWei) external view returns (uint256 bps)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone (view on a pluggable module)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "ICurvePolicy (declared in IPolicies.sol)",
+   "edges": [],
+   "file": "cauldron/IPolicies.sol",
+   "kind": "function",
+   "line": 49,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "priceAt",
+   "observations": [],
+   "reachability": "Declaration of the mint-cost curve, consulted inside a try/catch at `priceAt` CauldronHook.sol:2318 with the hook's own base and step, and installed at `curvePolicy` CauldronHook.sol:2087. The base the hook passes is the value the registry pushes from the winning proposal at `setNftCurveFrom` CauldronRegistry.sol:1146.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function priceAt(uint256 k, uint256 base, uint256 step) external view returns (uint256 cost)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone (view on a pluggable module)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "IFeeRouter (declared in IPolicies.sol)",
+   "edges": [],
+   "file": "cauldron/IPolicies.sol",
+   "kind": "function",
+   "line": 70,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "route",
+   "observations": [],
+   "reachability": "Declaration of the fee-split structure. The hook calls it in a try/catch at `route` CauldronHook.sol:1327 and accepts the answer ONLY when the three parts sum exactly to the fee at `feeAmount` CauldronHook.sol:1407; otherwise it falls through to the built-in split at `wantGuild` CauldronHook.sol:1460. The router is installed by the owner or the registry at `feeRouter` CauldronHook.sol:2097, and the reference implementation makes the sum exact by construction at `toRelaunch` DefaultFeeRouter.sol:24.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function route(uint256 feeAmount, address guild, address vault, uint256 guildBps, uint256 floorBps) external view returns (uint256 toGuild, uint256 toFloor, uint256 toRelaunch)",
+   "value": "NONE; the module only returns amounts, and the hook performs every send itself",
+   "visibility": "external",
+   "writes": []
+  }
+ ]
+}

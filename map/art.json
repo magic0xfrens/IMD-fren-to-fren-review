@@ -1,0 +1,1745 @@
+{
+ "cluster": "art",
+ "files": [
+  "cauldron/CauldronArtAdapter.sol",
+  "render/FrenRenderer.sol",
+  "render/LiquidatoorRenderer.sol",
+  "render/SSTORE2.sol",
+  "render/TraitStorage.sol",
+  "deploy/BadgeArtLib.sol"
+ ],
+ "nodes": [
+  {
+   "authority": "implementation-defined (declaration only)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "IFrenRendererFive (declared in CauldronArtAdapter.sol)",
+   "edges": [],
+   "file": "cauldron/CauldronArtAdapter.sol",
+   "kind": "function",
+   "line": 8,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "tokenURI",
+   "observations": [],
+   "reachability": "Declaration only at `tokenURI` (CauldronArtAdapter.sol:8); authority and behavior are implementation-defined.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function tokenURI(uint256 tokenId, uint8 classIdx, uint8 bodyIdx, uint8 faceIdx, uint8 itemIdx) external view returns (string memory)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "implementation-defined (declaration only)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "IRevealedArtSource (declared in CauldronArtAdapter.sol)",
+   "edges": [],
+   "file": "cauldron/CauldronArtAdapter.sol",
+   "kind": "function",
+   "line": 17,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "rarityOf",
+   "observations": [],
+   "reachability": "Declaration only at `rarityOf` (CauldronArtAdapter.sol:17); authority and behavior are implementation-defined.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function rarityOf(uint256 tokenId) external view returns (uint8)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "implementation-defined (declaration only)",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [],
+   "body_sha1": "",
+   "contract": "IRevealedArtSource (declared in CauldronArtAdapter.sol)",
+   "edges": [],
+   "file": "cauldron/CauldronArtAdapter.sol",
+   "kind": "function",
+   "line": 18,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "revealed",
+   "observations": [],
+   "reachability": "Declaration only at `revealed` (CauldronArtAdapter.sol:18); authority and behavior are implementation-defined.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function revealed(uint256 tokenId) external view returns (bool)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "deployer",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    83,
+    85
+   ],
+   "body_sha1": "c0cab1fccd6ce4a43b87fdc117e4939bd56194c0",
+   "contract": "CauldronArtAdapter",
+   "edges": [],
+   "file": "cauldron/CauldronArtAdapter.sol",
+   "kind": "constructor",
+   "line": 83,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "",
+   "observations": [],
+   "reachability": "Externally reachable at `constructor` (CauldronArtAdapter.sol:83); authority is deployer. Gate evidence is recorded separately.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "constructor(IFrenRendererFive renderer_)",
+   "value": "NONE",
+   "visibility": "",
+   "writes": [
+    "frenRenderer (line 84, immutable)"
+   ]
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    90,
+    95
+   ],
+   "body_sha1": "5f5a54290152150fe72f712fa382b4fd394d5f27",
+   "contract": "CauldronArtAdapter",
+   "edges": [
+    "CauldronArtAdapter.traitsOf (CauldronArtAdapter.sol:93), TRUSTED, in-cluster",
+    "IFrenRendererFive.tokenURI (CauldronArtAdapter.sol:94), UNTRUSTED, in-cluster"
+   ],
+   "file": "cauldron/CauldronArtAdapter.sol",
+   "kind": "function",
+   "line": 90,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "tokenURI",
+   "observations": [],
+   "reachability": "Externally reachable at `tokenURI` (CauldronArtAdapter.sol:90); authority is anyone. Gate evidence is recorded separately.",
+   "reads": [
+    "frenRenderer (line 94, immutable)"
+   ],
+   "semantics": "fresh",
+   "signature": "function tokenURI(uint256 tokenId) external view returns (string memory)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    104,
+    113
+   ],
+   "body_sha1": "3bfb2b71dd56c06ab0c74e076521735d50fb72b6",
+   "contract": "CauldronArtAdapter",
+   "edges": [
+    "IRevealedArtSource.revealed (CauldronArtAdapter.sol:105), UNTRUSTED, in-cluster",
+    "IRevealedArtSource.rarityOf (CauldronArtAdapter.sol:106), UNTRUSTED, in-cluster",
+    "CauldronArtAdapter._bodyCount (CauldronArtAdapter.sol:110), TRUSTED, in-cluster",
+    "CauldronArtAdapter._itemCount (CauldronArtAdapter.sol:112), TRUSTED, in-cluster"
+   ],
+   "file": "cauldron/CauldronArtAdapter.sol",
+   "kind": "function",
+   "line": 100,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "traitsOf",
+   "observations": [],
+   "reachability": "Externally reachable at `traitsOf` (CauldronArtAdapter.sol:100); authority is anyone. Gate evidence is recorded separately.",
+   "reads": [
+    "CLASSES (line 109, constant)",
+    "FACES_PER_SET (line 111, constant)"
+   ],
+   "semantics": "fresh",
+   "signature": "function traitsOf(address collection, uint256 tokenId) public view returns (uint8 classIdx, uint8 bodyIdx, uint8 faceIdx, uint8 itemIdx)",
+   "value": "NONE",
+   "visibility": "public",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    117,
+    124
+   ],
+   "body_sha1": "fc80f9d737f7dc48497a092d21f9b0b519016159",
+   "contract": "CauldronArtAdapter",
+   "edges": [],
+   "file": "cauldron/CauldronArtAdapter.sol",
+   "kind": "function",
+   "line": 117,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_bodyCount",
+   "observations": [],
+   "reachability": "Internal body declared at `_bodyCount` (CauldronArtAdapter.sol:117); callers: traitsOf.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _bodyCount(uint8 classIdx) private pure returns (uint8)",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    128,
+    135
+   ],
+   "body_sha1": "4cfd2d7600424134788ebd1c3235c975a6f58dda",
+   "contract": "CauldronArtAdapter",
+   "edges": [],
+   "file": "cauldron/CauldronArtAdapter.sol",
+   "kind": "function",
+   "line": 128,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_itemCount",
+   "observations": [],
+   "reachability": "Internal body declared at `_itemCount` (CauldronArtAdapter.sol:128); callers: traitsOf.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _itemCount(uint8 classIdx) private pure returns (uint8)",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    27,
+    37
+   ],
+   "body_sha1": "2d579e8cb2d198e0b3299c3060e2099015586c02",
+   "contract": "BadgeArtLib",
+   "edges": [],
+   "file": "deploy/BadgeArtLib.sol",
+   "kind": "function",
+   "line": 27,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "chunk",
+   "observations": [],
+   "reachability": "Internal body declared at `chunk` (BadgeArtLib.sol:27); callers: upload.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function chunk(bytes memory body) internal pure returns (bytes[] memory out)",
+   "value": "NONE",
+   "visibility": "internal",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    47,
+    66
+   ],
+   "body_sha1": "fb5b31a15b354d83fe8123f351f4c85e360ba800",
+   "contract": "BadgeArtLib",
+   "edges": [
+    "Vm.readFileBinary (BadgeArtLib.sol:48), TRUSTED, out-of-cluster",
+    "Vm.readFileBinary (BadgeArtLib.sol:49), TRUSTED, out-of-cluster",
+    "BadgeArtLib._assertEscaped (BadgeArtLib.sol:52), TRUSTED, in-cluster",
+    "BadgeArtLib._assertEscaped (BadgeArtLib.sol:53), TRUSTED, in-cluster",
+    "BadgeArtLib.chunk (BadgeArtLib.sol:64), TRUSTED, in-cluster",
+    "BadgeArtLib._uploadSide (BadgeArtLib.sol:64), TRUSTED, in-cluster",
+    "BadgeArtLib.chunk (BadgeArtLib.sol:65), TRUSTED, in-cluster",
+    "BadgeArtLib._uploadSide (BadgeArtLib.sol:65), TRUSTED, in-cluster"
+   ],
+   "file": "deploy/BadgeArtLib.sol",
+   "kind": "function",
+   "line": 45,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "upload",
+   "observations": [],
+   "reachability": "Internal body declared at `upload` (BadgeArtLib.sol:45); callers: no executable caller in this cluster.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function upload(LiquidatoorRenderer r, string memory longPath, string memory shortPath) internal",
+   "value": "NONE",
+   "visibility": "internal",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    68,
+    75
+   ],
+   "body_sha1": "709daa60fb2bd3e087ed644a57b89af579614347",
+   "contract": "BadgeArtLib",
+   "edges": [
+    "LiquidatoorRenderer.setArt (BadgeArtLib.sol:72), UNTRUSTED, in-cluster",
+    "LiquidatoorRenderer.appendArt (BadgeArtLib.sol:73), UNTRUSTED, in-cluster"
+   ],
+   "file": "deploy/BadgeArtLib.sol",
+   "kind": "function",
+   "line": 68,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "_uploadSide",
+   "observations": [],
+   "reachability": "Internal body declared at `_uploadSide` (BadgeArtLib.sol:68); callers: upload.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _uploadSide(LiquidatoorRenderer r, bool isLong, bytes[] memory chunks) private",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    79,
+    83
+   ],
+   "body_sha1": "00dac5a7bd5a5d0f19ffad74de3eb90808d844fb",
+   "contract": "BadgeArtLib",
+   "edges": [],
+   "file": "deploy/BadgeArtLib.sol",
+   "kind": "function",
+   "line": 79,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_assertEscaped",
+   "observations": [],
+   "reachability": "Internal body declared at `_assertEscaped` (BadgeArtLib.sol:79); callers: upload.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _assertEscaped(bytes memory art) private pure",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "deployer",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    31,
+    33
+   ],
+   "body_sha1": "a256f8e4c662e0bccb1ff18b5a4a6fffacbc2af8",
+   "contract": "FrenRenderer",
+   "edges": [],
+   "file": "render/FrenRenderer.sol",
+   "kind": "constructor",
+   "line": 31,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "",
+   "observations": [],
+   "reachability": "Externally reachable at `constructor` (FrenRenderer.sol:31); authority is deployer. Gate evidence is recorded separately.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "constructor(TraitStorage _store)",
+   "value": "NONE",
+   "visibility": "",
+   "writes": [
+    "store (line 32, immutable)"
+   ]
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    46,
+    65
+   ],
+   "body_sha1": "1c1473039e8a00ddc8dee13ad63a8b11404e85e8",
+   "contract": "FrenRenderer",
+   "edges": [
+    "FrenRenderer.renderSVG (FrenRenderer.sol:47), TRUSTED, in-cluster",
+    "Base64.encode (FrenRenderer.sol:49), TRUSTED, library",
+    "Strings.toString (FrenRenderer.sol:53), TRUSTED, library",
+    "FrenRenderer._attributes (FrenRenderer.sol:56), TRUSTED, in-cluster",
+    "Base64.encode (FrenRenderer.sol:63), TRUSTED, library"
+   ],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 40,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "tokenURI",
+   "observations": [],
+   "reachability": "Externally reachable at `tokenURI` (FrenRenderer.sol:40); authority is anyone. Gate evidence is recorded separately.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function tokenURI( uint256 tokenId, uint8 classIdx, uint8 bodyIdx, uint8 faceIdx, uint8 itemIdx ) external view returns (string memory)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    73,
+    88
+   ],
+   "body_sha1": "67af7516f0a01f530712daf7b45003ca1b83a58e",
+   "contract": "FrenRenderer",
+   "edges": [
+    "TraitStorage.getPalette (FrenRenderer.sol:74), UNTRUSTED, in-cluster",
+    "FrenRenderer._newBuf (FrenRenderer.sol:77), TRUSTED, in-cluster",
+    "FrenRenderer._appendHeader (FrenRenderer.sol:79), TRUSTED, in-cluster",
+    "FrenRenderer._faceClass (FrenRenderer.sol:82), TRUSTED, in-cluster",
+    "FrenRenderer._appendLayer (FrenRenderer.sol:82), TRUSTED, in-cluster",
+    "FrenRenderer._appendLayer (FrenRenderer.sol:83), TRUSTED, in-cluster",
+    "FrenRenderer._appendLayer (FrenRenderer.sol:84), TRUSTED, in-cluster",
+    "FrenRenderer._append (FrenRenderer.sol:86), TRUSTED, in-cluster",
+    "FrenRenderer._finalize (FrenRenderer.sol:87), TRUSTED, in-cluster"
+   ],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 68,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "renderSVG",
+   "observations": [],
+   "reachability": "Externally reachable at `renderSVG` (FrenRenderer.sol:68); authority is anyone. Gate evidence is recorded separately.",
+   "reads": [
+    "store (line 74, immutable)",
+    "LAYER_FACE (line 82, constant)",
+    "LAYER_BODY (line 83, constant)",
+    "LAYER_ITEM (line 84, constant)"
+   ],
+   "semantics": "fresh",
+   "signature": "function renderSVG( uint8 classIdx, uint8 bodyIdx, uint8 faceIdx, uint8 itemIdx ) public view returns (string memory)",
+   "value": "NONE",
+   "visibility": "public",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    97,
+    114
+   ],
+   "body_sha1": "23b93e4d9a9f3b11f0d7f7da0436523e5291b5a8",
+   "contract": "FrenRenderer",
+   "edges": [
+    "FrenRenderer._gradient (FrenRenderer.sol:98), TRUSTED, in-cluster",
+    "FrenRenderer._append (FrenRenderer.sol:99), TRUSTED, in-cluster",
+    "FrenRenderer._append (FrenRenderer.sol:106), TRUSTED, in-cluster",
+    "FrenRenderer._append (FrenRenderer.sol:107), TRUSTED, in-cluster",
+    "FrenRenderer._append (FrenRenderer.sol:108), TRUSTED, in-cluster",
+    "FrenRenderer._append (FrenRenderer.sol:109), TRUSTED, in-cluster"
+   ],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 94,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_appendHeader",
+   "observations": [],
+   "reachability": "Internal body declared at `_appendHeader` (FrenRenderer.sol:94); callers: renderSVG.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _appendHeader(Buf memory b, uint8 bodyIdx, uint8 faceIdx, uint8 itemIdx) private pure",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    134,
+    160
+   ],
+   "body_sha1": "3459cccdf8fb692038e24e9a3086c692327159c7",
+   "contract": "FrenRenderer",
+   "edges": [
+    "TraitStorage.getTraitOrEmpty (FrenRenderer.sol:135), UNTRUSTED, in-cluster",
+    "FrenRenderer._colorAt (FrenRenderer.sol:144), TRUSTED, in-cluster",
+    "FrenRenderer._appendRow (FrenRenderer.sol:158), TRUSTED, in-cluster"
+   ],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 128,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "_appendLayer",
+   "observations": [],
+   "reachability": "Internal body declared at `_appendLayer` (FrenRenderer.sol:128); callers: renderSVG.",
+   "reads": [
+    "store (line 135, immutable)"
+   ],
+   "semantics": "fresh",
+   "signature": "function _appendLayer( Buf memory b, uint8 layerType, uint8 classIdx, uint8 layerIdx, bytes memory pal ) private view",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    163,
+    191
+   ],
+   "body_sha1": "ff1c5fb4437c15fdffbd17d8771e7c50e3804d15",
+   "contract": "FrenRenderer",
+   "edges": [
+    "FrenRenderer._nibble (FrenRenderer.sol:168), TRUSTED, in-cluster",
+    "FrenRenderer._nibble (FrenRenderer.sol:175), TRUSTED, in-cluster",
+    "FrenRenderer._append (FrenRenderer.sol:179), TRUSTED, in-cluster",
+    "FrenRenderer._appendUint (FrenRenderer.sol:180), TRUSTED, in-cluster",
+    "FrenRenderer._append (FrenRenderer.sol:181), TRUSTED, in-cluster",
+    "FrenRenderer._appendUint (FrenRenderer.sol:182), TRUSTED, in-cluster",
+    "FrenRenderer._append (FrenRenderer.sol:183), TRUSTED, in-cluster",
+    "FrenRenderer._appendUint (FrenRenderer.sol:184), TRUSTED, in-cluster",
+    "FrenRenderer._append (FrenRenderer.sol:185), TRUSTED, in-cluster",
+    "FrenRenderer._append (FrenRenderer.sol:186), TRUSTED, in-cluster",
+    "FrenRenderer._append (FrenRenderer.sol:187), TRUSTED, in-cluster"
+   ],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 163,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_appendRow",
+   "observations": [],
+   "reachability": "Internal body declared at `_appendRow` (FrenRenderer.sol:163); callers: _appendLayer.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _appendRow(Buf memory b, Layer memory L, uint256 row) private pure",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    198,
+    201
+   ],
+   "body_sha1": "67c6f3ce47bfd49d3fb0b4b28b25f6a03f266bd8",
+   "contract": "FrenRenderer",
+   "edges": [],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 194,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_nibble",
+   "observations": [],
+   "reachability": "Internal body declared at `_nibble` (FrenRenderer.sol:194); callers: _appendRow.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _nibble(bytes memory blob, uint256 pixOff, uint256 idx) private pure returns (uint256)",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    208,
+    217
+   ],
+   "body_sha1": "ebcf1678dcce495e0b532be71bc43db3b519cc98",
+   "contract": "FrenRenderer",
+   "edges": [
+    "FrenRenderer._hexByte (FrenRenderer.sol:213), TRUSTED, in-cluster",
+    "FrenRenderer._hexByte (FrenRenderer.sol:214), TRUSTED, in-cluster",
+    "FrenRenderer._hexByte (FrenRenderer.sol:215), TRUSTED, in-cluster"
+   ],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 208,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_colorAt",
+   "observations": [],
+   "reachability": "Internal body declared at `_colorAt` (FrenRenderer.sol:208); callers: _appendLayer.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _colorAt(bytes memory pal, uint256 gi) private pure returns (string memory)",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    221,
+    224
+   ],
+   "body_sha1": "4a27409e8914ea5f44e77b3a18fe0e10fa1fbba9",
+   "contract": "FrenRenderer",
+   "edges": [],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 221,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_hexByte",
+   "observations": [],
+   "reachability": "Internal body declared at `_hexByte` (FrenRenderer.sol:221); callers: _colorAt, _rgbHex.",
+   "reads": [
+    "HEX (line 222, constant)",
+    "HEX (line 223, constant)"
+   ],
+   "semantics": "fresh",
+   "signature": "function _hexByte(bytes memory out, uint256 at, uint8 v) private pure",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    231,
+    240
+   ],
+   "body_sha1": "fe5792184ce16b45f41a8fee67af58f223e059f5",
+   "contract": "FrenRenderer",
+   "edges": [
+    "FrenRenderer._rgbHex (FrenRenderer.sol:238), TRUSTED, in-cluster",
+    "FrenRenderer._clamp (FrenRenderer.sol:238), TRUSTED, in-cluster",
+    "FrenRenderer._clamp (FrenRenderer.sol:238), TRUSTED, in-cluster",
+    "FrenRenderer._clamp (FrenRenderer.sol:238), TRUSTED, in-cluster",
+    "FrenRenderer._rgbHex (FrenRenderer.sol:239), TRUSTED, in-cluster",
+    "FrenRenderer._clamp (FrenRenderer.sol:239), TRUSTED, in-cluster",
+    "FrenRenderer._clamp (FrenRenderer.sol:239), TRUSTED, in-cluster",
+    "FrenRenderer._clamp (FrenRenderer.sol:239), TRUSTED, in-cluster"
+   ],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 227,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_gradient",
+   "observations": [],
+   "reachability": "Internal body declared at `_gradient` (FrenRenderer.sol:227); callers: _appendHeader.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _gradient(uint8 bodyIdx, uint8 faceIdx, uint8 itemIdx) private pure returns (string memory top, string memory bot)",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    242,
+    246
+   ],
+   "body_sha1": "c4d8c5cfd3943d26d67fb58aed33a8633699bc56",
+   "contract": "FrenRenderer",
+   "edges": [],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 242,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_clamp",
+   "observations": [],
+   "reachability": "Internal body declared at `_clamp` (FrenRenderer.sol:242); callers: _gradient.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _clamp(int256 v) private pure returns (uint8)",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    248,
+    254
+   ],
+   "body_sha1": "b6a51ea8b331251a773cb21dab19df627c92c0f9",
+   "contract": "FrenRenderer",
+   "edges": [
+    "FrenRenderer._hexByte (FrenRenderer.sol:250), TRUSTED, in-cluster",
+    "FrenRenderer._hexByte (FrenRenderer.sol:251), TRUSTED, in-cluster",
+    "FrenRenderer._hexByte (FrenRenderer.sol:252), TRUSTED, in-cluster"
+   ],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 248,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_rgbHex",
+   "observations": [],
+   "reachability": "Internal body declared at `_rgbHex` (FrenRenderer.sol:248); callers: _gradient.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _rgbHex(uint8 r, uint8 g, uint8 bl) private pure returns (string memory)",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    257,
+    261
+   ],
+   "body_sha1": "af793fb50c5445358289cdf3ad3b7cdb2eac8bc3",
+   "contract": "FrenRenderer",
+   "edges": [],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 257,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_faceClass",
+   "observations": [],
+   "reachability": "Internal body declared at `_faceClass` (FrenRenderer.sol:257); callers: renderSVG.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _faceClass(uint8 classIdx) private pure returns (uint8)",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    271,
+    278
+   ],
+   "body_sha1": "691c2af7e3519719469ae76c4df8b86a3c242b9e",
+   "contract": "FrenRenderer",
+   "edges": [
+    "FrenRenderer._className (FrenRenderer.sol:273), TRUSTED, in-cluster",
+    "Strings.toString (FrenRenderer.sol:274), TRUSTED, library",
+    "Strings.toString (FrenRenderer.sol:275), TRUSTED, library",
+    "Strings.toString (FrenRenderer.sol:276), TRUSTED, library"
+   ],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 267,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_attributes",
+   "observations": [],
+   "reachability": "Internal body declared at `_attributes` (FrenRenderer.sol:267); callers: tokenURI.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _attributes(uint8 classIdx, uint8 bodyIdx, uint8 faceIdx, uint8 itemIdx) private pure returns (string memory)",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    280,
+    289
+   ],
+   "body_sha1": "e8df7ea3127f9370f0753d424451c9ca01402ca7",
+   "contract": "FrenRenderer",
+   "edges": [],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 280,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_className",
+   "observations": [],
+   "reachability": "Internal body declared at `_className` (FrenRenderer.sol:280); callers: _attributes.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _className(uint8 classIdx) private pure returns (string memory)",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    300,
+    303
+   ],
+   "body_sha1": "dc6212fa52956d02aed750c5537c50d7b92d6160",
+   "contract": "FrenRenderer",
+   "edges": [],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 300,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_newBuf",
+   "observations": [],
+   "reachability": "Internal body declared at `_newBuf` (FrenRenderer.sol:300); callers: renderSVG.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _newBuf(uint256 cap) private pure returns (Buf memory b)",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    305,
+    316
+   ],
+   "body_sha1": "969ed8e9165c29b3f3a2c56400b28603f925097d",
+   "contract": "FrenRenderer",
+   "edges": [],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 305,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_append",
+   "observations": [],
+   "reachability": "Internal body declared at `_append` (FrenRenderer.sol:305); callers: _appendHeader, _appendRow, _appendUint, renderSVG.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _append(Buf memory b, string memory s) private pure",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    319,
+    340
+   ],
+   "body_sha1": "70f90d1514b0cce21c79dc35d7d91c4e1de4baa0",
+   "contract": "FrenRenderer",
+   "edges": [
+    "FrenRenderer._append (FrenRenderer.sol:321), TRUSTED, in-cluster"
+   ],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 319,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_appendUint",
+   "observations": [],
+   "reachability": "Internal body declared at `_appendUint` (FrenRenderer.sol:319); callers: _appendRow.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _appendUint(Buf memory b, uint256 v) private pure",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    342,
+    348
+   ],
+   "body_sha1": "ab14aca7de92b75dfe4074cf31a9e9cff8e21728",
+   "contract": "FrenRenderer",
+   "edges": [],
+   "file": "render/FrenRenderer.sol",
+   "kind": "function",
+   "line": 342,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_finalize",
+   "observations": [],
+   "reachability": "Internal body declared at `_finalize` (FrenRenderer.sol:342); callers: renderSVG.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _finalize(Buf memory b) private pure returns (bytes memory out)",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "deployer",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    44,
+    46
+   ],
+   "body_sha1": "085123ca8ffdff36fe9d6539cce48badc55e3b1f",
+   "contract": "LiquidatoorRenderer",
+   "edges": [],
+   "file": "render/LiquidatoorRenderer.sol",
+   "kind": "constructor",
+   "line": 44,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "",
+   "observations": [],
+   "reachability": "Externally reachable at `constructor` (LiquidatoorRenderer.sol:44); authority is deployer. Gate evidence is recorded separately.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "constructor()",
+   "value": "NONE",
+   "visibility": "",
+   "writes": [
+    "owner (line 45)"
+   ]
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "if (msg.sender != owner) revert NotOwner(); (LiquidatoorRenderer.sol:49)",
+   "body_lines": [
+    48,
+    51
+   ],
+   "body_sha1": "cfa084da1ee935be1765fe38e10f2f09b8b8bb23",
+   "contract": "LiquidatoorRenderer",
+   "edges": [],
+   "file": "render/LiquidatoorRenderer.sol",
+   "kind": "function",
+   "line": 48,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "transferOwnership",
+   "observations": [],
+   "reachability": "Externally reachable at `transferOwnership` (LiquidatoorRenderer.sol:48); authority is owner. Gate evidence is recorded separately.",
+   "reads": [
+    "owner (line 49)"
+   ],
+   "semantics": "fresh",
+   "signature": "function transferOwnership(address to) external",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "owner (line 50)"
+   ]
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "if (msg.sender != owner) revert NotOwner(); (LiquidatoorRenderer.sol:62)",
+   "body_lines": [
+    61,
+    66
+   ],
+   "body_sha1": "662946db0abcc7f0101ada1197bd97136a74dada",
+   "contract": "LiquidatoorRenderer",
+   "edges": [
+    "LiquidatoorRenderer._append (LiquidatoorRenderer.sol:65), TRUSTED, in-cluster"
+   ],
+   "file": "render/LiquidatoorRenderer.sol",
+   "kind": "function",
+   "line": 61,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "setArt",
+   "observations": [],
+   "reachability": "Externally reachable at `setArt` (LiquidatoorRenderer.sol:61); authority is owner. Gate evidence is recorded separately.",
+   "reads": [
+    "owner (line 62)",
+    "longArt (line 63)",
+    "shortArt (line 63)"
+   ],
+   "semantics": "fresh",
+   "signature": "function setArt(bool isLong, bytes[] calldata chunks) external",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "longArt (line 63)",
+    "shortArt (line 63)"
+   ]
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "if (msg.sender != owner) revert NotOwner(); (LiquidatoorRenderer.sol:81)",
+   "body_lines": [
+    80,
+    83
+   ],
+   "body_sha1": "9a3cd8536c6482e04def4d118d0c811ebf488c83",
+   "contract": "LiquidatoorRenderer",
+   "edges": [
+    "LiquidatoorRenderer._append (LiquidatoorRenderer.sol:82), TRUSTED, in-cluster"
+   ],
+   "file": "render/LiquidatoorRenderer.sol",
+   "kind": "function",
+   "line": 80,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "appendArt",
+   "observations": [],
+   "reachability": "Externally reachable at `appendArt` (LiquidatoorRenderer.sol:80); authority is owner. Gate evidence is recorded separately.",
+   "reads": [
+    "owner (line 81)",
+    "longArt (line 82)",
+    "shortArt (line 82)"
+   ],
+   "semantics": "fresh",
+   "signature": "function appendArt(bool isLong, bytes[] calldata chunks) external",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "longArt (line 82)",
+    "shortArt (line 82)"
+   ]
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    85,
+    92
+   ],
+   "body_sha1": "547bc35655249bfc4d94a72afd14cc368ef9a378",
+   "contract": "LiquidatoorRenderer",
+   "edges": [
+    "SSTORE2.write (LiquidatoorRenderer.sol:88), TRUSTED, in-cluster"
+   ],
+   "file": "render/LiquidatoorRenderer.sol",
+   "kind": "function",
+   "line": 85,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "_append",
+   "observations": [],
+   "reachability": "Internal body declared at `_append` (LiquidatoorRenderer.sol:85); callers: appendArt, setArt.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _append(address[] storage dst, bool isLong, bytes[] calldata chunks) private",
+   "value": "NONE",
+   "visibility": "private",
+   "writes": []
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    95,
+    100
+   ],
+   "body_sha1": "7b3fd76689044edd89cb54264c785391520986c1",
+   "contract": "LiquidatoorRenderer",
+   "edges": [
+    "SSTORE2.read (LiquidatoorRenderer.sol:98), TRUSTED, in-cluster"
+   ],
+   "file": "render/LiquidatoorRenderer.sol",
+   "kind": "function",
+   "line": 95,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "art",
+   "observations": [],
+   "reachability": "Externally reachable at `art` (LiquidatoorRenderer.sol:95); authority is anyone. Gate evidence is recorded separately.",
+   "reads": [
+    "longArt (line 96)",
+    "shortArt (line 96)"
+   ],
+   "semantics": "fresh",
+   "signature": "function art(bool isLong) public view returns (bytes memory out)",
+   "value": "NONE",
+   "visibility": "public",
+   "writes": []
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    108,
+    117
+   ],
+   "body_sha1": "0dca875c0da29126435c4997a7ad8fb383a94b16",
+   "contract": "LiquidatoorRenderer",
+   "edges": [
+    "ILiquidatorMintable.liqStats (LiquidatoorRenderer.sol:109), UNTRUSTED, out-of-cluster",
+    "LiquidatoorRenderer._u (LiquidatoorRenderer.sol:112), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._attributes (LiquidatoorRenderer.sol:114), TRUSTED, in-cluster",
+    "LiquidatoorRenderer.renderSVG (LiquidatoorRenderer.sol:115), TRUSTED, in-cluster"
+   ],
+   "file": "render/LiquidatoorRenderer.sol",
+   "kind": "function",
+   "line": 108,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "tokenURI",
+   "observations": [],
+   "reachability": "Externally reachable at `tokenURI` (LiquidatoorRenderer.sol:108); authority is anyone. Gate evidence is recorded separately.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function tokenURI(uint256 tokenId) external view returns (string memory)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    125,
+    164
+   ],
+   "body_sha1": "d9cd53028dcc9db401457a824e45d4b507d3dc20",
+   "contract": "LiquidatoorRenderer",
+   "edges": [
+    "LiquidatoorRenderer.art (LiquidatoorRenderer.sol:126), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._hud (LiquidatoorRenderer.sol:158), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._readout (LiquidatoorRenderer.sol:159), TRUSTED, in-cluster"
+   ],
+   "file": "render/LiquidatoorRenderer.sol",
+   "kind": "function",
+   "line": 121,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "renderSVG",
+   "observations": [],
+   "reachability": "Externally reachable at `renderSVG` (LiquidatoorRenderer.sol:121); authority is anyone. Gate evidence is recorded separately.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function renderSVG(uint256 tokenId, LiqStats memory s) public view returns (string memory)",
+   "value": "NONE",
+   "visibility": "public",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    174,
+    184
+   ],
+   "body_sha1": "282fa5ac748180b3e88a3dc38b093c6c79ff00b8",
+   "contract": "LiquidatoorRenderer",
+   "edges": [
+    "LiquidatoorRenderer._pad4 (LiquidatoorRenderer.sol:177), TRUSTED, in-cluster"
+   ],
+   "file": "render/LiquidatoorRenderer.sol",
+   "kind": "function",
+   "line": 170,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_hud",
+   "observations": [],
+   "reachability": "Internal body declared at `_hud` (LiquidatoorRenderer.sol:170); callers: renderSVG.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _hud(uint256 tokenId, string memory accent, string memory glow) internal pure returns (string memory)",
+   "value": "NONE",
+   "visibility": "internal",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    190,
+    210
+   ],
+   "body_sha1": "613c1b5e1ba651d38620ea3290405108c83a9955",
+   "contract": "LiquidatoorRenderer",
+   "edges": [
+    "LiquidatoorRenderer._line (LiquidatoorRenderer.sol:202), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._addr (LiquidatoorRenderer.sol:202), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._line (LiquidatoorRenderer.sol:203), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._line (LiquidatoorRenderer.sol:204), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._eth (LiquidatoorRenderer.sol:204), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._line (LiquidatoorRenderer.sol:205), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._u (LiquidatoorRenderer.sol:205), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._line (LiquidatoorRenderer.sol:206), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._gwei (LiquidatoorRenderer.sol:206), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._line (LiquidatoorRenderer.sol:207), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._gwei (LiquidatoorRenderer.sol:207), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._line (LiquidatoorRenderer.sol:208), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._eth (LiquidatoorRenderer.sol:208), TRUSTED, in-cluster"
+   ],
+   "file": "render/LiquidatoorRenderer.sol",
+   "kind": "function",
+   "line": 186,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_readout",
+   "observations": [],
+   "reachability": "Internal body declared at `_readout` (LiquidatoorRenderer.sol:186); callers: renderSVG.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _readout(LiqStats memory s, string memory accent, string memory ink) internal pure returns (string memory)",
+   "value": "NONE",
+   "visibility": "internal",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    218,
+    225
+   ],
+   "body_sha1": "3f23f95c2560aef28e89c07ab4884580a8319016",
+   "contract": "LiquidatoorRenderer",
+   "edges": [
+    "LiquidatoorRenderer._u (LiquidatoorRenderer.sol:219), TRUSTED, in-cluster"
+   ],
+   "file": "render/LiquidatoorRenderer.sol",
+   "kind": "function",
+   "line": 212,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_line",
+   "observations": [],
+   "reachability": "Internal body declared at `_line` (LiquidatoorRenderer.sol:212); callers: _readout.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _line( uint256 y, string memory label, string memory value, string memory accent, string memory ink ) internal pure returns (string memory)",
+   "value": "NONE",
+   "visibility": "internal",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    227,
+    239
+   ],
+   "body_sha1": "6c5c375359f1b186d76f52ad6701c9040e709a3e",
+   "contract": "LiquidatoorRenderer",
+   "edges": [
+    "LiquidatoorRenderer._u (LiquidatoorRenderer.sol:234), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._addr (LiquidatoorRenderer.sol:235), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._eth (LiquidatoorRenderer.sol:236), TRUSTED, in-cluster",
+    "LiquidatoorRenderer._u (LiquidatoorRenderer.sol:237), TRUSTED, in-cluster"
+   ],
+   "file": "render/LiquidatoorRenderer.sol",
+   "kind": "function",
+   "line": 227,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_attributes",
+   "observations": [],
+   "reachability": "Internal body declared at `_attributes` (LiquidatoorRenderer.sol:227); callers: tokenURI.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _attributes(LiqStats memory s) internal pure returns (string memory)",
+   "value": "NONE",
+   "visibility": "internal",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    245,
+    253
+   ],
+   "body_sha1": "8bdfe23a2b4f57c34f014b4089b144e811084688",
+   "contract": "LiquidatoorRenderer",
+   "edges": [],
+   "file": "render/LiquidatoorRenderer.sol",
+   "kind": "function",
+   "line": 245,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_u",
+   "observations": [],
+   "reachability": "Internal body declared at `_u` (LiquidatoorRenderer.sol:245); callers: _attributes, _eth, _gwei, _line, _pad4, _readout, tokenURI.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _u(uint256 v) internal pure returns (string memory)",
+   "value": "NONE",
+   "visibility": "internal",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    255,
+    262
+   ],
+   "body_sha1": "8d5ed4dac7167ff560ce3a88e292b2b8b194f75e",
+   "contract": "LiquidatoorRenderer",
+   "edges": [
+    "LiquidatoorRenderer._u (LiquidatoorRenderer.sol:256), TRUSTED, in-cluster"
+   ],
+   "file": "render/LiquidatoorRenderer.sol",
+   "kind": "function",
+   "line": 255,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_pad4",
+   "observations": [],
+   "reachability": "Internal body declared at `_pad4` (LiquidatoorRenderer.sol:255); callers: _hud.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _pad4(uint256 v) internal pure returns (string memory)",
+   "value": "NONE",
+   "visibility": "internal",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    268,
+    278
+   ],
+   "body_sha1": "7e16b4ff2d348dc0fbce4912f9fe820d95364bed",
+   "contract": "LiquidatoorRenderer",
+   "edges": [],
+   "file": "render/LiquidatoorRenderer.sol",
+   "kind": "function",
+   "line": 268,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_addr",
+   "observations": [],
+   "reachability": "Internal body declared at `_addr` (LiquidatoorRenderer.sol:268); callers: _attributes, _readout.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _addr(address a) internal pure returns (string memory)",
+   "value": "NONE",
+   "visibility": "internal",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    283,
+    292
+   ],
+   "body_sha1": "e83ecadfa6a0515bd09559a346cd3cd9161dd344",
+   "contract": "LiquidatoorRenderer",
+   "edges": [
+    "LiquidatoorRenderer._u (LiquidatoorRenderer.sol:291), TRUSTED, in-cluster"
+   ],
+   "file": "render/LiquidatoorRenderer.sol",
+   "kind": "function",
+   "line": 283,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_gwei",
+   "observations": [],
+   "reachability": "Internal body declared at `_gwei` (LiquidatoorRenderer.sol:283); callers: _readout.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _gwei(uint256 wei_) internal pure returns (string memory)",
+   "value": "NONE",
+   "visibility": "internal",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    296,
+    305
+   ],
+   "body_sha1": "bb2be667a931df1212acc801def91e778666b575",
+   "contract": "LiquidatoorRenderer",
+   "edges": [
+    "LiquidatoorRenderer._u (LiquidatoorRenderer.sol:304), TRUSTED, in-cluster"
+   ],
+   "file": "render/LiquidatoorRenderer.sol",
+   "kind": "function",
+   "line": 296,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "_eth",
+   "observations": [],
+   "reachability": "Internal body declared at `_eth` (LiquidatoorRenderer.sol:296); callers: _attributes, _readout.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function _eth(uint256 wei_) internal pure returns (string memory)",
+   "value": "NONE",
+   "visibility": "internal",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    22,
+    46
+   ],
+   "body_sha1": "64afea175214211e330471c0b0a937cdfb06f8a5",
+   "contract": "SSTORE2",
+   "edges": [],
+   "file": "render/SSTORE2.sol",
+   "kind": "function",
+   "line": 22,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "write",
+   "observations": [],
+   "reachability": "Internal body declared at `write` (SSTORE2.sol:22); callers: no executable caller in this cluster.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function write(bytes memory data) internal returns (address pointer)",
+   "value": "NONE",
+   "visibility": "internal",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    49,
+    59
+   ],
+   "body_sha1": "06a62391879b3e0c6152571587bf0aba54d3ba10",
+   "contract": "SSTORE2",
+   "edges": [],
+   "file": "render/SSTORE2.sol",
+   "kind": "function",
+   "line": 49,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "read",
+   "observations": [],
+   "reachability": "Internal body declared at `read` (SSTORE2.sol:49); callers: no executable caller in this cluster.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function read(address pointer) internal view returns (bytes memory)",
+   "value": "NONE",
+   "visibility": "internal",
+   "writes": []
+  },
+  {
+   "authority": "deployer",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    45,
+    45
+   ],
+   "body_sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+   "contract": "TraitStorage",
+   "edges": [],
+   "file": "render/TraitStorage.sol",
+   "kind": "constructor",
+   "line": 45,
+   "modifiers": [
+    "Ownable(msg.sender)"
+   ],
+   "mutability": "nonpayable",
+   "name": "",
+   "observations": [],
+   "reachability": "Externally reachable at `constructor` (TraitStorage.sol:45); authority is deployer. Gate evidence is recorded separately.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "constructor() Ownable(msg.sender)",
+   "value": "NONE",
+   "visibility": "",
+   "writes": []
+  },
+  {
+   "authority": "internal",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    51,
+    54
+   ],
+   "body_sha1": "32a783351bdc35b3459663f1421eb99e50d5d1ae",
+   "contract": "TraitStorage",
+   "edges": [],
+   "file": "render/TraitStorage.sol",
+   "kind": "modifier",
+   "line": 51,
+   "modifiers": [],
+   "mutability": "nonpayable",
+   "name": "notFrozen",
+   "observations": [],
+   "reachability": "Internal body declared at `notFrozen` (TraitStorage.sol:51); callers: no executable caller in this cluster.",
+   "reads": [
+    "frozen (line 52)"
+   ],
+   "semantics": "fresh",
+   "signature": "modifier notFrozen()",
+   "value": "NONE",
+   "visibility": "",
+   "writes": []
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (TraitStorage.sol:57)",
+   "body_lines": [
+    57,
+    61
+   ],
+   "body_sha1": "64f1cf96635f3e3b93189c5940eabdd4d494b6bf",
+   "contract": "TraitStorage",
+   "edges": [
+    "SSTORE2.write (TraitStorage.sol:59), TRUSTED, in-cluster"
+   ],
+   "file": "render/TraitStorage.sol",
+   "kind": "function",
+   "line": 57,
+   "modifiers": [
+    "onlyOwner",
+    "notFrozen"
+   ],
+   "mutability": "nonpayable",
+   "name": "storePalette",
+   "observations": [],
+   "reachability": "Externally reachable at `storePalette` (TraitStorage.sol:57); authority is owner. Gate evidence is recorded separately.",
+   "reads": [
+    "palettePointer (line 60)"
+   ],
+   "semantics": "fresh",
+   "signature": "function storePalette(bytes calldata rgb) external onlyOwner notFrozen",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "palettePointer (line 59)"
+   ]
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (TraitStorage.sol:64)",
+   "body_lines": [
+    64,
+    68
+   ],
+   "body_sha1": "2f321d500002f0e8acdb0098de653dfbea5a9828",
+   "contract": "TraitStorage",
+   "edges": [
+    "SSTORE2.write (TraitStorage.sol:65), TRUSTED, in-cluster"
+   ],
+   "file": "render/TraitStorage.sol",
+   "kind": "function",
+   "line": 64,
+   "modifiers": [
+    "onlyOwner",
+    "notFrozen"
+   ],
+   "mutability": "nonpayable",
+   "name": "storeTrait",
+   "observations": [],
+   "reachability": "Externally reachable at `storeTrait` (TraitStorage.sol:64); authority is owner. Gate evidence is recorded separately.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function storeTrait(uint256 key, bytes calldata blob) public onlyOwner notFrozen",
+   "value": "NONE",
+   "visibility": "public",
+   "writes": [
+    "traitPointer (line 66)"
+   ]
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (TraitStorage.sol:73)",
+   "body_lines": [
+    75,
+    80
+   ],
+   "body_sha1": "bde6731a9270e8804ad224f98f4cd7a473996e20",
+   "contract": "TraitStorage",
+   "edges": [
+    "TraitStorage.storeTrait (TraitStorage.sol:78), TRUSTED, in-cluster"
+   ],
+   "file": "render/TraitStorage.sol",
+   "kind": "function",
+   "line": 71,
+   "modifiers": [
+    "onlyOwner",
+    "notFrozen"
+   ],
+   "mutability": "nonpayable",
+   "name": "storeTraits",
+   "observations": [],
+   "reachability": "Externally reachable at `storeTraits` (TraitStorage.sol:71); authority is owner. Gate evidence is recorded separately.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function storeTraits(uint256[] calldata traitKeys, bytes[] calldata blobs) external onlyOwner notFrozen",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "owner",
+   "authority_gate_quote": "onlyOwner (TraitStorage.sol:83)",
+   "body_lines": [
+    83,
+    86
+   ],
+   "body_sha1": "cf8a038429f6729bfafc74737c576c2b96e535d2",
+   "contract": "TraitStorage",
+   "edges": [],
+   "file": "render/TraitStorage.sol",
+   "kind": "function",
+   "line": 83,
+   "modifiers": [
+    "onlyOwner"
+   ],
+   "mutability": "nonpayable",
+   "name": "freeze",
+   "observations": [],
+   "reachability": "Externally reachable at `freeze` (TraitStorage.sol:83); authority is owner. Gate evidence is recorded separately.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function freeze() external onlyOwner",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": [
+    "frozen (line 84)"
+   ]
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    96,
+    98
+   ],
+   "body_sha1": "3db5430286d43dca8ba4bb7cff908f4a8144178b",
+   "contract": "TraitStorage",
+   "edges": [],
+   "file": "render/TraitStorage.sol",
+   "kind": "function",
+   "line": 92,
+   "modifiers": [],
+   "mutability": "pure",
+   "name": "traitKey",
+   "observations": [],
+   "reachability": "Externally reachable at `traitKey` (TraitStorage.sol:92); authority is anyone. Gate evidence is recorded separately.",
+   "reads": [],
+   "semantics": "fresh",
+   "signature": "function traitKey(uint8 layerType, uint8 classIdx, uint8 layerIdx) public pure returns (uint256)",
+   "value": "NONE",
+   "visibility": "public",
+   "writes": []
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    101,
+    105
+   ],
+   "body_sha1": "ec611257d2427f75ebdec845cf5ebd9f0270b893",
+   "contract": "TraitStorage",
+   "edges": [
+    "SSTORE2.read (TraitStorage.sol:104), TRUSTED, in-cluster"
+   ],
+   "file": "render/TraitStorage.sol",
+   "kind": "function",
+   "line": 101,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "getTrait",
+   "observations": [],
+   "reachability": "Externally reachable at `getTrait` (TraitStorage.sol:101); authority is anyone. Gate evidence is recorded separately.",
+   "reads": [
+    "traitPointer (line 102)"
+   ],
+   "semantics": "fresh",
+   "signature": "function getTrait(uint256 key) external view returns (bytes memory)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    112,
+    116
+   ],
+   "body_sha1": "5c9791590653496287e54b9c44536b7181ba06be",
+   "contract": "TraitStorage",
+   "edges": [
+    "TraitStorage.traitKey (TraitStorage.sol:113), TRUSTED, in-cluster",
+    "SSTORE2.read (TraitStorage.sol:115), TRUSTED, in-cluster"
+   ],
+   "file": "render/TraitStorage.sol",
+   "kind": "function",
+   "line": 108,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "getTraitOrEmpty",
+   "observations": [],
+   "reachability": "Externally reachable at `getTraitOrEmpty` (TraitStorage.sol:108); authority is anyone. Gate evidence is recorded separately.",
+   "reads": [
+    "traitPointer (line 113)"
+   ],
+   "semantics": "fresh",
+   "signature": "function getTraitOrEmpty(uint8 layerType, uint8 classIdx, uint8 layerIdx) external view returns (bytes memory)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    119,
+    122
+   ],
+   "body_sha1": "9c574d6b07bceee0028be54986ebf114211eaabc",
+   "contract": "TraitStorage",
+   "edges": [
+    "SSTORE2.read (TraitStorage.sol:121), TRUSTED, in-cluster"
+   ],
+   "file": "render/TraitStorage.sol",
+   "kind": "function",
+   "line": 119,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "getPalette",
+   "observations": [],
+   "reachability": "Externally reachable at `getPalette` (TraitStorage.sol:119); authority is anyone. Gate evidence is recorded separately.",
+   "reads": [
+    "palettePointer (line 120)",
+    "palettePointer (line 121)"
+   ],
+   "semantics": "fresh",
+   "signature": "function getPalette() external view returns (bytes memory)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  },
+  {
+   "authority": "anyone",
+   "authority_gate_quote": "UNGATED",
+   "body_lines": [
+    124,
+    126
+   ],
+   "body_sha1": "85097b1eb55d1b051adc4b92a7bb9185aa5e42b0",
+   "contract": "TraitStorage",
+   "edges": [],
+   "file": "render/TraitStorage.sol",
+   "kind": "function",
+   "line": 124,
+   "modifiers": [],
+   "mutability": "view",
+   "name": "hasTrait",
+   "observations": [],
+   "reachability": "Externally reachable at `hasTrait` (TraitStorage.sol:124); authority is anyone. Gate evidence is recorded separately.",
+   "reads": [
+    "traitPointer (line 125)"
+   ],
+   "semantics": "fresh",
+   "signature": "function hasTrait(uint256 key) external view returns (bool)",
+   "value": "NONE",
+   "visibility": "external",
+   "writes": []
+  }
+ ]
+}
