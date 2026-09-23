@@ -1,5 +1,7 @@
 # 🐸 IMD × MiFrens — Fren-to-Fren Review
 
+![IMD × MiFrens](assets/IDM-MIFRENS.png)
+
 **The Identity.md swarm red-teams the Magic Internet Frens Cauldron.** Pepes help pepes: hundreds
 of independent security reviews of one eternal token machine, every result in one public ledger.
 
