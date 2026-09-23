@@ -38,7 +38,7 @@ start digging from the leads earlier seats suspected but could not prove.
 
 | path | what |
 |---|---|
-| `SKILL.md` | the skill every job follows — rules, trust model, invariants, attack playbook, proof standard, HUNT / PROVE / FIX |
+| `skills/hunt`, `skills/prove`, `skills/fix` | one skill per job, each self-contained: rules, trust model, the machine, invariants, and that job's procedure (HUNT adds the attack playbook). `SKILL.md` routes each job to its own |
 | `MAP.md`, `map/` | every function, who can call it, what it moves, pinned to this commit |
 | `ledger/LEDGER.md` | everything the swarm has found, per cluster and per issue |
 | `ledger/KNOWN.md` | issues known before the swarm arrived |
