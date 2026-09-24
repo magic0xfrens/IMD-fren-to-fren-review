@@ -2,3 +2,4 @@
 # node tools/aggregate.mjs rebuilds LEDGER.md and ledger.json from these.
 7b9c907d-99b9-405b-8491-6088c77d4cc9  # 2026-09-24 deep review, foci perp-book value-flow hook-deltas rotation; order 6d2f3179-55f5-47a7-a6ae-a608a2f03a18
 00fde9c0-9ddd-4bae-ac0f-89a58d003858  # 2026-09-24 deep review of perp-engine; order caaf197a-f280-4934-abb9-6010f705e819
+7b19d800-fabe-4051-af78-21e96d37f86f  # 2026-09-24 fuzz 50000 runs; order 25daaf3d; FAILED: worker could not build offline (no solc 0.8.17 for permit2)
