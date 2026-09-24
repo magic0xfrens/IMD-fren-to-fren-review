@@ -42,12 +42,12 @@ interface IQuotePrice {
  *  meaningful and the process usable.
  *
  *  ── Where the guardrails are ───────────────────────────────────────────────
- *  This is the part that decides whether a DAO gets drained, so each limit is
+ *  This is the part that decides whether a DAO gets emptied, so each limit is
  *  deliberate:
  *
  *  1. THE ALLOWLIST IS NOT VOTABLE. Only the timelock adds assets. A vote can
  *     only choose among assets already vetted, so even a fully captured vote
- *     cannot route the treasury into an attacker's token. This is the single
+ *     cannot route the treasury into an untrusted caller's token. This is the single
  *     most important guardrail here — everything else limits damage, this one
  *     removes the category.
  *  2. VOTING POWER IS SNAPSHOTTED at the proposing block, so nobody can buy or
@@ -60,7 +60,7 @@ interface IQuotePrice {
  *  6. ONE ACTIVE ENVELOPE and a cooldown, so the LP cannot be churned by
  *     back-to-back proposals.
  *  7. A GUARDIAN can cancel, which is the emergency stop when a proposal turns
- *     out to be malicious after passing.
+ *     out to be untrusted after passing.
  *
  *  ── On front-running the vote ──────────────────────────────────────────────
  *  A proposal is public for its whole voting period, so the destination is known
@@ -229,7 +229,7 @@ contract TreasuryGovernor {
     ///  live untracked proposal. So one junk filing plus one FOR-vote every six
     ///  days — gas only, one MiFren — keeps case (4) permanently out of reach:
     ///  `_leadId` stays pointed at a corpse, no later proposal can ever take the
-    ///  hint, and EVERY {winner} call falls through to the scan the attacker is
+    ///  hint, and EVERY {winner} call falls through to the scan the untrusted caller is
     ///  also inflating. The two halves feed each other.
     ///
     ///  The fallback therefore stops being over the proposal list. This is the
@@ -253,7 +253,7 @@ contract TreasuryGovernor {
     ///  fallback, pinning it costs eight cold reads instead of one — a gas
     ///  regression a stranger pays for in votes, not a denial. Its maximality
     ///  invariant is unchanged and still carries the fast path, so the cheaper
-    ///  path keeps working for everyone who is not being attacked.
+    ///  path keeps working for everyone who is not being tested.
     uint256[BENCH_SLOTS] private _bench;
 
     // ── Guardrails. Constants rather than settable: a governor that can vote to
@@ -423,7 +423,7 @@ contract TreasuryGovernor {
         //  PROPOSALS COMPETE; THEY DO NOT QUEUE.
         //
         //  An earlier version allowed one open proposal at a time, which read as
-        //  a safety property and was actually an attack: anyone holding the
+        //  a safety property and was actually an probe: anyone holding the
         //  5-MiFren threshold could file junk every three days and block
         //  treasury governance permanently, for the price of gas. Serialising a
         //  public queue hands a veto to whoever is fastest.
@@ -538,7 +538,7 @@ contract TreasuryGovernor {
     /// @dev Keep `id` on the bench if it out-weighs the weakest mandate already
     ///      there. See {_bench}. O(BENCH_SLOTS), and only on a FOR-vote.
     ///
-    ///  ── A SETTLED, PASSED MANDATE IS EVICTED LAST (red-team T2b) ───────────
+    ///  ── A SETTLED, PASSED MANDATE IS EVICTED LAST (review T2b) ───────────
     ///  This used to rank purely on raw `forVotes` and exclude only `_dead`
     ///  entries. `_benchRecord` is reached from {vote}, and {vote} reverts past
     ///  `votingEndsAt` — so every CANDIDATE is a proposal whose vote is still
@@ -651,7 +651,7 @@ contract TreasuryGovernor {
         emit Executed(id, p.quote, p.maxTotalBps, envelope.expiry);
     }
 
-    /// @notice Emergency stop. A proposal that turns out to be malicious can pass
+    /// @notice Emergency stop. A proposal that turns out to be untrusted can pass
     ///         legitimately; the guardian is the answer to that, and it can only
     ///         ever STOP a rotation, never start or redirect one.
     function cancel(uint256 id) external {
@@ -816,7 +816,7 @@ contract TreasuryGovernor {
         //  {consume} bounds it separately — it simply can no longer eat the budget
         //  the guild voted for the migration.
         //
-        //  ── AND A PARTIAL MANDATE NEEDS THE SAME PROTECTION (red-team T2a) ──
+        //  ── AND A PARTIAL MANDATE NEEDS THE SAME PROTECTION (review T2a) ──
         //  The first version of this exempted partial envelopes: "below a whole
         //  position there is no migration to protect". Wrong — what needs
         //  protecting is not the migration, it is the LEG THE GUILD VOTED ABOUT.
@@ -838,7 +838,7 @@ contract TreasuryGovernor {
 
     /// @notice Did the guild's mandate cover the WHOLE position, and is it spent?
     ///
-    ///  ── WHY REDENOMINATION NEEDS ITS OWN TEST (red-team R-04) ──────────────
+    ///  ── WHY REDENOMINATION NEEDS ITS OWN TEST (review R-04) ──────────────
     ///  Consumers used to read "the envelope has no allowance left" as "the
     ///  rotation finished", and re-denominated the generation on it. But
     ///  `maxTotalBps` is how much the guild VOTED to move, not how much of the LP
@@ -906,10 +906,10 @@ contract TreasuryGovernor {
      *  `rotateSliceFrom` is PERMISSIONLESS, so a single successful slice of any
      *  size, out of any leg, by any address, sets `movedBps != 0` and immunises
      *  the envelope against this path for the rest of its life. To hold an
-     *  envelope at zero a griefer would have to keep EVERY slice reverting for
-     *  the whole COOLDOWN — which is not an attack on the envelope, it IS the
+     *  envelope at zero a disruptor would have to keep EVERY slice reverting for
+     *  the whole COOLDOWN — which is not an probe on the envelope, it IS the
      *  condition this clears. Deliberately not a failed-attempt counter for the
-     *  same reason: a counter can be driven up by an attacker calling into a
+     *  same reason: a counter can be driven up by an untrusted caller calling into a
      *  route they have temporarily broken, while zero-progress can be refuted by
      *  anyone, at any moment, with one transaction.
      *
@@ -923,7 +923,7 @@ contract TreasuryGovernor {
      *  and `execute` already refuse until `lastEnvelopeAt + COOLDOWN` on the
      *  very next line, so a stalled envelope stops blocking at exactly the
      *  moment the cooldown stops blocking anyway. No new constant, no new
-     *  storage slot, and no new timing surface for an attacker to aim at.
+     *  storage slot, and no new timing surface for an untrusted caller to aim at.
      *
      *  THIS DOES NOT CANCEL ANYTHING. The envelope stays `active` and stays
      *  spendable, so if the route recovers the original mandate still works. All
@@ -945,7 +945,7 @@ contract TreasuryGovernor {
         if (msg.sender != registry) revert NotGuardian();
         Envelope storage e = envelope;
         (, uint16 left) = allowance();
-        //  ── `left`, NOT `quote`, IS THE LIVENESS TEST (red-team R-03) ───────
+        //  ── `left`, NOT `quote`, IS THE LIVENESS TEST (review R-03) ───────
         //  This read `q == address(0)` as "nothing approved". address(0) is also
         //  how a rotation BACK TO NATIVE ETHER names its destination, so a
         //  perfectly valid envelope was indistinguishable from no envelope and
@@ -973,7 +973,7 @@ contract TreasuryGovernor {
         }
         e.movedBps += bps;
         if (fromPrimary) e.movedPrimaryBps += bps;
-        //  ── A SPENT ENVELOPE MUST STOP BLOCKING GOVERNANCE (red-team R-05) ──
+        //  ── A SPENT ENVELOPE MUST STOP BLOCKING GOVERNANCE (review R-05) ──
         //  `propose` refuses while `envelope.active && now < expiry` (:322), and
         //  nothing cleared `active` on exhaustion — only the guardian's `cancel`
         //  (:409) ever did. So a mandate spent in its first hour locked out every
@@ -984,7 +984,7 @@ contract TreasuryGovernor {
         //  DEACTIVATION FOLLOWS THE SAME COUNTER {allowance} REPORTS: an envelope
         //  is finished when the position the guild voted about has moved, not when
         //  a stranger has spent the shared total on side pools. That holds for
-        //  partial mandates too (red-team T2a) — see {allowance}.
+        //  partial mandates too (review T2a) — see {allowance}.
         if (e.movedPrimaryBps >= cap) e.active = false;
         emit EnvelopeConsumed(bps, e.movedBps);
     }

@@ -78,7 +78,7 @@ interface IPerpHook {
  *     liquidations; execution still swaps at spot. Falls back to spot until the
  *     window has history (the 24h warmup covers the cold start).
  *   • PER-BLOCK LIQUIDATION CAP — the ETH-notional liquidated per block is capped
- *     to a share of depth, so an attacker can't engineer an unbounded atomic
+ *     to a share of depth, so an untrusted caller can't engineer an unbounded atomic
  *     cascade (cross-block cascades still happen — that's the fun, just bounded).
  *   • DEATH FORCE-CLOSE — opens are blocked once the token is dead; any open
  *     position can be permissionlessly force-closed at that point (solvent,
@@ -107,7 +107,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     uint8 internal constant MODE_LIQUIDATION = 1;
     uint8 internal constant MODE_DEATH = 2;
     /**
-     *  ── THE DEATH PATH IS NOT A FREE OPTION ON THE POOL (red-team T3d) ──────
+     *  ── THE DEATH PATH IS NOT A FREE OPTION ON THE POOL (review T3d) ──────
      *  {forceCloseDead} / {forceCloseAllDead} are PERMISSIONLESS, pay the caller
      *  `keeperBps` of the residual, and passed a literal `minOut` of `0` into
      *  {_settle} — which enforces slippage only on `MODE_NORMAL`. So once the token
@@ -119,11 +119,11 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
      *  So the dead path gets a floor of its own, derived from the engine's own TWAP
      *  mark rather than from the caller: the sale must clear at least this fraction
      *  of the marked value, and a buy-back must not cost more than the reciprocal.
-     *  Wide on purpose — it is a theft filter, not a slippage setting. Honest depth
+     *  Wide on purpose — it is a loss filter, not a slippage setting. Honest depth
      *  moves nowhere near it, and a keeper who has to move the pool 10% to profit is
      *  paying more for the privilege than the cut is worth.
      *
-     *  ── AND IT IS A LIMIT, NOT A REFUSAL (red-team T3d x LIQ-02) ────────────
+     *  ── AND IT IS A LIMIT, NOT A REFUSAL (review T3d x LIQ-02) ────────────
      *  The first cut REVERTED outside the band, which re-opened LIQ-02: a short
      *  bigger than the pool's token side is cleared in bites and its terminal bite
      *  is on THIS path, so a reverting band left the book unclearable and blocked
@@ -132,7 +132,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
      *  pool fills whatever it can INSIDE the band, and the piece it could not take
      *  is rebooked (non-terminal paths) or written off by name (death). Nobody is
      *  ever filled outside the band, and the book always reaches `openCount == 0`.
-     *  The mark is a TWAP, so an attacker holding the pool below the band drags the
+     *  The mark is a TWAP, so an untrusted caller holding the pool below the band drags the
      *  band down with him rather than freezing anything.
      */
     uint256 internal constant DEATH_SLIP_BPS = 1000; // 10% band around the mark
@@ -177,7 +177,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     uint256 internal maxOiBps = 3_000;          // per-side OI ≤ 30% of depth
     /// @notice DUST FILTER: minimum ETH collateral to open a position. Stops bots
     ///         from spamming millions of dust positions (which would bloat the
-    ///         liquidation set + heatmap and grief the batch auto-liquidator).
+    ///         liquidation set + heatmap and disrupt the batch auto-liquidator).
     ///         Owner-tunable. 0 = no floor.
     uint256 public minCollateral = 0.003 ether;
     /// @notice Hard cap on how many positions a single swap's batch auto-liq will
@@ -228,7 +228,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     ///         guarantee, so there must be no way to configure it into violation.
     uint256 public constant MAX_OPEN_POSITIONS = 64;
     /// @dev Positions cleared per `forceCloseAllDead` call. Must stay ABOVE
-    ///      `maxOpenPositions` so a single call always drains the book.
+    ///      `maxOpenPositions` so a single call always empties the book.
     uint256 internal constant FORCE_CLOSE_MAX = 96;
 
     // ── Community PLV (LP-for-perps) ──
@@ -276,7 +276,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     }
 
     /// @dev Push `amount` of the quote to `to`, reverting on failure. For
-    ///      recipients the protocol chooses (dividend, treasury) — an attacker
+    ///      recipients the protocol chooses (dividend, treasury) — an untrusted caller
     ///      controlled one must use {_payOut} instead.
     function _pushQuote(address to, uint256 amount) internal {
         if (amount == 0) return;
@@ -312,7 +312,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     uint32 public twapWindow = 5 minutes;     // liquidation-mark averaging window
                                               // (5m resists flash-manip; 30m lags too much)
     uint256 public maxLiqBps = 2_000;         // ETH-notional liquidated ≤ 20% of depth / block
-    uint256 public maxFundingBps = 5_000;     // |funding P&L| ≤ 50% of collateral (anti-drain cap)
+    uint256 public maxFundingBps = 5_000;     // |funding P&L| ≤ 50% of collateral (anti-empty cap)
 
     //  `internal`: a DYNAMIC-ARRAY auto-getter is the most expensive kind (bounds
     //  check + element return, one per array), and neither has a single reader
@@ -368,7 +368,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     ///      MIN_TWAP (1 s). The 24h open-warmup covers the COLD start but is read
     ///      off `registry.lastSummonAt()`, which a mid-generation quote rotation
     ///      does not move — so opens stayed live against the collapsed mark.
-    ///      {_guardOpen} re-arms off this instead. (red-team H-4)
+    ///      {_guardOpen} re-arms off this instead. (review H-4)
     uint32 internal ringArmedAt;
 
     // ── per-timestamp liquidation throttle ──
@@ -415,7 +415,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     mapping(address => uint256) public badgesOwed;
 
     /// @notice ETH a settlement could not PUSH to a trader/keeper (their `receive()`
-    ///         reverted). Claimed via {claimPayout}. This is what stops one hostile
+    ///         reverted). Claimed via {claimPayout}. This is what stops one untrusted
     ///         trader from freezing every settlement path. (Audit H-04.)
     mapping(address => uint256) public payoutOwed;
     /// @notice Old-generation token inventory the best-effort migration left behind,
@@ -439,9 +439,9 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     uint256[] internal _openIds;                    // live position ids
     mapping(uint256 => uint256) internal _openPos;  // id → 1-based index in _openIds
     uint256 internal sweepCursor;                     // rotating scan start
-    //  REMOVED (red-team R1B): `SWEEP_SCAN = 12` capped the per-swap scan at a
+    //  REMOVED (review R1B): `SWEEP_SCAN = 12` capped the per-swap scan at a
     //  POSITIONAL window over a 64-slot book, and `sweepCursor` persists, so the
-    //  window was AIMABLE — dust padding plus two dust sells hid a victim from
+    //  window was AIMABLE — dust padding plus two dust sells hid a affected user from
     //  both windows of the swap that bankrupted it. The scan is now bounded by
     //  `_openIds.length` (≤ MAX_OPEN_POSITIONS) and by SWEEP_KILL_RESERVE below,
     //  which is the guard that actually protects the parent swap. See {_doSweep}.
@@ -501,7 +501,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     error DustPosition();
     error BadParam();
     /// @notice The LP vault still holds quote-side value, so the engine may not
-    ///         adopt a different quote yet. See {syncGeneration} (red-team R-08).
+    ///         adopt a different quote yet. See {syncGeneration} (review R-08).
     ///         Named for the STAKE, not the event `VaultFunded` above it.
     error VaultStaked();
     error OwnershipCannotBeRenounced();
@@ -585,7 +585,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
 
     /// @dev Block re-entry into any user entrypoint while an IN-SWAP liquidation
     ///      is settling (`_inLocked`). The hook-driven `liquidateInSwap` pays ETH
-    ///      to an attacker-controlled keeper mid-settlement; without this, that
+    ///      to an untrusted caller-controlled keeper mid-settlement; without this, that
     ///      keeper could re-enter open/close/liquidate (the OZ `nonReentrant`
     ///      lock isn't engaged on the in-swap path). The engine never calls its
     ///      own entrypoints, so this never blocks legitimate flow. (Audit M-01)
@@ -669,7 +669,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     /// @dev Re-express an 18-decimal (wei-written) CONFIG threshold in the live
     ///      quote's own units.
     ///
-    ///  ── AN ABSOLUTE WEI CONSTANT IS A DENOMINATION BUG (red-team T02) ─────
+    ///  ── AN ABSOLUTE WEI CONSTANT IS A DENOMINATION BUG (review T02) ─────
     ///  Every absolute threshold in this contract was written in ether/wei and then
     ///  compared against a QUOTE-denominated amount. On a 6-decimal quote
     ///  `minCollateral = 0.003 ether` demanded 3e15 raw units — about $3bn — so a
@@ -679,7 +679,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     ///  `tierDepthWei` leverage tiers fail identically, so all of them scale here
     ///  rather than each being patched where it happens to be read.
     ///
-    ///  ── AND THE SCALE IS A VALUE, NOT A UNIT COUNT (red-team F-03) ────────
+    ///  ── AND THE SCALE IS A VALUE, NOT A UNIT COUNT (review F-03) ────────
     ///  The first cut of this scaled by `10**decimals()`. But every constant here
     ///  is a VALUE statement: `tierDepthWei = [25, 100, 300] ether` means "≈ $80k /
     ///  $320k / $1M of pool depth", and unit-scaling turned it into $25 / $100 /
@@ -763,8 +763,8 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
      * @dev Sample the oracle.
      *
      *  MARK POISONING (audit A-02 — Critical). This used to bail out entirely when
-     *  `dt < OBS_INTERVAL`, which left `ring.lastTick` holding a STALE value. An attacker
-     *  could exploit that with one atomic round-trip:
+     *  `dt < OBS_INTERVAL`, which left `ring.lastTick` holding a STALE value. An untrusted caller
+     *  could failure case that with one atomic round-trip:
      *    1. CRASH spot with a large sell. The hook's afterSwap sweep pokes us, a
      *       write lands, and `ring.lastTick` is frozen at the crashed tick.
      *    2. RESTORE spot by buying back in the SAME transaction. `dt == 0`, so the
@@ -773,7 +773,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
      *       `ring.lastTick * (now - ring.lastObsTs)`, so the crashed tick is integrated over
      *       the entire window even though spot never actually moved.
      *  The mark then reads far below reality and SOLVENT positions become
-     *  liquidatable — the attacker collects the keeper reward and the trader is
+     *  liquidatable — the untrusted caller collects the keeper reward and the trader is
      *  wrongly closed, for only the cost of the round-trip's fee and slippage.
      *
      *  Fix: ALWAYS integrate the elapsed interval and ALWAYS refresh `ring.lastTick`, so
@@ -831,7 +831,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     /**
      * @notice Does an open book have to block a new volume link?
      *
-     *  ── WHY THE ENGINE ANSWERS THIS AND NOT THE HOOK (red-team S0x) ─────────
+     *  ── WHY THE ENGINE ANSWERS THIS AND NOT THE HOOK (review S0x) ─────────
      *  {CauldronHook.linkVolume} refused ANY link while `openCount > 0`, and a
      *  rotation links its destination pool on EVERY slice. Since anyone may open
      *  a position permissionlessly, one dust position — measured at 0.000744 ETH
@@ -858,7 +858,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
      *  EIP-170 headroom; the hook swaps one external call for another and does
      *  not grow.
      */
-    ///  ── AND A RELAUNCH MUST NOT RE-ARM THE HOSTAGE (red-team Jc) ─────────
+    ///  ── AND A RELAUNCH MUST NOT RE-ARM THE HOSTAGE (review Jc) ─────────
     ///  T3e moved the `markSource = address(0)` drop OUT of the `newQuote != quote`
     ///  branch so a RELAUNCH could not inherit a source armed on the DEAD
     ///  generation's pool. Necessary, but it made this predicate true again after
@@ -947,7 +947,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     ///      PLV (crowded pays in, underweight draws out) — solvent because the
     ///      crowded side's larger notional always pays in ≥ what the underweight
     ///      side draws. Bounded to ±maxFundingBps of collateral so funding can
-    ///      never be weaponized to drain the vault or wipe a position.
+    ///      never be used to empty the vault or wipe a position.
     function _fundingDelta(Position memory p) internal view returns (int256) {
         int256 diff = fundingIndex - p.entryFunding;
         int256 signed = p.isLong ? diff : -diff; // +: crowded side → pays
@@ -1089,7 +1089,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
         //  that sank it (XL1/S08) — that path is deliberately untouched.
         //  Requiring the mark to ALSO condemn before this entrypoint may fire
         //  was tried and is WRONG: S08_A's backstop ("anyone can liquidate the
-        //  position the gas-capped swap declined to") runs on a victim that is
+        //  position the gas-capped swap declined to") runs on a affected user that is
         //  MEASURED mark-healthy — markValue 0.1822 ETH against 0.0931 ETH of
         //  backing at maintenanceBps 1500 — and condemned by SPOT alone, which
         //  is a real crash, not a manipulation. Spot-only liquidatability is
@@ -1201,14 +1201,14 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
         uint256 cursor = sweepCursor;
         uint256 scanned;
         uint256 kills;
-        //  ── THE BOOK IS THE WINDOW, AND GAS IS THE BOUND (red-team R1B) ─────
+        //  ── THE BOOK IS THE WINDOW, AND GAS IS THE BOUND (review R1B) ─────
         //  `scanned < SWEEP_SCAN` (12) capped the scan at a POSITIONAL window over
         //  a book that holds MAX_OPEN_POSITIONS (64). Because `sweepCursor`
-        //  persists across swaps, an attacker could pad the book with dust and
-        //  then advance the cursor with two dust sells so that a chosen victim sat
+        //  persists across swaps, an untrusted caller could pad the book with dust and
+        //  then advance the cursor with two dust sells so that a chosen affected user sat
         //  outside BOTH the pre- and the post-trade window of the very swap that
         //  bankrupted it — measured 0.31526 ETH of bad debt, at ~0.40 ETH of
-        //  RECOVERABLE short collateral. A window an attacker can aim is not a
+        //  RECOVERABLE short collateral. A window an untrusted caller can aim is not a
         //  bound, it is a blind spot.
         //
         //  The count cap was never the thing keeping this sweep from OOGing the
@@ -1249,7 +1249,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
         //  THE {liquidate} ESCAPE IS PARTIAL, AND THE GAP IS THE INTERESTING
         //  CASE. For a book that is insolvent AT SPOT the escape is real:
         //  {liquidate} is permissionless, runs outside the swap path, is paced
-        //  only by the per-block throttle, and anyone can drain the backlog until
+        //  only by the per-block throttle, and anyone can empty the backlog until
         //  trading resumes (asserted in H1C_PreExistingBacklogWedge.t.sol).
         //
         //  But the condition that REFUSES a trade here is
@@ -1266,18 +1266,18 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
         //  payer balance and keeper payout all roll back). The residual is that
         //  an adversary can PLACE that cap by opening nine dust positions a large
         //  trade would condemn — ~0.027 ETH at `minCollateral`, and because they
-        //  stay healthy at spot they are never liquidated, so the grief is cheap
+        //  stay healthy at spot they are never liquidated, so the disrupt is cheap
         //  and sustained. Named and accepted, not overlooked: lifting it means
         //  raising the pre-trade kill ceiling AND re-deriving the hybrid badge
         //  gas budget, since a wider kill loop pushes the badge out of auto-mint
         //  into `badgesOwed` (measured: five failures, three of them wearing
         //  error shapes from unrelated subsystems).
         while (scanned < len && (kills < MAX_LIQ_PER_SWAP || spec != 0)) {
-            //  ── STOP BEFORE RUNNING OUT, NOT AFTER (red-team L-2) ───────────
+            //  ── STOP BEFORE RUNNING OUT, NOT AFTER (review L-2) ───────────
             //  The hook fires this with a fixed gas budget and discards the
             //  result (CauldronHook.sol:912), so an OOG in here is not a partial
             //  sweep — the whole call reverts and EVERY kill in it is rolled
-            //  back, silently. That made the book an attacker's lever: each
+            //  back, silently. That made the book an untrusted caller's lever: each
             //  parked liquidatable position raised the gas bar for the sweep by
             //  ~230k for everyone, so ~0.021 ETH of dust positions (minCollateral
             //  is 0.003 ether, :131) pushed the bar past what ordinary swaps
@@ -1291,7 +1291,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
             //  ...and REPORTS the degradation (H1). Degrading silently is what
             //  let a constant pre-trade gas floor pass a trade that bankrupts N
             //  positions with gas for one kill: measured 4.36 ETH of bad debt
-            //  charged to PLV on a 30 ETH vault, at ordinary-swap attacker cost.
+            //  charged to PLV on a 30 ETH vault, at ordinary-swap untrusted caller cost.
             //  The floor cannot know N; this loop does. `complete == false` is
             //  the hook's signal to refuse the PRE-trade swap outright.
             if (gasleft() < SWEEP_KILL_RESERVE) { status = SWEEP_GAS; break; }
@@ -1299,7 +1299,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
             if (n == 0) break;
             if (cursor >= n) cursor = 0;
             uint256 id = spec != 0 ? pendingIds[scanned] : _openIds[cursor];
-            //  RE-PROJECT PER KILL, FROM LIVE SPOT (red-team LIQ04-D). Each
+            //  RE-PROJECT PER KILL, FROM LIVE SPOT (review LIQ04-D). Each
             //  settlement swap in this loop moves spot, so a projection taken once
             //  before the loop valued kills 2..N against a price that no longer
             //  existed and let positions the trade WOULD sink slip through to the
@@ -1429,7 +1429,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     ///  a protocol whose entire design is that liquidation happens inside the
     ///  swap with no keeper.
     ///
-    ///  So the flag fires on the trade's OWN victims only. Pre-existing backlog
+    ///  So the flag fires on the trade's OWN affected users only. Pre-existing backlog
     ///  lets the swap through, where the very same sweep kills 8 of it per trade
     ///  and the post-trade sweep kills 8 more — the book grinds itself back to
     ///  zero across ordinary trades, keeperless, which is the intended design.
@@ -1500,7 +1500,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
         // min-scan was O(n²) and could OOG under many positions). `_settle`
         // swap-pops the closed id, so `_openIds[0]` always holds the next to close.
         // Deterministic + MEV-free (the caller can't influence which id is at [0]).
-        // MAX_OPEN_POSITIONS (< FORCE_CLOSE_MAX) guarantees ONE call drains the
+        // MAX_OPEN_POSITIONS (< FORCE_CLOSE_MAX) guarantees ONE call empties the
         // book — see the A-03 note on that constant.
         uint256 iters;
         while (openCount != 0 && iters < FORCE_CLOSE_MAX) {
@@ -1576,7 +1576,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
         //  This used to refuse on `gen == syncedGeneration` alone, which made a
         //  live quote rotation unfollowable: `quote` is assigned only below, so
         //  the engine kept marking, funding and liquidating against the asset
-        //  the generation launched with — the pool the rotation had drained —
+        //  the generation launched with — the pool the rotation had emptied —
         //  with no reachable call able to correct it until the next relaunch.
         //  Re-syncing on a quote change closes that, and costs nothing when the
         //  quote has not moved (the common case still reverts `AlreadySynced`).
@@ -1607,7 +1607,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
         //  across, against the token it is still denominated in: the engine is still
         //  HOLDING it, so recovery becomes mechanical. Deliberately does not revert —
         //  a reverting sync is the brick shape.
-        //  ── ONLY A GENERATION CHANGE CAN STRAND INVENTORY (red-team F-05) ──
+        //  ── ONLY A GENERATION CHANGE CAN STRAND INVENTORY (review F-05) ──
         //  On a QUOTE ROTATION `gen == syncedGeneration`, so the migration above is
         //  skipped and `migratedIn` stays 0 — because `newTok == syncedToken` and
         //  there was nothing to move, not because a move failed. Booking that as a
@@ -1661,17 +1661,17 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
         //  payouts stay native and every LP can exit normally. {_isDead} reads the
         //  divergence as death (see its note), which force-closes the book and
         //  stops new leverage, so the engine PARKS rather than mispaying. Once the
-        //  vault has drained, `syncGeneration` is permissionless and adopts the new
+        //  vault has emptied, `syncGeneration` is permissionless and adopts the new
         //  quote on the next call.
         //
         //  Only ever bites on a LIVE ROTATION: a relaunch clamps its quote to
-        //  native (red-team B-05), so the rebirth path sees `newQuote == quote`
+        //  native (review B-05), so the rebirth path sees `newQuote == quote`
         //  and never reaches this line.
         if (newQuote != quote) {
             //  A relaunch into a different quote. Once a rotation has carried this
             //  book, its money is CARRIED home too instead of vetoed or written
             //  off (adversarial A6); otherwise — and always for the owner — the
-            //  original veto / write-off, whose history (red-team X8-01, F-01,
+            //  original veto / write-off, whose history (review X8-01, F-01,
             //  T3c: why only owed payouts and QUOTE-side stake gate it, and why
             //  the owner may always write off) moved with it into
             //  {PerpSwapLib.syncQuoteChangeAt} (EIP-170). Reached by raw
@@ -1718,7 +1718,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     /**
      * @dev THE LIQUIDATION TRIGGER: the WORSE of the TWAP mark and live SPOT.
      *
-     *  ── WHY TWO PRICES (red-team LIQ-01, measured on Sepolia r42) ───────────
+     *  ── WHY TWO PRICES (review LIQ-01, measured on Sepolia r42) ───────────
      *  The mark was the ONLY test, and the mark is a `twapWindow`-long average. So
      *  a single large swap could carry a position from healthy to deeply insolvent
      *  INSIDE the trade that the hook's afterSwap sweep runs on: the sweep asked
@@ -1743,11 +1743,11 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
      *      there is no hurry and the manipulation-resistant average should decide;
      *    * past zero equity every further block is bad debt the vault eats, and
      *      waiting cannot make it smaller.
-     *  An attacker who wants to trip the spot leg must therefore push spot past a
-     *  victim's ENTIRE equity, not merely through its maintenance buffer, and must
+     *  An untrusted caller who wants to trip the spot leg must therefore push spot past a
+     *  affected user's ENTIRE equity, not merely through its maintenance buffer, and must
      *  pay that impact into the same pool the liquidation's own settlement swap
      *  then unwinds against. The control for this is asserted in
-     *  test/attacks/XL1_LiqTwapAndDepthCap.t.sol.
+     *  test/probes/XL1_LiqTwapAndDepthCap.t.sol.
      *
      * @return trip      liquidatable at all.
      * @return insolvent backing cannot cover the debt at one of the two prices.
@@ -1802,7 +1802,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
             //  Gating the leg HERE was tried and is wrong: `isLiquidatable` /
             //  `positionHealth` are this function's other callers, and a view
             //  that hides a spot-insolvent position from keepers and from the UI
-            //  is a worse answer than the drain. The gate therefore lives on the
+            //  is a worse answer than the empty. The gate therefore lives on the
             //  one caller that SPENDS staker capital — see {liquidate}.
             uint160 pj = _projSqrtP;
             uint160 sp = pj != 0 ? pj : _sqrtP();
@@ -1822,7 +1822,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
      * @dev The per-block liquidation throttle: bound the ETH-notional liquidated
      *      per block so nobody can engineer an unbounded ATOMIC cascade.
      *
-     *  ── A THROTTLE MUST NEVER CREATE PERMANENT BAD DEBT (red-team LIQ-01) ───
+     *  ── A THROTTLE MUST NEVER CREATE PERMANENT BAD DEBT (review LIQ-01) ───
      *  `cap` is a share of ACTIVE POOL DEPTH, so a position whose notional had
      *  grown past that depth could not fit under it at ANY `maxLiqBps` — 100% still
      *  reverted `LiqCapped()` on the live engine, because notional 4.35 ETH >
@@ -1888,10 +1888,10 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
         //  liquidator who had just pushed spot in the SAME transaction got the
         //  short's buy-back executed at the price they had made, and
         //  {_absorbPlvLoss} socialised the overspend onto the stakers (measured:
-        //  1 ETH push → PLV −0.0719, attacker +0.0435; 3 ETH → −0.4400/+0.2720).
+        //  1 ETH push → PLV −0.0719, untrusted caller +0.0435; 3 ETH → −0.4400/+0.2720).
         //  WHAT IS ACTUALLY IMPLEMENTED, one call and one budget: a FLAT band
         //  over `backing + insuranceEth + plv` (see the single {_buyUpTo} call
-        //  below). It closes the drain, and it COSTS CLOSEABILITY IN ONE SWAP:
+        //  below). It closes the empty, and it COSTS CLOSEABILITY IN ONE SWAP:
         //  an insolvent short by definition needs more than its own backing, so
         //  a flat band pushes a genuine cascade into the partial-fill path. That
         //  cost is accepted deliberately — see the note on the `_rebook` branch
@@ -1900,7 +1900,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
         //  A SPLIT band (the position's OWN backing spent UNBANDED, and only the
         //  SOCIALISED tranche `insuranceEth + plv` — the only money
         //  {_absorbPlvLoss} can ever charge — spent INSIDE the band) would keep
-        //  same-swap closeability AND kill the drain. It is the right shape, it
+        //  same-swap closeability AND kill the empty. It is the right shape, it
         //  is written up in `audit/RH_MAINNET_2026-09-16/`, and IT IS NOT HERE:
         //  a second {_buyUpTo} call site does not fit under EIP-170. Nothing in
         //  this function may be read as if it had landed.
@@ -1914,10 +1914,10 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
         //  permissionless {liquidate} but not the in-swap sweep) changes NOTHING
         //  — `_projSqrtP` is already 0 in the post-trade sweep, so both paths see
         //  raw live spot and are indistinguishable by price. They are the same
-        //  shape: "a swap moved spot, now settle against it". The attacker's push
+        //  shape: "a swap moved spot, now settle against it". The untrusted caller's push
         //  and an honest trade's impact cannot be told apart at settlement, and
         //  the mark cannot be the discriminator either — S08_A's backstop runs on
-        //  a MEASURED mark-healthy victim condemned by spot alone.
+        //  a MEASURED mark-healthy affected user condemned by spot alone.
         //  So the band applies to every settlement that can spend staker money.
         //  The LONG leg bands only on death (it SELLS — no staker capital is
         //  spent to execute it); the SHORT leg bands on every non-NORMAL mode
@@ -1975,7 +1975,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
             //  the band no longer closes in ONE swap. Splitting the budget into
             //  an UNBANDED tranche (the position's own backing) and a BANDED one
             //  (`insuranceEth + plv`, the only money `_absorbPlvLoss` can charge)
-            //  keeps same-swap closeability AND kills the drain — it is the right
+            //  keeps same-swap closeability AND kills the empty — it is the right
             //  shape and it is written up in `audit/RH_MAINNET_2026-09-16/`. It
             //  is not here because the second `_buyUpTo` call site costs ~987 B,
             //  which is more headroom than this contract has ever had at once.
@@ -2101,7 +2101,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
      * @dev Exact-OUTPUT buy of AT MOST `tokenOut` token, spending AT MOST `budget`
      *      quote. Returns the quote spent and the token actually received.
      *
-     *  ── AN UNBOUNDED EXACT-OUTPUT BUY IS A BRICK (red-team LIQ-02) ─────────
+     *  ── AN UNBOUNDED EXACT-OUTPUT BUY IS A BRICK (review LIQ-02) ─────────
      *  This was `_buyExactOut`, an exact-output buy whose only price limit was the
      *  direction's extreme. Closing a SHORT has to buy `size` token back, so when
      *  the pool held LESS token than the position owed, the swap walked the price
@@ -2185,7 +2185,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
         //  {syncGeneration} does delete the whole observation ring, after which
         //  `twapTick`'s oldest-entry fallback trusts as little as MIN_TWAP (1 s) of
         //  history — the RING warmup too. No position may be opened until the ring
-        //  genuinely spans `twapWindow` again. (red-team H-4)
+        //  genuinely spans `twapWindow` again. (review H-4)
         uint256 summonWarm = registry.lastSummonAt() + warmup;
         uint256 ringWarm = uint256(ringArmedAt) + twapWindow;
         if (block.timestamp < (summonWarm < ringWarm ? ringWarm : summonWarm)) revert NotWarm();
@@ -2197,9 +2197,9 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     ///  refuses while `openCount != 0` (:987). A live rotation that completes
     ///  while this engine is unwired — which {CauldronHook.linkVolume}'s own note
     ///  used to recommend ("or unset the engine") — leaves that cache pointing at
-    ///  the asset the treasury has just drained, and nothing could put it right:
+    ///  the asset the treasury has just emptied, and nothing could put it right:
     ///  `forceCloseDead`/`forceCloseAllDead` both demand a DEAD pool, the
-    ///  pre-rotation pool is drained but very much alive, so `openCount` never
+    ///  pre-rotation pool is emptied but very much alive, so `openCount` never
     ///  fell and `syncGeneration` reverted `PositionsOpen()` for the rest of the
     ///  generation. Meanwhile the engine went on marking, funding and liquidating
     ///  against a pool that is cheap to push (CauldronHook.sol:1500-1508), and
@@ -2214,7 +2214,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     /**
      * @dev Is the GENERATION dead — not "is my own pool dead".
      *
-     *  ── WHY THIS ASKS ABOUT THE PRIMARY POOL (red-team S0x) ──────────────────
+     *  ── WHY THIS ASKS ABOUT THE PRIMARY POOL (review S0x) ──────────────────
      *  `CauldronHook.isDead` sums a pool's 24h volume PLUS every pool in
      *  `_volumeSiblings[thatPool]`, and `linkVolume` only ever writes the edge
      *  primary -> secondary (CauldronHook.sol:1635). A rotated leg is therefore a
@@ -2401,13 +2401,13 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     function _sendEth(address to, uint256 amount) internal { _pushQuote(to, amount); }
 
     /// @dev SETTLEMENT-SAFE payout (audit H-04). Used for the two recipients a
-    ///      SETTLEMENT pays that an attacker controls: the position's trader and the
+    ///      SETTLEMENT pays that an untrusted caller controls: the position's trader and the
     ///      keeper. A contract whose `receive()` reverts could otherwise make its own
     ///      position permanently unsettleable — which cascades: `forceCloseAllDead`
     ///      reverts wholesale, so `openCount` never reaches 0, so `syncGeneration`
     ///      reverts `PositionsOpen` forever and the engine is stranded on a DEAD
     ///      token with the entire short inventory denominated in it. Crediting
-    ///      instead of reverting removes the griefing primitive entirely; the funds
+    ///      instead of reverting removes the disruption primitive entirely; the funds
     ///      remain fully claimable via {claimPayout}. Bounded gas so a recipient
     ///      cannot consume the settlement's budget either.
     function _payOut(address to, uint256 amount) internal {
@@ -2419,7 +2419,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     }
 
     /// @dev Push the quote to `to` and REPORT failure instead of reverting. Shared
-    ///      by all three pushes that must survive a hostile recipient: {_payOut},
+    ///      by all three pushes that must survive a untrusted recipient: {_payOut},
     ///      the rotation sweep, and {retirePayout}.
     ///
     ///  `capped` bounds the NATIVE forward to the 30k settlement budget so a
@@ -2427,7 +2427,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     ///  {retirePayout} passes false, because a recipient that merely overran that
     ///  budget should be PAID at the last chance rather than written off.
     ///
-    ///  The ERC20 leg has the same griefing surface by a different mechanism: a
+    ///  The ERC20 leg has the same disruption surface by a different mechanism: a
     ///  blacklistable token (true of most tokenized equities) can make one recipient
     ///  permanently unpayable, and a non-standard token returns false rather than
     ///  reverting. Both are reported, so the credit-instead-of-revert guarantee
@@ -2444,7 +2444,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     /// @notice Retire a settlement payout its recipient cannot accept, so one
     ///         stranded wei can never veto a quote adoption. Timelock-only.
     ///
-    ///  ── THE GUARD MUST NOT DEPEND ON A THIRD PARTY (red-team X3i) ─────────
+    ///  ── THE GUARD MUST NOT DEPEND ON A THIRD PARTY (review X3i) ─────────
     ///  {syncGeneration} refuses to adopt a new quote while `payoutOwedTotal != 0`,
     ///  and that counter was cleared ONLY by {claimPayout}, which is
     ///  `msg.sender`-keyed with no override. So ONE WEI owed to a contract whose
@@ -2452,7 +2452,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     ///  still completed, because {RedemptionExt} wraps the sync in `try {} catch {}`
     ///  (RedemptionExt.sol:562). The engine was left stranded on the OLD quote for
     ///  the rest of the generation: exactly the F-10/F-11 state the guard exists to
-    ///  prevent, reached through a different door. No attacker needed — the
+    ///  prevent, reached through a different door. No untrusted caller needed — the
     ///  dividend and treasury fee sinks reach it on their own.
     ///
     ///  The owner cannot profit by calling this: the value goes to `to` or it goes
@@ -2476,7 +2476,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     ///  So while `quote` disagrees with the generation's quote — exactly when this
     ///  entry is what stands between the engine and recovery — ANYONE may call it.
     ///  Once the engine is back in step it is owner-only again, which is where the
-    ///  griefing surface would otherwise live.
+    ///  disruption surface would otherwise live.
     ///  No `nonReentrant`: both effects below land BEFORE the push, so a recipient
     ///  reentering this finds `payoutOwed[to] == 0` and reverts, and the asset branch
     ///  is chosen before any external code runs — a reentrant adoption cannot change
@@ -2497,7 +2497,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
         if (amount == 0) revert ZeroValue();
         //  THE OWNER MAY ALWAYS WRITE OFF, DIVERGED OR NOT. Making the successful
         //  push a condition for EVERY caller would hand a permanently-refusing
-        //  recipient the veto back (red-team X3i: `payoutOwedTotal` is the one
+        //  recipient the veto back (review X3i: `payoutOwedTotal` is the one
         //  counter that can still refuse a quote adoption, and nothing may pin it
         //  forever). So the push result gates the UNPRIVILEGED caller only.
         bool priv = msg.sender == owner();
@@ -2664,7 +2664,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     ///      Both are clamped into uint128; a price that large cannot occur with a
     ///      777M-supply token, but truncation would misreport rather than revert.
     ///
-    ///  MEASURED DEAD END, DO NOT RETRY (red-team LIQ-02): moving this body into
+    ///  MEASURED DEAD END, DO NOT RETRY (review LIQ-02): moving this body into
     ///  {PerpSwapLib} COSTS 551 bytes. Eight scalar arguments plus a struct return
     ///  marshalled across a library call is dearer than the six clamps and two
     ///  divisions it replaces — the same shape as the `maxLeverage` attempt logged
@@ -2812,7 +2812,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
 
     function _creditPerp(bool ethSide) private {
         if (msg.sender != hookAddr) revert OnlyHook();
-        //  ── NATIVE ONLY, LIKE ITS THREE SIBLINGS (red-team H-3) ───────────
+        //  ── NATIVE ONLY, LIKE ITS THREE SIBLINGS (review H-3) ───────────
         //  `fundPlv`, `fundInsurance` and `fundFromVault` all route through
         //  {_pullQuote}, which refuses `msg.value` on an ERC20 book. This one
         //  banked `msg.value` straight into `plv`/`tokYieldEth` — counters
@@ -2939,7 +2939,7 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     ///  entry plus a prologue for a cold path nobody calls in a normal month.
     ///  Folding them together is what paid for the mark source.
     ///  `_quoteOracle` is the {QuoteOracle} {_q} prices its wei-written thresholds
-    ///  through (red-team F-03). Zero leaves them unit-scaled, which is the
+    ///  through (review F-03). Zero leaves them unit-scaled, which is the
     ///  pre-oracle behaviour; it is read defensively and only ever at an adoption.
     function setRouting(
         address _dividend,
@@ -2972,12 +2972,12 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
 
     // ── Community PLV config ────────────────────────────────────────────────
     /// @notice Wire (or clear) the PerpVault that supplies depositor liquidity.
-    ///         DRAIN GUARD (Audit H-01): once a vault is wired, it can only be
+    ///         Empty GUARD (Audit H-01): once a vault is wired, it can only be
     ///         re-pointed while the PLV is EMPTY (plv/plvToken/tokYieldEth all 0).
     ///         So even the owner (a timelock+multisig on mainnet) cannot swap the
-    ///         vault out from under staked funds and drain them via the onlyVault
+    ///         vault out from under staked funds and empty them via the onlyVault
     ///         withdraw path — depositor principal must first exit the legit way.
-    ///  ── ASK WHO IS OWED, NOT WHAT IS HELD (red-team R-09) ─────────────────
+    ///  ── ASK WHO IS OWED, NOT WHAT IS HELD (review R-09) ─────────────────
     ///  This tested `plv != 0 || plvToken != 0 || tokYieldEth != 0`. Both of the
     ///  residues that outlive the last depositor are unownable — orphaned
     ///  short-side yield (credited at zero token shares, attributable to nobody
@@ -2987,16 +2987,16 @@ contract PerpEngine is IUnlockCallback, Ownable, ReentrancyGuard {
     ///  engine was gone. Measured: one wei was enough.
     ///  {PerpVault.hasStakers} answers the question the guard was always asking.
     ///
-    ///  ── AND IT STAYS `hasStakers`, NOT `hasQuoteStake` (red-team F-01) ────
+    ///  ── AND IT STAYS `hasStakers`, NOT `hasQuoteStake` (review F-01) ────
     ///  {syncGeneration} was moved to the quote-side-only question because a quote
     ///  rotation does not redenominate the token side, so the token side has
     ///  nothing to be protected from there. THIS guard is the opposite case: a new
     ///  vault gets the `onlyVault` withdraw path over `plvToken`, which IS token-side
     ///  principal, so re-pointing the vault while token stakers hold shares hands
-    ///  their principal to whatever contract the owner names — the H-01 drain this
+    ///  their principal to whatever contract the owner names — the H-01 empty this
     ///  guard exists for. A genuine token staker is owed money and may veto here.
     ///  The cost is that a dust token deposit can also block replacing a BUGGY
-    ///  vault; the engine itself keeps running either way, so that is a griefing
+    ///  vault; the engine itself keeps running either way, so that is a disruption
     ///  nuisance and not the permanent freeze F-01 reported, and it is strictly
     ///  preferable to making staked principal re-pointable.
     function setVault(address _vault) external onlyOwner {

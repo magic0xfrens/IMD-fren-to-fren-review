@@ -100,7 +100,7 @@ contract DeployPerp is Script {
         engine.setVault(address(vault));
         // AUDIT (M-05): `insuranceFloor` defaults to 0, which BOTH disables the
         // opens circuit-breaker (`insuranceEth < insuranceFloor` is never true) and
-        // — before the risk-based guard was added — let `skimInsurance` drain the
+        // — before the risk-based guard was added — let `skimInsurance` empty the
         // entire bad-debt buffer. Arm it explicitly at deploy.
         engine.setVaultLimits(
             vm.envOr("MAX_UTIL_BPS", uint256(8_000)),
@@ -148,7 +148,7 @@ contract DeployPerp is Script {
         //  observation-ring writes — that throttle means the EFFECTIVE lookback is
         //  between `twapWindow` and `twapWindow + 15s`.
         //
-        //  Size it in BLOCKS, not seconds, because that is what an attacker has to
+        //  Size it in BLOCKS, not seconds, because that is what an untrusted caller has to
         //  hold a price across:
         //    * Sepolia / L1 (~12s blocks): 300s ~ 25 blocks. A 15s window would be
         //      ONE block — trivially flash-manipulable. Do not go low here.
@@ -169,7 +169,7 @@ contract DeployPerp is Script {
         //  Wire it when a generation is going to run MORE THAN ONE POOL. It is
         //  the thing that makes "several pools" and "perps" compatible: the mark
         //  becomes liquidity-weighted across the generation's pools, so the thin
-        //  pool an attacker can cheaply push carries proportionally little weight
+        //  pool an untrusted caller can cheaply push carries proportionally little weight
         //  instead of being solely authoritative over liquidations.
         //
         //  Sequencing, and it matters — the mark must aggregate BEFORE a second
@@ -217,7 +217,7 @@ contract DeployPerp is Script {
             markSource = address(ms);
             console2.log("PerpMarkSource :", markSource, "(armed at gen)", gen);
         }
-        //  WIRE THE QUOTE ORACLE UNCONDITIONALLY (red-team F-03). {PerpEngine._q}
+        //  WIRE THE QUOTE ORACLE UNCONDITIONALLY (review F-03). {PerpEngine._q}
         //  prices its wei-written thresholds — the dust filter, the insurance
         //  circuit breaker and the leverage tiers — through this oracle. Without it
         //  they fall back to unit scaling, which on a 6-decimal quote means "$25 of

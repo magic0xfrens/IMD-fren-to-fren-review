@@ -33,7 +33,7 @@ interface IERC20Decimals {
  *  and the reason I gave — "an oracle on death detection is a manipulation
  *  surface" — conflated two different things. Deriving a price from our OWN thin
  *  pools is manipulable; a Chainlink feed aggregated off-chain from many venues
- *  is not, and no flash loan touches it. The governance scalar's actual property
+ *  is not, and no same-transaction loan touches it. The governance scalar's actual property
  *  was not safety, it was staleness: set when ETH was $3,000 it is 2x wrong at
  *  $6,000, and nothing corrects it.
  *

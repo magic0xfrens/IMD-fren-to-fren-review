@@ -17,7 +17,7 @@ interface IRegistryCurrent {
 ///  This interface used to declare a FOUR-argument `play` — selector 0x1ca5b161
 ///  against the router's real 0x7fe7c4b6 — and the router has no fallback, so
 ///  `launch()` reverted unconditionally and the atomic launch+buy could never
-///  run (blind red-team X5b). Five arguments, quote-first.
+///  run (blind review X5b). Five arguments, quote-first.
 interface IGachaPlay {
     function play(
         uint256 quoteIn,
@@ -108,7 +108,7 @@ contract LaunchSniper is Ownable {
         }
     }
 
-    /// @notice DISABLED (blind red-team X5h). `Ownable` ships a live
+    /// @notice DISABLED (blind review X5h). `Ownable` ships a live
     ///         `renounceOwnership()`, and this contract's ENTIRE owner surface is
     ///         {launch} and {sweep}. Sealing {sweep} is the part that bites: this
     ///         contract is payable, takes ETH during a launch, holds the bought

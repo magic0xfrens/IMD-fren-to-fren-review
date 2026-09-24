@@ -29,7 +29,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
  *
  *  ── WHY WEIGHTING BY LIQUIDITY IS THE SAFE DIRECTION ──────────────────────
  *  The mark becomes `Σ(tickᵢ × Lᵢ) / Σ(Lᵢ)`. The pool that is cheapest to push is
- *  by construction the pool with the least weight in it, so the attack that
+ *  by construction the pool with the least weight in it, so the probe that
  *  motivated the interlock gets strictly worse as the split gets more lopsided —
  *  the opposite of the current behaviour, where a thinning primary becomes MORE
  *  authoritative. It also composes with the existing defences rather than
@@ -171,7 +171,7 @@ contract PerpMarkSource is Ownable {
      *         falling back to the primary's tick when nothing is weighable.
      */
     function weightedTick() external view returns (int24 tick) {
-        //  ── FAIL CLOSED, NEVER ANSWER TICK 0 (red-team T3e) ─────────────────
+        //  ── FAIL CLOSED, NEVER ANSWER TICK 0 (review T3e) ─────────────────
         //  This used to `return 0`, which is not "no answer" — tick 0 is a VALID,
         //  perfectly plausible price of 1:1. {PerpEngine._currentTick} (`:666-684`)
         //  accepts any well-formed 32-byte answer with no sanity check and marks the

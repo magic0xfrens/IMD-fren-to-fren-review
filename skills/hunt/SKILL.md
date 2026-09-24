@@ -81,7 +81,7 @@ is shown in local Foundry tests; nothing ever touches a live network.
 
 ## 🗺️ The realm and the trust circle
 
-**In scope:** every Solidity file outside `test/`, `reference/`, `lib/` and `tools/`, in the 10
+**In scope:** every Solidity file outside `test/`, `lib/` and `tools/`, in the 10
 clusters of `MAP.md`: hook, registry, pool, perp, rotation, nft, governance, seed, art, deploy.
 
 **Out of scope:**
@@ -194,25 +194,21 @@ Each node's `semantics` says whether it is **fresh** (unchanged since it was map
 
 ```sh
 forge build        # ~2 min cold on a fast laptop (a few on a small VPS). Foreground; wait.
-forge test         # must be green offline: the PoC template and the frenlist suite
+forge test         # must be green offline: the Repro test template and the frenlist suite
 FOUNDRY_PROFILE=render forge build                     # the art cluster builds separately
 forge test --match-path 'test/fren-review/hunt_a/*' -vvv  # run just your own tests
 ```
 
-**The repro test base.** `test/fren-review/FrenPoCTemplate.t.sol` on `test/fren-review/FrenBase.sol` boots
+**The repro test base.** `test/fren-review/FrenReproTemplate.t.sol` on `test/fren-review/FrenBase.sol` boots
 the real registry, hook and perp engine on a local v4 PoolManager, with no fork and no RPC. The
 harness gives you:
-- `registry`, `hook`, `perp`, `pm`, `token`, `attacker`, `victim` and `trader`
+- `registry`, `hook`, `perp`, `pm`, `token`, `outsider`, `holder` and `trader`
 - the helpers `_buy(ethIn, to)`, `_buyExactOut(tokenOut, to)`, `_buyWithLimit(ethIn, limit, to)`,
   `_sell(tokenIn, payer)`, `_modifyLiquidity(lower, upper, delta)`, `_warp(dt)`,
   `_bootPerp(plvEth, plvToken)`, `_key()`, `_keyOf(gen)`, `_tick()`, `_sqrtP()` and
-  `_inRangeLiquidity()` (see `test/attacks/YBase.sol`)
+  `_inRangeLiquidity()` (see `test/harness/YBase.sol`)
 
 For the nft cluster, deploy `MiFrensGenesis` directly, as `test/GenesisDiscountMint.t.sol` does.
-
-**Earlier tests.** `reference/test/` holds 270+ earlier probe and functional tests. They are not
-compiled. Read them to see how earlier hunters reached deep state (rotation, requote, liquidation
-cascades) and copy what you need. Tests that use `FORK_RPC` won't run for you.
 
 **Invariant fuzzing works here.** Write a stateful handler over `FrenBase` that
 buys, sells, opens, closes, liquidates, warps and rotates at random. Add `invariant_` functions for
@@ -359,7 +355,7 @@ These are starting points, not a fence. Each line is an probe to try, not a know
   - Dividend accrual around `castSpell` and transfers.
   - Gacha randomness with a constant `prevrandao`.
 - **governance**
-  - Vote, transfer, and vote again. Borrow voting power with a flash loan.
+  - Vote, transfer, and vote again. Borrow voting power with a same-transaction loan.
   - Proposal calldata that reaches beyond its mandate.
   - Quorum math at low supply.
 - **seed / deploy**
@@ -391,7 +387,7 @@ rest. A defect you notice elsewhere is a `lead`, not a finding.
 Budget by turns, not by feel. You have a fixed number of turns and a wall clock.
 
 1. **Light the fire (≤10%).** Run `forge build` and `forge test`. Copy
-   `test/fren-review/FrenPoCTemplate.t.sol` into `test/fren-review/hunt_<x>/`, rename its contract to
+   `test/fren-review/FrenReproTemplate.t.sol` into `test/fren-review/hunt_<x>/`, rename its contract to
    `Hunt<X>…`, point its import at `../FrenBase.sol`, and make it run.
 2. **Know the ground (≈10%).** Read `CAULDRON.md`, `ledger/LEDGER.md` (leads included),
    `ledger/KNOWN.md`, the scope's files, and their entries in `MAP.md` / `map/<cluster>.json`. Write
@@ -420,7 +416,7 @@ Budget by turns, not by feel. You have a fixed number of turns and a wall clock.
 
 A repro test proves an **outsider** probe on the **real** contracts, reached through **public calls**.
 
-- **Actors.** Use `vm.prank` / `vm.startPrank` only as `attacker`, `victim`, `trader`, other plain
+- **Actors.** Use `vm.prank` / `vm.startPrank` only as `outsider`, `holder`, `trader`, other plain
   EOAs, or contracts you deployed. Never prank as owner, registry, hook, timelock or governance. The
   one exception is a finding *about* a circle member skipping a guard, and then you say so.
 - **State.**
@@ -450,7 +446,7 @@ A repro test proves an **outsider** probe on the **real** contracts, reached thr
 4. **Slaying a mock.** Probe the real contracts, not a stand-in.
 
 **The kill checklist.** Try to destroy your own finding before you report it:
-1. Does it need a circle member to act maliciously? Then it is out of scope, unless a guard is
+1. Does it need a circle member to act against the protocol? Then it is out of scope, unless a guard is
    skipped.
 2. Is every precondition reachable from a fresh deploy through public calls, at the parameters the
    deploy scripts actually set?
@@ -480,8 +476,8 @@ You leave three things, and they must agree:
   "title": "Anyone can empty the relaunch reserve through X",
   "path": "cauldron/Example.sol",
   "line": 123,
-  "description": "Root cause: ...\nAttacker: outsider with X ETH flash liquidity, no role.\nPreconditions: ...\nImpact: victim loses N ETH of collateral; attacker nets M ETH after fees.\nInvariant: breaks P2.\nNot known: checked KNOWN <ids> and LEDGER <ids>; different root cause because ...\nFix direction: ...",
-  "reproduction": "1. ... 2. ... (exact inputs). Expected vs actual. The PoC is test/fren-review/hunt_a/HuntAExample.t.sol::test_HuntA_Repro, run with <command>: [PASS] ..."
+  "description": "Root cause: ...\nUntrusted caller: outsider with X ETH flash liquidity, no role.\nPreconditions: ...\nImpact: holder loses N ETH of collateral; outsider nets M ETH after fees.\nInvariant: breaks P2.\nNot known: checked KNOWN <ids> and LEDGER <ids>; different root cause because ...\nFix direction: ...",
+  "reproduction": "1. ... 2. ... (exact inputs). Expected vs actual. The Repro test is test/fren-review/hunt_a/HuntAExample.t.sol::test_HuntA_Repro, run with <command>: [PASS] ..."
 }]}
 ```
 
@@ -494,7 +490,7 @@ function that line falls in. One root cause is one finding: list its other sympt
 |---|---|
 | critical | an outsider cheaply takes or permanently locks user/protocol funds, or permanently bricks a core flow |
 | high | loss of funds or loss under specific but realistic conditions; long-lived denial of trading, relaunch, claims or withdrawals; governance capture |
-| medium | bounded loss, griefing that costs the untrusted caller, temporary denial, accounting errors without direct loss of funds |
+| medium | bounded loss, disruption that costs the untrusted caller, temporary denial, accounting errors without direct loss of funds |
 | low | edge cases with minor impact; unsafe patterns with a plausible path to harm |
 | info | no security impact |
 

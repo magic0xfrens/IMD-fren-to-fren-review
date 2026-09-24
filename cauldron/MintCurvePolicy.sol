@@ -94,7 +94,7 @@ contract MintCurvePolicy is ICurvePolicy {
     ///  keeps its values as the fallback for when no policy is set.
     ///
     ///  ── THE DISCARDED ARGUMENTS ARE A GOVERNANCE HAZARD, NOT JUST A STYLE
-    ///     CHOICE (red-team Z-09) ───────────────────────────────────────────────
+    ///     CHOICE (review Z-09) ───────────────────────────────────────────────
     ///  The second and third parameters are `volumePerNFT` and `nftPriceStep` — the
     ///  values `CauldronRegistry.sol:1134` writes on every relaunch from the WINNING
     ///  PROPOSAL's mint-out target. Ignoring them means a vote that thinks it is

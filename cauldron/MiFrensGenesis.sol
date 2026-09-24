@@ -86,7 +86,7 @@ contract MiFrensGenesis is ERC721, ERC721Votes, ERC2981, ICreatorToken, ILiquida
     ///  what makes the walk unavoidable rather than merely convenient.
     ///
     ///  Sized from MEASUREMENT, not estimate — and RE-sized after the first
-    ///  estimate proved too low (red-team B-02). The earlier note put each basket
+    ///  estimate proved too low (review B-02). The earlier note put each basket
     ///  asset at ~33k and the whole worst case at ~140k, carried by 180k "with
     ///  margin". That undercounted: in the ordinary lifecycle a fren is enchanted
     ///  BEFORE fees accrue, so at transfer every basket leg takes the EXPENSIVE
@@ -109,7 +109,7 @@ contract MiFrensGenesis is ERC721, ERC721Votes, ERC2981, ICreatorToken, ILiquida
     ///
     ///  This budget is keyed to MAX_ASSETS = 3. RAISING MAX_ASSETS without raising
     ///  these two constants re-opens B-02 — the coupling is asserted by
-    ///  test/attacks/B02_DividendGasBudgetOverrun.t.sol.
+    ///  test/probes/B02_DividendGasBudgetOverrun.t.sol.
     uint256 private constant GAS_DIVIDEND_FWD = 260_000;
     uint256 private constant GAS_DIVIDEND_MIN = 320_000;
 
@@ -128,7 +128,7 @@ contract MiFrensGenesis is ERC721, ERC721Votes, ERC2981, ICreatorToken, ILiquida
     ///         THE CONSTRUCTOR DOES NOT REJECT A NON-BINDING CAP, deliberately:
     ///         ten existing fixtures construct 3-token collections with
     ///         `cap == supply`, and reverting would break them for no gain on a
-    ///         real launch. `test/attacks/L1_LaunchStops.t.sol` pins that
+    ///         real launch. `test/probes/L1_LaunchStops.t.sol` pins that
     ///         acceptance. **A production deploy MUST therefore pass a binding
     ///         cap itself** — nothing here will catch it.
     ///
@@ -238,7 +238,7 @@ contract MiFrensGenesis is ERC721, ERC721Votes, ERC2981, ICreatorToken, ILiquida
     ///  mint to the cap, transfer the inventory to a second wallet he also
     ///  owns, and `balanceOf` is 0 again — the cap hands him a whole fresh
     ///  allocation, for the cost of an ERC721 transfer. Measured: 40 minted
-    ///  under a cap of 20 (red-team L1-C). `MAX_PER_WALLET` is the protocol's
+    ///  under a cap of 20 (review L1-C). `MAX_PER_WALLET` is the protocol's
     ///  ONLY per-actor cap, so a cap that does not cap is the whole defence.
     ///
     ///  `genesisBalanceOf` is NOT this counter and must not be repurposed: it
@@ -692,7 +692,7 @@ contract MiFrensGenesis is ERC721, ERC721Votes, ERC2981, ICreatorToken, ILiquida
     }
 
     /// @notice Whether this token has already spent its one expiry re-anchor.
-    ///         See the note in {_reveal} (red-team Z-08) — an uncapped re-anchor is
+    ///         See the note in {_reveal} (review Z-08) — an uncapped re-anchor is
     ///         an unlimited free gacha re-roll.
     mapping(uint256 => bool) public reanchored;
 
@@ -714,7 +714,7 @@ contract MiFrensGenesis is ERC721, ERC721Votes, ERC2981, ICreatorToken, ILiquida
             // back, leaving the token stuck. Return quietly instead; the holder
             // (or a keeper) calls reveal() again once the new block is mined.
             //
-            // ── THE RE-ANCHOR IS CAPPED AT ONE (red-team Z-08) ────────────────
+            // ── THE RE-ANCHOR IS CAPPED AT ONE (review Z-08) ────────────────
             //  "Exactly ONE unknowable draw" was false: the draw stops being
             //  unknowable the moment block `mb` is mined, and nothing obliges the
             //  holder to reveal. Every input (blockhash(mb), tokenId, address) is
@@ -788,7 +788,7 @@ contract MiFrensGenesis is ERC721, ERC721Votes, ERC2981, ICreatorToken, ILiquida
     function igniteCauldron() external nonReentrant returns (address token) {
         if (address(registry) == address(0)) revert RegistryNotSet();
         if (finalized) revert AlreadyFinalized();
-        //  A CANCELLED SALE IS A REFUND POT, NOT A TREASURY (blind red-team X5a).
+        //  A CANCELLED SALE IS A REFUND POT, NOT A TREASURY (blind review X5a).
         //  `cancelPresale` (:289) has no sell-out precondition, so "cancelled AND
         //  sold out" is an ordinary state — and every gate here used to pass in
         //  it. The whole un-refunded `paid[]` balance was then forwarded into

@@ -104,7 +104,7 @@ library FeeRouteLib {
 
     function _move(address asset, address to, uint256 amount) private returns (bool ok) {
         //  A CODELESS RECIPIENT IS NOT A SUCCESSFUL DELIVERY, ON EITHER BRANCH
-        //  (red-team X4c/X4e, third sibling, F-04). The floor `vault` is a contract
+        //  (review X4c/X4e, third sibling, F-04). The floor `vault` is a contract
         //  by construction; a non-zero but CODELESS one — an operator typo, or a
         //  CREATE address that was never deployed — takes the native branch, where
         //  `to.call{value:}("")` SUCCEEDS and the ether really leaves. This then
@@ -138,7 +138,7 @@ library FeeRouteLib {
      */
     function _fundGuild(address asset, address guild, uint256 amount) private returns (bool ok) {
         //  A CODELESS RECIPIENT IS NOT A SUCCESSFUL DELIVERY, ON EITHER BRANCH
-        //  (red-team X4c, completed on the second pass). The EVM reports
+        //  (review X4c, completed on the second pass). The EVM reports
         //  `success` for a call to an address with no code, and `fundToken`
         //  returns nothing, so returndata cannot tell the two apart.
         //
@@ -166,7 +166,7 @@ library FeeRouteLib {
         private
         returns (bool ok)
     {
-        //  A CODELESS RECIPIENT IS NOT A SUCCESSFUL DELIVERY (red-team X4e — the
+        //  A CODELESS RECIPIENT IS NOT A SUCCESSFUL DELIVERY (review X4e — the
         //  twin of X4c, on the perp-engine path). The EVM reports `success` for
         //  a call to an address with no code, and these pull entrypoints return
         //  nothing, so returndata cannot tell the two apart. Against a
@@ -236,7 +236,7 @@ library FeeRouteLib {
         bytes4 selector
     ) external returns (bool ok) {
         if (amount == 0) return true;
-        //  A CODELESS RECIPIENT IS NOT A SUCCESSFUL DELIVERY (red-team X4e — the
+        //  A CODELESS RECIPIENT IS NOT A SUCCESSFUL DELIVERY (review X4e — the
         //  twin of X4c, on the perp-engine path). The EVM reports `success` for
         //  a call to an address with no code, and these pull entrypoints return
         //  nothing, so returndata cannot tell the two apart. Against a

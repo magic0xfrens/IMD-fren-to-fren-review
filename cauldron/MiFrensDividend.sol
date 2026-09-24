@@ -303,7 +303,7 @@ contract MiFrensDividend is ReentrancyGuard {
      * @notice Credit an ERC20 balance that arrived by a plain `transfer` rather than
      *         through {fundToken}.
      *
-     *  ── WHY THIS EXISTS (red-team Z-10) ──────────────────────────────────────
+     *  ── WHY THIS EXISTS (review Z-10) ──────────────────────────────────────
      *  `DeployLaunchpad.s.sol:336` makes this contract the collection's EIP-2981
      *  royalty receiver. A marketplace settling a sale in WETH or USDC pays that
      *  royalty with a plain `transfer` — and {fundToken} is PULL-based, so it can
@@ -365,7 +365,7 @@ contract MiFrensDividend is ReentrancyGuard {
 
         //  ONE BAD ASSET MUST NOT TAKE THE OTHERS DOWN (audit D-2). This loop
         //  used to push with a reverting helper, so a single token that stopped
-        //  transferring — a pause, a blacklist, an owner who turned hostile —
+        //  transferring — a pause, a blacklist, an owner who turned untrusted —
         //  reverted the WHOLE claim for every holder and every asset, with no
         //  removal path to recover. A failed leg is now banked to `owedAsset` and
         //  retried later through {withdrawOwedToken}; the debt marker still

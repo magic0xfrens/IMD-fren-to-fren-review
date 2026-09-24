@@ -602,7 +602,7 @@ contract CauldronGachaRouter is IUnlockCallback, Ownable {
         _safeTransfer(token, to, amount);
     }
 
-    /// @notice DISABLED (blind red-team X4f). `Ownable` ships a live
+    /// @notice DISABLED (blind review X4f). `Ownable` ships a live
     ///         `renounceOwnership()`, and every owner-gated path on this router is
     ///         a recovery or a repair: {rescueETH} and {rescueToken} are the ONLY
     ///         exits for value stranded here, and {setOracle} is how the odds-curve

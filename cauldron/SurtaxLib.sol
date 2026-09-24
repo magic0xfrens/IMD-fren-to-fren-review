@@ -74,7 +74,7 @@ library SurtaxLib {
         // Per-block jitter, also fading with the window, so late-window blocks can
         // still randomly spike.
         //
-        //  WHAT THIS DOES AND DOES NOT GUARANTEE (red-team X1h). The jitter is a
+        //  WHAT THIS DOES AND DOES NOT GUARANTEE (review X1h). The jitter is a
         //  per-BLOCK value and `snipeSurtaxBps` is `public view`, so a sniper can
         //  read it, revert its own transaction when the draw is unfavourable, and
         //  retry in the next block. It therefore does NOT guarantee that a sniper
@@ -97,7 +97,7 @@ library SurtaxLib {
         //  property asserted here is the one the tests check.
         //
         // ENTROPY. The seed MUST NOT contain anything the caller can move inside
-        // its OWN transaction (red-team X1b — Medium). It used to fold in the
+        // its OWN transaction (review X1b — Medium). It used to fold in the
         // pool's LIVE tick, read from `getSlot0` in `_beforeSwap`: a value the
         // swapper sets simply by putting a probe swap ahead of its real one in the
         // same tx. Measured 6402 vs 9600 bps in one block against a deterministic
@@ -112,7 +112,7 @@ library SurtaxLib {
         // blockhash term still carries it. Neither can be steered from inside the
         // transaction being priced, which is the property that was missing.
         //
-        // JITTER MUST *ADD*, NOT `max` (red-team B-03). The previous form returned
+        // JITTER MUST *ADD*, NOT `max` (review B-03). The previous form returned
         // `max(decayed, jitter)`, but `rnd ∈ [0, maxBps]` and both terms carry the
         // identical `remaining/window` factor under the same floor division, so
         // `jitter <= decayed` for ALL inputs and the `max` was ALWAYS `decayed` —

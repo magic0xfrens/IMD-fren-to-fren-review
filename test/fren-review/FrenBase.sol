@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.26;
 
-import {YBase} from "../attacks/YBase.sol";
+import {YBase} from "../harness/YBase.sol";
 
 /// @title Fren Review base — the real protocol on a local Uniswap v4 PoolManager
 ///
 /// The same bring-up as `LocalLifecycleBoot` (test/audit_full_scope/
-/// LocalLifecycleAdapters.t.sol), without importing the fork attack suites that
+/// LocalLifecycleAdapters.t.sol), without importing the fork probe suites that
 /// file wraps: those suites would come along into the Fren Review repo and turn
 /// an offline `forge test` red.
 ///
 /// YBase._boot needs FORK_RPC and returns SILENTLY without it (`active == false`),
-/// so a PoC built on YBase directly "passes" having executed nothing. This base
+/// so a Repro test built on YBase directly "passes" having executed nothing. This base
 /// deploys PoolManager, Permit2 and PositionManager from compiled artifacts and
 /// asserts the stack came up.
 abstract contract FrenBase is YBase {

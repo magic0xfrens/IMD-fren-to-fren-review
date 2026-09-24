@@ -143,7 +143,7 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
     ///         backlog could brick relaunch outright. Capping the sub-calls to
     ///         `gasleft() - RELAUNCH_TAIL_RESERVE` makes an OOG child consume only
     ///         its budget; the rebirth always completes and any un-cleared positions
-    ///         / tickets are drained afterwards by the permissionless keeper paths.
+    ///         / tickets are emptied afterwards by the permissionless keeper paths.
     uint256 internal constant RELAUNCH_TAIL_RESERVE = 8_000_000;
     /// @notice Ticket-resolution budget inside relaunch (bounded so it can never
     ///         starve the rebirth). The rest resolve post-relaunch (permissionless).
@@ -224,7 +224,7 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
     ///
     ///  OWNER-ONLY, and that is the whole guardrail: a proposer picks FROM this
     ///  set but can never add to it. Letting a proposer add their own quote
-    ///  would let them name a token they control and drain the pool into it.
+    ///  would let them name a token they control and empty the pool into it.
     ///
     ///  Native ETH cannot be removed. It is the fallback every generation can
     ///  always launch against, and the sink a failed non-ETH payout rolls into;
@@ -256,7 +256,7 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
     ///  facet with no stub here, and there is no catch-all fallback — so the
     ///  multi-leg rotation that RedemptionExt.sol:307-318 describes as the whole
     ///  point of `fromLeg` (merging two legs, rebalancing between them, moving
-    ///  USDG -> anything rather than only ever draining the original quote) had
+    ///  USDG -> anything rather than only ever emptying the original quote) had
     ///  no reachable path from any caller.
     ///
     ///  It is also the ONLY write the treasury UI issues for a rotation —
@@ -453,7 +453,7 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
     /// @notice PROTECTION: pause/unpause the genesis redemption path. Gated to the
     ///         emergencyAdmin (the governance timelock) — a targeted circuit-breaker
     ///         so a discovered bug in redeemOgFren can be halted without the nuclear
-    ///         emergencyWithdrawLP. NOT timelocked itself (a live exploit needs a
+    ///         emergencyWithdrawLP. NOT timelocked itself (a live failure case needs a
     ///         fast stop); it only ever DISABLES a permissionless flow, never moves
     ///         funds, so it carries no rug surface.
     function setRedemptionPaused(bool paused) external onlyEmergency {
@@ -862,13 +862,13 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
             CauldronToken(oldToken).burn(address(this), tokensFromLP);
         }
 
-        // 3a-bis. Drain any matured tickets for the dying brew BEFORE its vault
+        // 3a-bis. Empty any matured tickets for the dying brew BEFORE its vault
         //     closes, so pending winners mint while the floor is still open and
         //     funded — they end up backed, not stranded (audit L2). Bounded loop;
         //     stragglers committed this very block resolve later (documented).
         //     GAS-CAPPED + try/catch (audit Z-07): an unbounded mint loop must never
         //     starve the rebirth. Bounded to RELAUNCH_TICKETS with a reserved tail;
-        //     the remainder is drained by the permissionless resolveTickets path.
+        //     the remainder is emptied by the permissionless resolveTickets path.
         if (gasleft() > RELAUNCH_TAIL_RESERVE) {
             try hook.resolveTickets{gas: gasleft() - RELAUNCH_TAIL_RESERVE}(RELAUNCH_TICKETS) {} catch {}
         }
@@ -898,9 +898,9 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
         uint256 nftSupply = nftMaxSupply;
 
         (uint256 winId, BrewSpec memory spec) = governor.winner();
-        //  ── THE QUOTE IS A REQUEST, NEVER AN INSTRUCTION (red-team B-05) ─────
+        //  ── THE QUOTE IS A REQUEST, NEVER AN INSTRUCTION (review B-05) ─────
         //
-        //  `spec.quote` is attacker-chosen: anyone may propose. It used to be
+        //  `spec.quote` is untrusted caller-chosen: anyone may propose. It used to be
         //  carried through with only an allowlist re-check, and handed to a seeder
         //  that was written entirely for native ether. That combination was a
         //  permanent, unrecoverable freeze of the whole protocol — FOUR unguarded
@@ -924,12 +924,12 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
         //       currency0 is an ERC20 → `CurrencyNotSettled()`.
         //    4. `hook.setLiveKey` refused any non-native key.
         //
-        //  Reachable with no attacker at all: `indexer/deployments/round.json`
+        //  Reachable with no untrusted caller at all: `indexer/deployments/round.json`
         //  advertises USDG and xNVDA as selectable `quoteAssets`, so a proposer
         //  choosing an offered option was enough to end the protocol.
         //
         //  ALL FOUR ARE NOW FIXED, so a non-native rebirth is real rather than
-        //  aspirational. What keeps it safe is that the attacker-chosen field is
+        //  aspirational. What keeps it safe is that the untrusted caller-chosen field is
         //  narrowed twice before it can move value, and neither narrowing can
         //  revert:
         //
@@ -968,7 +968,7 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
         currentToken = token;
         generationToken[newGen] = token;
 
-        //  7b. WHAT CAN WE ACTUALLY SEED WITH? (red-team B-05)
+        //  7b. WHAT CAN WE ACTUALLY SEED WITH? (review B-05)
         //
         //  Mining runs FIRST because it is the step that can still downgrade the
         //  quote on its own (no salt lands above a pathological asset → it returns
@@ -995,7 +995,7 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
         //  in the launch pair, so the two disagree exactly when a rotation has
         //  happened. Passing the flipped value asked the seeder for an
         //  ETH-magnitude number denominated in an asset this registry did not
-        //  hold: `TRANSFER_FROM_FAILED`, permanently (red-team R-02).
+        //  hold: `TRANSFER_FROM_FAILED`, permanently (review R-02).
         (specQuote, totalETH, vaultSwept) = PoolOps.seedFunding(
             address(hook),
             specQuote,
@@ -1059,7 +1059,7 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
         genesisPending = 0;
         uint256 unclaimedGenesis = genesisReserveOutstanding;
         //  `degenerate` is the SAME test, kept so the branch can be reported below
-        //  rather than only taken (red-team S0xTSa).
+        //  rather than only taken (review S0xTSa).
         bool degenerate = tokensFromLP <= unclaimedGenesis;
         uint256 newActive = degenerate
             ? tokensFromLP // degenerate guard (near-total migration) — never 0-seed
@@ -1067,7 +1067,7 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
         // OBSERVABLE UNDER-COVERAGE (audit F-06). The Z-12 fix made the LEGACY
         // shortfall observable but left this twin fallback silent, and it is the more
         // dangerous of the two: it fires when the dead pool returned NOTHING
-        // (`tokensFromLP == 0` — a fully drained book, or a progressive generation
+        // (`tokensFromLP == 0` — a fully emptied book, or a progressive generation
         // whose teardown recovered no token), and it hard-sets the active band to 80%
         // of supply. `newReserve` is then only 20% of supply while migration demand is
         // ~100%, so the exit guarantee silently degrades to first-come-first-served
@@ -1178,7 +1178,7 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
             //  it had done, and the survivors can NEVER be cleared afterwards
             //  (`forceCloseDead` is gated on an `_isDead()` that keys off the
             //  now-live newborn token, and `_settle` would have to swap against
-            //  a pool this relaunch has already drained). Measured: at a 12M gas
+            //  a pool this relaunch has already emptied). Measured: at a 12M gas
             //  cap, 64 of 64 positions survived and were locked permanently.
             //
             //  {CauldronHook.forceClosePerps} is total EXCEPT for that one
@@ -1201,7 +1201,7 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
             //  for the lowest succeeding limit, so an honest wallet lands there
             //  too. The subtraction is checked: below the reserve it reverts,
             //  and a budget too small for the close reverts through the call,
-            //  so the rebirth either drains the book or does not happen.
+            //  so the rebirth either empties the book or does not happen.
             hook.forceClosePerps{gas: gasleft() - RELAUNCH_TAIL_RESERVE}();
         }
     }
@@ -1284,7 +1284,7 @@ contract CauldronRegistry is CauldronBase, IUnlockCallback {
      *         requirement — old tokens are never frozen, so a holder who prefers a
      *         past iteration simply keeps (or trades) it.
      *
-     *  Non-exploitable & non-inflationary:
+     *  Non-defective & non-inflationary:
      *    - Burns the caller's own previous-gen tokens (real supply destroyed), and
      *      TRANSFERS the same amount of current-gen tokens from the registry's
      *      pre-minted migration pool — no new tokens are ever minted.

@@ -246,7 +246,7 @@ contract CauldronCollection is ERC721, ERC2981, ICreatorToken, ICauldronCollecti
 
     /// @notice Whether this token has already spent its one expiry re-anchor.
     ///
-    ///  ── ONE RE-ANCHOR, EVER (red-team Z-08) ─────────────────────────────────
+    ///  ── ONE RE-ANCHOR, EVER (review Z-08) ─────────────────────────────────
     ///  See the note in {_reveal}: an uncapped re-anchor is an unlimited free
     ///  re-roll, because the holder can read the pending tier off-chain the moment
     ///  block `mintBlockOf` is mined and is under no obligation to commit it.
@@ -270,7 +270,7 @@ contract CauldronCollection is ERC721, ERC2981, ICreatorToken, ICauldronCollecti
             // back, leaving the token stuck. Return quietly instead; the holder
             // (or a keeper) calls reveal() again once the new block is mined.
             //
-            // ── THE RE-ANCHOR IS CAPPED AT ONE (red-team Z-08) ────────────────
+            // ── THE RE-ANCHOR IS CAPPED AT ONE (review Z-08) ────────────────
             //  The claim above — "exactly ONE unknowable draw" — was false, for a
             //  reason the M-03 note never considers: the draw stops being unknowable
             //  the moment block `mb` is mined, and NOTHING OBLIGES THE HOLDER TO
@@ -279,7 +279,7 @@ contract CauldronCollection is ERC721, ERC2981, ICreatorToken, ICauldronCollecti
             //  commits it if it is good, and otherwise waits out the 256-block
             //  window. `blockhash(mb)` then returns 0, this branch re-anchored
             //  WITHOUT committing a rarity, and they had a fresh draw for the price
-            //  of one transaction. Measured on the PoC: tier 0 ground up to tier 3
+            //  of one transaction. Measured on the Repro test: tier 0 ground up to tier 3
             //  in 3 re-anchors, and 400 re-rolls reached Ultra deterministically.
             //  M-03 reasoned about best-of-two and shipped best-of-unlimited.
             //

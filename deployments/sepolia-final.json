@@ -19,5 +19,5 @@
     "collection": "0x7eDD29fE99C9FE590Ee7651b68959ee20DDF8D4a",
     "maxSupply": 2222
   },
-  "verified": "Full cycle live: genesis mint\u2192summon GnomeLand\u2192gacha/reveal NFTs\u2192rising curve\u2192genesis bonus\u2192propose+vote MIF\u2192relaunch gen-2 (per-proposal supply 2222, LP burned)\u2192claimByBurn (anti-exploit ok)"
+  "verified": "Full cycle live: genesis mint\u2192summon GnomeLand\u2192gacha/reveal NFTs\u2192rising curve\u2192genesis bonus\u2192propose+vote MIF\u2192relaunch gen-2 (per-proposal supply 2222, LP burned)\u2192claimByBurn (anti-failure case ok)"
 }

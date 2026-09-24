@@ -12,7 +12,7 @@ import {IUnlockCallback} from "v4-core/src/interfaces/callback/IUnlockCallback.s
 import {SwapParams} from "v4-core/src/types/PoolOperation.sol";
 import {BalanceDelta} from "v4-core/src/types/BalanceDelta.sol";
 import {FrenBase} from "./fren-review/FrenBase.sol";
-import {YNoFrens} from "./attacks/YBase.sol";
+import {YNoFrens} from "./harness/YBase.sol";
 import {PerpEngine} from "../cauldron/PerpEngine.sol";
 
 interface IPositionLiquidity {
@@ -66,7 +66,7 @@ contract CauldronFuzz is FrenBase {
 
     constructor() {
         _boot(25 ether, 50); // 50 genesis frens: the reserve has claims to back
-        actors = [trader, attacker, victim];
+        actors = [trader, outsider, holder];
 
         // Perps on the live generation, funded by REAL buys: `deal` would move
         // totalSupply and falsify the supply property.
@@ -149,10 +149,10 @@ contract CauldronFuzz is FrenBase {
             if (op == 0 || op == 1) {
                 try this.doOpen(op == 0, lev, amt) returns (uint256 id) { ids[open++] = id; } catch {}
             } else if (op == 2) {
-                try this.doBuy(amt * 20, attacker) {} catch {}
+                try this.doBuy(amt * 20, outsider) {} catch {}
             } else if (op == 3) {
-                uint256 bal = IERC20(token).balanceOf(attacker);
-                if (bal > 0) try this.doSell(bound(r >> 24, 1, bal), attacker) {} catch {}
+                uint256 bal = IERC20(token).balanceOf(outsider);
+                if (bal > 0) try this.doSell(bound(r >> 24, 1, bal), outsider) {} catch {}
             } else if (op == 4) {
                 _warp(bound(r >> 24, 60, 3 days));
                 vm.roll(block.number + 50);

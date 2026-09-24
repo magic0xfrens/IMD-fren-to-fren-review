@@ -87,7 +87,7 @@ contract MigrationVesting is Ownable, ReentrancyGuard {
     uint64 public constant MAX_WINDOW = 14 days;
 
     //  ── THE GRANT ARRAY IS THE ONLY EXIT, SO ITS LENGTH MUST NOT BE A WEAPON
-    //     (blind red-team X5g) ────────────────────────────────────────────────
+    //     (blind review X5g) ────────────────────────────────────────────────
     //  `_release` walks `_grants[holder]` with no bound, and it is the ONLY way
     //  tokens leave this escrow ({claim} and {claimFor} both go through it). The
     //  loop prunes as it goes, so a run that exceeds the block gas limit reverts
@@ -97,7 +97,7 @@ contract MigrationVesting is Ownable, ReentrancyGuard {
     //  And the length was settable by a stranger. {vestBatch} is permissionless
     //  and books a grant for any holder with an allowance on this escrow — which
     //  every holder who has migrated once has, because the standard UX is an
-    //  infinite approval. `amt = min(balance, allowance)`, so DUSTING a victim
+    //  infinite approval. `amt = min(balance, allowance)`, so DUSTING a affected user
     //  with one wei of the dead-gen token (no permission needed) converts into
     //  one more `Grant`. Measured: 2,000 forced grants put `claimFor` over a
     //  30,000,000-gas block.
@@ -128,7 +128,7 @@ contract MigrationVesting is Ownable, ReentrancyGuard {
         uint64 window;   // vest duration; 0 = instant (fully vested at `start`)
     }
 
-    /// @notice All open grants per beneficiary. Fully-drained grants are pruned.
+    /// @notice All open grants per beneficiary. Fully-emptied grants are pruned.
     mapping(address => Grant[]) private _grants;
 
     // --- events ---
@@ -185,7 +185,7 @@ contract MigrationVesting is Ownable, ReentrancyGuard {
     ///         or a keeper calls {claim} / {claimFor} to sweep vested instant tiers).
     ///
     ///  A holder already holding {MAX_BATCH_GRANTS} open grants is SKIPPED rather
-    ///  than reverted (blind red-team X5g): this path is permissionless, so it must
+    ///  than reverted (blind review X5g): this path is permissionless, so it must
     ///  never be able to fill the array a beneficiary's only exit walks, and it must
     ///  never let one uncooperative entry kill the whole keeper batch.
     function vestBatch(uint256 fromGen, address[] calldata holders) external nonReentrant {
@@ -259,7 +259,7 @@ contract MigrationVesting is Ownable, ReentrancyGuard {
     }
 
     /// @dev Pay out every grant's vested-minus-released amount to `holder`,
-    ///      pruning grants that become fully drained (swap-pop). Grants may hold
+    ///      pruning grants that become fully emptied (swap-pop). Grants may hold
     ///      different tokens (post-relaunch), so payout is per-grant.
     function _release(address holder) private returns (uint256 totalMoved) {
         Grant[] storage gs = _grants[holder];
@@ -270,7 +270,7 @@ contract MigrationVesting is Ownable, ReentrancyGuard {
             if (due > 0) {
                 grt.released = vested;
                 totalMoved += due;
-                //  CHECK THE RETURN (blind red-team X5i). This was an unchecked
+                //  CHECK THE RETURN (blind review X5i). This was an unchecked
                 //  `transfer` placed AFTER `grt.released` was written, so a token
                 //  that returns false instead of reverting booked the payout, emitted
                 //  `Claimed`, counted it in `totalMoved` and moved nothing. The very
@@ -282,7 +282,7 @@ contract MigrationVesting is Ownable, ReentrancyGuard {
                 //  untouched, and the claim stays open. Mirrors the checked
                 //  `transferFrom` in `_pullAndVest` (:220). Grant tokens are always
                 //  protocol CauldronTokens, never caller-supplied, so this cannot be
-                //  used to grief a holder's other grants.
+                //  used to disrupt a holder's other grants.
                 if (!IERC20(grt.token).transfer(holder, due)) revert TransferFailed();
                 emit Claimed(holder, due, grt.token);
             }
@@ -370,7 +370,7 @@ contract MigrationVesting is Ownable, ReentrancyGuard {
         emit StakerOracleSet(_oracle);
     }
 
-    /// @notice DISABLED (blind red-team X5g). `Ownable` ships a live
+    /// @notice DISABLED (blind review X5g). `Ownable` ships a live
     ///         `renounceOwnership()`, and this escrow's owner is the only party who
     ///         can ever call {setVestWindow} or {setStakerOracle}. Renouncing would
     ///         permanently freeze the vest window and — worse — pin the instant-tier

@@ -590,7 +590,7 @@ library PoolOps {
         uint256 ethIn = uint256(uint128(-delta.amount0())); // QUOTE we owe the pool
         uint256 got = uint256(uint128(delta.amount1()));    // token we're owed
 
-        //  SETTLE IN WHATEVER THE QUOTE IS (red-team B-05, wall 1b).
+        //  SETTLE IN WHATEVER THE QUOTE IS (review B-05, wall 1b).
         //
         //  This was `settle{value: ethIn}()` unconditionally. Native settlement
         //  against an ERC20-quoted pool pays nothing the pool asked for, so
@@ -678,7 +678,7 @@ library PoolOps {
      *
      *  Plain CREATE is STRUCTURALLY immune: the address derives from
      *  (registry, registry's nonce), and only the registry can advance its own
-     *  nonce. To occupy that address an attacker would need a ~2^160 preimage
+     *  nonce. To occupy that address an untrusted caller would need a ~2^160 preimage
      *  search on keccak256. Nothing depended on the token address being predictable
      *  — the `predictTokenAddress` helper was already removed as having no callers.
      */
@@ -1020,7 +1020,7 @@ library PoolOps {
      *  ── WHY THIS EXISTS, AND WHY IT LIVES HERE ─────────────────────────────
      *  `relaunch()` used to add three native-wei figures together and hand the sum
      *  to the seeder as the quote amount, whatever quote the proposal named. That
-     *  is red-team B-05: no conversion, no rescaling, and three unguarded reverts
+     *  is review B-05: no conversion, no rescaling, and three unguarded reverts
      *  behind `markConsumed`. Choosing the quote from what the protocol ACTUALLY
      *  HOLDS is what makes a non-native rebirth real rather than aspirational.
      *
@@ -1043,7 +1043,7 @@ library PoolOps {
      *
      *  There is deliberately NO SWAP here. Converting the recovered value would
      *  need a route, and a route on a permissionless entrypoint is either
-     *  attacker-supplied (it prices the treasury's own trade) or new governed
+     *  untrusted caller-supplied (it prices the treasury's own trade) or new governed
      *  storage. Both are a larger surface than the feature earns: the guild
      *  already changes a LIVE generation's denomination through
      *  {RedemptionExt.rotateSlice}, deliberately and reversibly, and the rebirth
@@ -1052,7 +1052,7 @@ library PoolOps {
      *
      *  NOTHING HERE REVERTS. Both releases are try/catch'd — `releaseRelaunchETH`
      *  legitimately reverts `NoETHToRelease` at zero, and a reserve we cannot pull
-     *  must never be the reason the machine cannot be reborn (red-team B-06/L-3).
+     *  must never be the reason the machine cannot be reborn (review B-06/L-3).
      *
      *  Closing the dying floor vault is folded in here rather than left at the call
      *  site purely for EIP-170: the registry could not afford both this call and
@@ -1075,7 +1075,7 @@ library PoolOps {
         uint256 recovered,
         address oldVault
     ) external returns (address quoteUsed, uint256 amount, uint256 vaultSwept) {
-        //  BEST-EFFORT (red-team L-3). `close()` ends in
+        //  BEST-EFFORT (review L-3). `close()` ends in
         //  `registry.call{value: swept}("")` and reverts `TransferFailed` if that
         //  send fails — reachable whenever the vault holds ether (anyone may donate
         //  to its `receive()`) and the registry cannot accept it. The floor sweep is
@@ -1084,7 +1084,7 @@ library PoolOps {
             try IVaultCloseOps(oldVault).close() returns (uint256 s) { vaultSwept = s; } catch {}
         }
 
-        //  ── "CAN FUND" MUST NOT MEAN "HOLDS ONE WEI" (red-team) ─────────────
+        //  ── "CAN FUND" MUST NOT MEAN "HOLDS ONE WEI" (review) ─────────────
         //  Each branch below used to be taken on a bare `> 0`, and the `return`
         //  is unconditional — so the FIRST denomination holding any dust won,
         //  and the later branches were never consulted.
@@ -1120,7 +1120,7 @@ library PoolOps {
         //  branch behaves exactly as it did.
         //
         //  ── `vaultSwept` IS WEI, AND ONLY THE NATIVE BRANCH MEASURES IN WEI
-        //     (blind red-team X5c) ────────────────────────────────────────────
+        //     (blind review X5c) ────────────────────────────────────────────
         //  `CauldronVault.close()` (:119) sweeps `address(this).balance` — always
         //  native. The caller feeds this third return straight into
         //  `crystallizeCollection` as the NUMERATOR over `totalETH`
@@ -1185,7 +1185,7 @@ library PoolOps {
         //  balance (`sweepLegProceeds` reads `legProceeds[]`, which this path never
         //  credits; branches 2 and 3 read the hook, not this contract), so the
         //  whole reserve was stranded with no recovery path — once per rebirth, on
-        //  an ordinary low-volume 6-decimal generation, with no attacker involved.
+        //  an ordinary low-volume 6-decimal generation, with no untrusted caller involved.
         //  The pulls now PEEK first and only fire when the result would actually
         //  clear {MIN_SEED_UNITS}; a short branch leaves the reserve where it is,
         //  so the next rebirth can still spend it. The funded path is unchanged:
@@ -1213,7 +1213,7 @@ library PoolOps {
     }
 
     /// @dev Best-effort pull of the hook's per-asset relaunch reserve. This is also
-    ///      the FIRST caller `releaseRelaunchAsset` has ever had (red-team L-1): the
+    ///      the FIRST caller `releaseRelaunchAsset` has ever had (review L-1): the
     ///      function was registry-gated with no registry function reaching it, so a
     ///      non-native generation's fees accrued behind a door only a contract
     ///      without the key could open.
@@ -1431,7 +1431,7 @@ library PoolOps {
     ///      propagates out of the loop and kills the whole keeper call. Because
     ///      opting in is permissionless and (previously) irrevocable, one opted-in
     ///      wallet holding more than the reserve can pay is enough to make EVERY
-    ///      batch containing it revert — a cheap, permanent grief against the keeper
+    ///      batch containing it revert — a cheap, permanent disrupt against the keeper
     ///      path that the protocol advertises as hands-off. Size the reserve's
     ///      capacity once per holder and skip anyone it cannot cover in full, so a
     ///      holder is never partially migrated behind their back either.
@@ -1444,7 +1444,7 @@ library PoolOps {
             if (!IAutoFlag(address(this)).autoMigrate(h)) continue;
             uint256 bal = IERC20(prevToken).balanceOf(h);
             if (bal == 0) continue;
-            // Re-read capacity each iteration: every migration drains the reserve.
+            // Re-read capacity each iteration: every migration empties the reserve.
             uint256 cap = ReserveLib.tokenOutForLiquidity(
                 r.tickLower, r.tickUpper, pm.getPositionLiquidity(r.positionId)
             );
@@ -1540,7 +1540,7 @@ library PoolOps {
      * @dev NFTs that can ACTUALLY claim this collection's floor: minted, less the
      *      genesis tranche.
      *
-     *  ── WHY THE LIVE FLOOR WAS DIVIDED BY THE WRONG NUMBER (red-team S0x) ────
+     *  ── WHY THE LIVE FLOOR WAS DIVIDED BY THE WRONG NUMBER (review S0x) ────
      *  Death and life disagreed about the denominator. `crystallizeCollection`
      *  freezes the base at `IVaultRedeemedOps(vault).outstanding()` (:1484), and
      *  {CauldronVault.outstanding} is `minted - floorOffset` (CauldronVault.sol:62)
@@ -1646,7 +1646,7 @@ library PoolOps {
         //  FORGED floor — which is by construction <= the OG floor — with the
         //  payment landing in the forged ledger instead of the genesis reserve.
         //  That is a loop, not a leak: buy the OG fren cheap here, redeem it at
-        //  the higher OG floor, repeat, draining `genesisReserveOutstanding` while
+        //  the higher OG floor, repeat, emptying `genesisReserveOutstanding` while
         //  crediting the wrong tranche. OGs leave the treasury only through
         //  {RedemptionExt.buyTreasuryOgFren}, which pays 2× the OG floor into the
         //  reserve that funded them.

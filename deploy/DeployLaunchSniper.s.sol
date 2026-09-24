@@ -30,7 +30,7 @@ contract DeployLaunchSniper is Script {
         address deployer = vm.addr(pk);
         address hook = vm.envAddress("HOOK");
         address presale = vm.envAddress("PRESALE");
-        //  PRECONDITION, MADE EXPLICIT (blind red-team X5e, hygiene). The sniper's
+        //  PRECONDITION, MADE EXPLICIT (blind review X5e, hygiene). The sniper's
         //  fee exemption is NOT granted by `setTaxExempt` alone: the hook's gate is
         //  `taxExempt[_taxedPlayer(sender, hookData)] && isOpener[sender]`
         //  (CauldronHook.sol:2384), where `sender` is the GACHA ROUTER. So this

@@ -200,7 +200,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
     // before forwarding the rest to the in-swap auto-liquidation. Ensures the
     // parent swap can always finish even if the liq path runs out of gas.
     uint256 internal constant LIQ_GAS_RESERVE = 180_000;
-    //  ── SIZED FROM A MEASURED KILL, NOT A GUESS (red-team L-2) ─────────────
+    //  ── SIZED FROM A MEASURED KILL, NOT A GUESS (review L-2) ─────────────
     //  This was 250_000 while ONE real liquidation costs ~388_000 (measured on a
     //  fork: minimum swap gas for the sweep to actually kill a position was
     //  543_602, against 103_857 for the bare swap). Only `gasleft - LIQ_GAS_RESERVE`
@@ -214,7 +214,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
     // Native in-swap gacha (direct Uniswap/aggregator buys forge crystals with no
     // router). Fired LAST in afterSwap with leftover gas, isolated in a self-call.
     uint256 internal constant GACHA_GAS_RESERVE = 200_000; // keep for fee collection + return
-    //  700k, not 500k (red-team GACHA1-f). The step forwards gasleft - RESERVE,
+    //  700k, not 500k (review GACHA1-f). The step forwards gasleft - RESERVE,
     //  so the FLOOR it can receive is MIN - RESERVE = 300k, while a commit(4) +
     //  resolve(6) measures ~488k: on a gas-tight direct buy the step OOGed,
     //  burned the buyer's gas and committed nothing, silently.
@@ -370,7 +370,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
     /// @notice The LIVE generation's PoolKey, pushed by the registry at each
     ///         summon/relaunch. The legacy buyback spends ONLY into this key (audit
     ///         C-01b) — never into the key of whatever swap triggered it, which an
-    ///         attacker controls. Also the single source of truth for "our pool".
+    ///         untrusted caller controls. Also the single source of truth for "our pool".
     PoolKey internal _liveKey;
     /// @notice Tokens bought by the live buyback + HELD here, awaiting the registry's
     ///         `materializeLegacyReserve` sweep (which deposits them into the shared
@@ -448,7 +448,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
     //  `Batch` is declared in {GachaLib}, which owns the resolution loop.
     GachaLib.Batch[] public batches;             // FIFO queue of commit batches
     /// @dev `batchCursor` + `outstandingCrystals`, grouped so {GachaLib} mutates
-    ///      them IN PLACE through one storage reference (red-team GACHA1-g). They
+    ///      them IN PLACE through one storage reference (review GACHA1-g). They
     ///      briefly crossed by value and were written back after the call, which
     ///      is exactly the shape a re-entrant resolve turns into a stale overwrite.
     GachaLib.State internal gacha;
@@ -651,7 +651,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
     ///      engine assumes currency0 is native ETH and denominates its accounting in
     ///      ETH — so a foreign pool (worse, a pool with NO ether leg) could mint
     ///      phantom `relaunchETH` and permanently brick `releaseRelaunchETH`, and
-    ///      could steer the legacy buyback into an attacker-priced book.
+    ///      could steer the legacy buyback into an untrusted caller-priced book.
     ///      We therefore only ever ADOPT pools the registry itself created, paired
     ///      against native ETH.
     ///
@@ -666,7 +666,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
     ///      of one call. Reverting here is what makes the key unsquattable: the key
     ///      names this hook, so every initialize must come through this callback.
     ///      Nobody but the registry has a legitimate reason to open a pool on this
-    ///      hook, so there is no pool creation left to grief.
+    ///      hook, so there is no pool creation left to disrupt.
     function _afterInitialize(
         address sender,
         PoolKey calldata key,
@@ -837,7 +837,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
             (bool swept, bytes memory out) = perpEngine.call{gas: g - reserve}(
                 abi.encodeWithSelector(IPerpEngineLiq.sweepLiquidations.selector, tx.origin, amountSpecified, isBuy, limit)
             );
-            //  ── THE FLOOR IS CONSTANT; THE WORK IS NOT (red-team H1) ────────
+            //  ── THE FLOOR IS CONSTANT; THE WORK IS NOT (review H1) ────────
             //  Passing the fixed floor below only ever proved the caller funded
             //  ONE in-swap kill (~440k measured). A trade that bankrupts four
             //  shorts passed it and stranded three of them insolvent at the
@@ -893,9 +893,9 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
             //  The caller picks the transaction's gas, so before this branch existed
             //  the entire liquidation engine was OPTIONAL: capping gas under the
             //  980k pre-trade floor executed a FULL-SIZE price-moving trade with the
-            //  pre-emptive sweep silently skipped, leaving the victim it bankrupted
+            //  pre-emptive sweep silently skipped, leaving the affected user it bankrupted
             //  open and insolvent (measured 0.30798 ETH of bad debt to PLV/insurance,
-            //  at NEGATIVE attacker cost, repeatable every block). No keeper can run
+            //  at NEGATIVE untrusted caller cost, repeatable every block). No keeper can run
             //  inside someone else's transaction before their swap, so there is no
             //  later rescue: the loss is realized at the price this trade sets.
             //
@@ -996,7 +996,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
             // LIVE-POOL GATE (audit Z-09). `_served` only asks whether the pool is
             // TRACKED, and retired generations stay tracked forever, so a swap on any
             // past generation's pool still minted crystal credit in the CURRENT epoch
-            // and inflated the lifetime/cumulative volume oracles. An attacker could
+            // and inflated the lifetime/cumulative volume oracles. An untrusted caller could
             // re-provide liquidity to a dead, worthless pool they price themselves and
             // farm the newborn collection with no exposure to the live token. Credit is
             // now accrued only for the pool the registry has declared live.
@@ -1150,34 +1150,34 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
     ///      buffered in beforeSwap — and after the sell fee) so either side triggers.
     ///      SPEND GATE (audit C-01b): the buy is executed against the LIVE key the
     ///      registry recorded, never the key of whatever swap happened to trigger
-    ///      us. Driving it off the caller's key let an attacker point the hook's
+    ///      us. Driving it off the caller's key let an untrusted caller point the hook's
     ///      own ETH at a book they priced and control.
     function _maybeLegacyBuyback(PoolId id, PoolKey calldata key) private {
         if (legacyBuffer == 0) return;
         PoolKey memory live = _liveKey;
-        //  DENOMINATION MATCH, AND AN EXIT WHEN IT FAILS (red-team X1/X4a). The
+        //  DENOMINATION MATCH, AND AN EXIT WHEN IT FAILS (review X1/X4a). The
         //  buffer is spent as raw units of `live.currency0`; if it is holding
         //  anything else — a native royalty on an ERC20 generation, or a balance
         //  left over from the quote it was funded in before a rotation — spending
         //  it would pay the WRONG asset out of the relaunch reserve. Roll it into
         //  the reserve for the asset it actually is instead, which both stops the
-        //  drain and gives the value an exit (`releaseRelaunchETH` /
+        //  empty and gives the value an exit (`releaseRelaunchETH` /
         //  `releaseRelaunchAsset`). Checked BEFORE the threshold so a stranded
-        //  sub-threshold balance still drains rather than sitting forever.
-        //  ...AND UNWIRED COUNTS AS UNSPENDABLE (red-team X1g). The wiring check
+        //  sub-threshold balance still empties rather than sitting forever.
+        //  ...AND UNWIRED COUNTS AS UNSPENDABLE (review X1g). The wiring check
         //  used to be the FIRST line of this function, so it returned before the
-        //  drain below could ever run: a balance buffered while the buyback was
+        //  empty below could ever run: a balance buffered while the buyback was
         //  wired and then switched off with `setLegacyBuyback(address(0), ..)`
         //  had no reader at ANY privilege level. That is the same
         //  accepted-but-unspendable class the denomination fix closed, closed for
         //  denomination only and left open for wiring — and now that royalties
-        //  route through `fundLegacyBuffer`, it is reachable with no attacker.
-        //  Folding it into the drain condition instead of short-circuiting ahead
+        //  route through `fundLegacyBuffer`, it is reachable with no untrusted caller.
+        //  Folding it into the empty condition instead of short-circuiting ahead
         //  of it means "the buyback cannot spend this" has exactly ONE meaning
         //  and exactly one exit, whichever reason it cannot spend it.
         //
         //  This is also why `fundLegacyBuffer` does NOT re-check the wiring: a
-        //  payment that arrives while the buyback is off is drained by the next
+        //  payment that arrives while the buyback is off is emptied by the next
         //  swap through this hook, so a second gate there would be a duplicate
         //  of this one with its own way to drift out of step.
         if (legacyBufferAsset != Currency.unwrap(live.currency0) || legacyRegistry == address(0)) {
@@ -1286,8 +1286,8 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
     ///         the empty `receive()` because the hook receives raw ETH internally
     ///         (fee takes) that must NOT be double-counted into the buffer.
     function fundLegacyBuffer() external payable {
-        //  KEEP VALUE THE BUFFER CANNOT SPEND OUT OF IT (red-team X1/X4a —
-        //  Critical), BUT ROUTE IT, NEVER REFUSE IT (red-team X1e — High,
+        //  KEEP VALUE THE BUFFER CANNOT SPEND OUT OF IT (review X1/X4a —
+        //  Critical), BUT ROUTE IT, NEVER REFUSE IT (review X1e — High,
         //  fix-induced). The buffer is spent as raw units of the live pool's
         //  currency0, so native wei may only enter it while that currency IS
         //  native and the buffer is not already holding something else. That
@@ -1339,7 +1339,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
         uint256 bal = IERC20(token).balanceOf(address(this));
         amt = owed > bal ? bal : owed;
         legacyOwedToReserve = owed - amt;
-        //  CHECKED, AND THE DEBIT ROLLS BACK IF IT FAILS (red-team X1f). This was
+        //  CHECKED, AND THE DEBIT ROLLS BACK IF IT FAILS (review X1f). This was
         //  a bare `IERC20.transfer` AFTER the counter was debited. USDT and most
         //  tokenised equities return false instead of reverting, so a
         //  false-returning token zeroed the counter while the tokens stayed here
@@ -1392,10 +1392,10 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
         //  quadrant inverts. One derivation serves both tests below; deriving it
         //  twice is how the two drift apart.
         bool inputIsQuote = params.zeroForOne == q0;
-        //  ── PRE-EMPTIVE LIQUIDATION, ON BOTH SWAP SHAPES (red-team LIQ04-A) ──
+        //  ── PRE-EMPTIVE LIQUIDATION, ON BOTH SWAP SHAPES (review LIQ04-A) ──
         //  Exact-OUTPUT buys were skipping the pre-sweep — their input is unknown
         //  until execution — which left the one quadrant with no projection as
-        //  the one an attacker would route through: 27 mETH of PLV, measured, on
+        //  the one an untrusted caller would route through: 27 mETH of PLV, measured, on
         //  a trade the exact-input route handles for free.
         //
         //  REFUSING them was the wrong fix, twice over. The protocol's own
@@ -1482,11 +1482,11 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
         // PROPOSER FLYWHEEL: carve a tiny slice off the TOP for the current
         // iteration's proposer (whoever kicked the machine forward). PULL pattern —
         // the slice is ACCRUED to a claimable balance, never pushed. `activeProposer`
-        // is attacker-controlled (anyone can propose), so a push here would be an
+        // is untrusted caller-controlled (anyone can propose), so a push here would be an
         // untrusted external call in the swap hot path; accrual keeps the swap path
         // call-free and re-entrancy-proof. Claimed later via `claimProposerFees`.
         //
-        //  ── NATIVE ONLY (red-team B-06 — High) ─────────────────────────────
+        //  ── NATIVE ONLY (review B-06 — High) ─────────────────────────────
         //  `proposerOwed` is paid out by `claimProposerFees` with
         //  `call{value: amount}` — WEI, unconditionally. This carve sat above
         //  every `_feeAsset` branch in this function, so a fee collected in USDG
@@ -1497,7 +1497,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
         //  Two harms, and the second is the serious one. It overpays (or, for a
         //  6-decimal quote, underpays ~1e12x) by the price ratio; and because
         //  `relaunchETH` is tracked by COUNTER rather than balance, the ether it
-        //  pays out is ether that was backing the reserve. Drain enough and
+        //  pays out is ether that was backing the reserve. Empty enough and
         //  `releaseRelaunchETH` fails its send — which `relaunch()` used to call
         //  bare, rolling back `markConsumed` and freezing the machine exactly
         //  like B-05.
@@ -1586,7 +1586,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
         //  other than the live quote keeps its old route: it stays in the
         //  floor/relaunch split below, where `_creditReserve` denominates it
         //  correctly.
-        //  NEVER MIX TWO DENOMINATIONS IN ONE BALANCE (red-team X1/X4a): if the
+        //  NEVER MIX TWO DENOMINATIONS IN ONE BALANCE (review X1/X4a): if the
         //  buffer is still holding the previous quote, this share keeps its old
         //  route (floor/relaunch, where `_creditReserve` denominates it right).
         if (_feeAsset == Currency.unwrap(_liveKey.currency0)
@@ -1801,7 +1801,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
     ///  is enforced here instead of living in a migration doc. CLOSE THE
     ///  POSITIONS before diversifying the quote.
     ///
-    ///  ── DO NOT "JUST UNSET THE ENGINE" (red-team R-07) ─────────────────────
+    ///  ── DO NOT "JUST UNSET THE ENGINE" (review R-07) ─────────────────────
     ///  This note used to offer that as the alternative. It is the one thing an
     ///  operator must not do: a zero `perpEngine` disables BOTH guards at once —
     ///  the `openCount` check below, and the in-call re-point in
@@ -1815,7 +1815,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
         if (perpEngine != address(0) && IPerpOpenCount(perpEngine).blocksVolumeLink()) {
             revert PerpsOpen();
         }
-        //  A POOL IS NOT ITS OWN SIBLING (red-team R-03 follow-on).
+        //  A POOL IS NOT ITS OWN SIBLING (review R-03 follow-on).
         //  `isDead` sums the primary's 24h volume and then every sibling's, so
         //  self-linking would double-count one pool's trading and hold a dead
         //  generation open forever — `relaunch` gates on `isDead`, so that is a
@@ -1837,7 +1837,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
         // so at nine siblings even rotating back into an already-linked quote
         // reverted the whole rotation. Only a genuinely NEW 10th pool is
         // refused now.
-        //  ── LINKS ARE FULLY CONNECTED, NOT ONE-WAY (red-team HIGH #2) ────────
+        //  ── LINKS ARE FULLY CONNECTED, NOT ONE-WAY (review HIGH #2) ────────
         //  This used to push `secondary` into `primary`'s list and stop. `isDead`
         //  sums a pool's OWN list, so `isDead(primary)` saw the whole generation
         //  while `isDead(leg)` saw only the leg — which has no volume of its own,
@@ -1983,7 +1983,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
     // -----------------------------------------------------------------------
 
     /**
-     * @notice Ownership is TRANSFERABLE, not renounceable (blind red-team X1d).
+     * @notice Ownership is TRANSFERABLE, not renounceable (blind review X1d).
      *
      *  OpenZeppelin ships `renounceOwnership` live, and this contract inherits
      *  {Ownable} directly rather than {CauldronBase}, so the guard at
@@ -2091,14 +2091,14 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
         //      `NotDead` forever, and `syncGeneration` needs `openCount == 0`
         //      so it reverts `PositionsOpen` for the rest of the machine's life.
         //  Nor can it be repaired once stranded: `_settle` ALWAYS swaps, against
-        //  a pool the relaunch has by then drained. Trader collateral and the
+        //  a pool the relaunch has by then emptied. Trader collateral and the
         //  LP's lent ETH would be locked permanently.
         //
         //  Reverting instead is safe AND recoverable: the whole relaunch rolls
         //  back, `markConsumed` with it, the winning proposal stays live, and
         //  the next caller simply sends more gas. It cannot wedge the machine,
         //  because the work is bounded — the engine caps the book at 64 and its
-        //  loop bound (96) guarantees ONE call drains it, at ~7.5M gas, well
+        //  loop bound (96) guarantees ONE call empties it, at ~7.5M gas, well
         //  inside a block. The overflow the gas cap was written to prevent
         //  cannot actually happen; the freeze it produced could, and did.
         if (IPerpForceClose(eng).openCount() != 0) revert PerpsOpen();
@@ -2108,7 +2108,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
     ///         summon/relaunch. The legacy buyback spends only into this key, and
     ///         `liveKey()` lets integrators read the canonical pool (audit C-01b).
     ///
-    ///  ── THE NATIVE ASSERTION WAS A LANDMINE, NOT A GUARD (red-team B-05) ──
+    ///  ── THE NATIVE ASSERTION WAS A LANDMINE, NOT A GUARD (review B-05) ──
     ///  This used to `revert ZeroAddress()` unless `currency0 == address(0)`.
     ///  Read as an invariant that holds, that looks protective. Read as code on
     ///  the mandatory rebirth path, it was a permanent brick: the registry calls
@@ -2131,7 +2131,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
     ///  `deployTokenAbove` mines it above `QUOTE_WATERMARK` and no quote at or
     ///  above that watermark can be allowlisted. So the gate keeps comparing the
     ///  UNIQUE per-generation token, never a shared quote, whatever the key's
-    ///  quote side is. Pinned by test/attacks/B07_RelaunchTotality.t.sol.
+    ///  quote side is. Pinned by test/probes/B07_RelaunchTotality.t.sol.
     function setLiveKey(PoolKey calldata k) external {
         if (msg.sender != registry) revert OnlyRegistry();
         _liveKey = k;
@@ -2247,7 +2247,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
     /// @notice One-time wiring of the registry allowed to pull the relaunch ETH
     ///         reserve. IMMUTABLE after the first set: a mutable setter would let
     ///         the hook owner repoint `registry` to an address they control and
-    ///         drain `relaunchETH` via releaseRelaunchETH() (audit F1). Set once
+    ///         empty `relaunchETH` via releaseRelaunchETH() (audit F1). Set once
     ///         at deploy, then locked forever.
     function setRegistry(address _registry) external onlyOwner {
         if (registry != address(0)) revert RegistryAlreadySet();
@@ -2261,7 +2261,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
     ///
     ///  ARMED + DELAYED (audit M-01). `setRegistry` is one-shot and its comment
     ///  explains exactly why — a mutable setter lets the hook owner re-point
-    ///  `registry` at an address they control and drain `relaunchETH` via
+    ///  `registry` at an address they control and empty `relaunchETH` via
     ///  `releaseRelaunchETH()`. The old unconstrained `setRegistryOverride` handed
     ///  that power straight back. Now the swap must be announced on-chain and wait
     ///  out REGISTRY_SWAP_DELAY, so holders (and the guardian) can see it coming.
@@ -2304,7 +2304,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
     // NOTE: the owner-only `trackPool(PoolId)` was REMOVED (audit Z-05b). Pools are
     // adopted exclusively in `_afterInitialize`, which is what enforces "the registry
     // created it AND currency0 is native ETH" (audit C-01). `trackPool` let the owner
-    // mark an arbitrary, attacker-priced pool as served, re-opening that gate by hand;
+    // mark an arbitrary, untrusted caller-priced pool as served, re-opening that gate by hand;
     // nothing in the protocol, the deploy scripts or the frontend ever called it. Its
     // removal also reclaims the EIP-170 headroom the wall-clock volume window needs.
 
@@ -2391,7 +2391,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
     }
 
     /// @notice Owner-tunable share of ETH fees streamed to the genesis dividend.
-    ///         Capped so it stays a tribute, never a drain.
+    ///         Capped so it stays a tribute, never a empty.
     /// @dev The cap is the DEPLOYED DEFAULT (audit I-02). It used to be 500 while
     ///      `guildBps` initialises to 1500, which made the setter a one-way ratchet:
     ///      once called, the guild share could never be returned to the value the
@@ -2769,7 +2769,7 @@ contract CauldronHook is BaseHook, Ownable, ReentrancyGuard {
 
     /// @notice The asset `legacyBuffer` is DENOMINATED in (address(0) = native wei).
     ///
-    ///  ── WHY THIS EXISTS (red-team X1/X4a — Critical) ───────────────────────
+    ///  ── WHY THIS EXISTS (review X1/X4a — Critical) ───────────────────────
     ///  `legacyBuffer` was a bare integer. It was funded in native wei by the
     ///  permissionless `fundLegacyBuffer()` (royalties) and spent by
     ///  {LegacyBuyLib.buyStep} as raw units of the LIVE pool's currency0 —

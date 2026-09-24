@@ -110,7 +110,7 @@
     ]
   },
   "deploy-config": {
-    "title": "Deployment: what the scripts deploy, wire and hand over, and any state they could ship that is exploitable or stuck",
+    "title": "Deployment: what the scripts deploy, wire and hand over, and any state they could ship that is defective or stuck",
     "files": [
       "deploy/DeployLaunchpad.s.sol",
       "deploy/DeployPerp.s.sol",

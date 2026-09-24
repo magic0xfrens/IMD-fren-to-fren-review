@@ -51,7 +51,7 @@ interface IPerpSync {
     function syncGeneration() external;
     /// @dev Open positions remaining. `relaunch` MUST see zero here before it
     ///      returns — a survivor can never be settled afterwards, because
-    ///      settlement swaps against a pool the relaunch has already drained.
+    ///      settlement swaps against a pool the relaunch has already emptied.
     function openCount() external view returns (uint256);
 }
 
@@ -348,7 +348,7 @@ abstract contract CauldronBase is Ownable, ReentrancyGuard {
     ///
     ///  Curated by the OWNER (the governance timelock) and never by a proposer.
     ///  A proposer curating their own set is the obvious capture vector: they
-    ///  add a token they control and drain the pool into it. The split is
+    ///  add a token they control and empty the pool into it. The split is
     ///  deliberate — the treasury decides what is SAFE, governance decides what
     ///  is STRATEGIC.
     ///
@@ -392,7 +392,7 @@ abstract contract CauldronBase is Ownable, ReentrancyGuard {
     ///  a perfectly live brew.
     ///
     ///  Governance-set rather than oracle-derived on purpose: it only needs the
-    ///  right order of magnitude, it changes rarely, and an attacker cannot move
+    ///  right order of magnitude, it changes rarely, and an untrusted caller cannot move
     ///  it. A price feed here would be a manipulation surface on the one number
     ///  that decides whether a generation dies.
     ///  ── STATUS: WRITE-ONLY. KEPT DELIBERATELY, NOT WIRED HERE ────────────
@@ -537,7 +537,7 @@ abstract contract CauldronBase is Ownable, ReentrancyGuard {
      *
      *  Tracking legs explicitly fixes that and buys the flexibility that was
      *  missing anyway: with the set known, a rotation can name WHICH leg it
-     *  draws from instead of always draining the original, and merging is just
+     *  draws from instead of always emptying the original, and merging is just
      *  rotating one leg entirely into another's pair.
      *
      *  DECLARED LAST, deliberately — appending keeps every existing slot number,

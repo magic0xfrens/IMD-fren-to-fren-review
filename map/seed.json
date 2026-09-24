@@ -1694,7 +1694,7 @@
    "mutability": "view",
    "name": "_isInstant",
    "observations": [],
-   "reachability": "Decides whether a migrating holder skips the vesting window. No oracle means false (`policy` MigrationVesting.sol:310). Otherwise the oracle is asked by a bounded one-word STATICCALL (`valid` MigrationVesting.sol:319), and only an answer of exactly 1 counts as instant (`word` MigrationVesting.sol:322); a revert, a short reply or any other word vests normally, so a broken or hostile oracle can only make migration slower, never revert it.",
+   "reachability": "Decides whether a migrating holder skips the vesting window. No oracle means false (`policy` MigrationVesting.sol:310). Otherwise the oracle is asked by a bounded one-word STATICCALL (`valid` MigrationVesting.sol:319), and only an answer of exactly 1 counts as instant (`word` MigrationVesting.sol:322); a revert, a short reply or any other word vests normally, so a broken or untrusted oracle can only make migration slower, never revert it.",
    "reads": [
     "stakerOracle (line 309)"
    ],

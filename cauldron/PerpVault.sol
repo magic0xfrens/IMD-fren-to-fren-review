@@ -57,12 +57,12 @@ interface IVaultRegistry {
  *  stop earning yield and stop bearing bad-debt risk the moment they're queued.
  *
  *  Share math uses a virtual offset (à la ERC-4626) so the first deposit and
- *  donation/inflation attacks are handled safely.
+ *  donation/inflation probes are handled safely.
  */
 contract PerpVault is ReentrancyGuard {
     /// @dev Virtual-shares offset (à la ERC-4626 decimals offset). Shares are
     ///      minted at 1e6× assets, so a first-depositor / donation-inflation
-    ///      attack would have to donate ~1e6× a victim's deposit to round their
+    ///      probe would have to donate ~1e6× a affected user's deposit to round their
     ///      shares down — economically infeasible. (Audit V-02)
     uint256 private constant OFFSET = 1e6;
     /// @dev Fixed-point base for the exit-queue index (see the queue note below).
@@ -91,14 +91,14 @@ contract PerpVault is ReentrancyGuard {
     //      ONE ASSET AT A TIME. This side holds exactly one denomination, the
     //      engine's current `quote`. It changes in exactly two ways:
     //        - a RELAUNCH into a new quote: {PerpEngine.syncGeneration} refuses
-    //          while {hasQuoteStake} is true, so the vault must be drained first;
+    //          while {hasQuoteStake} is true, so the vault must be emptied first;
     //        - a live ROTATION: {PerpEngine.requoteBook} converts the whole book
     //          and calls {beforeBookRequote}/{afterBookRequote} in the same
     //          transaction, so every figure here moves with it or nothing moves.
     //
-    //  ── THE INVARIANT WAS NOT ENFORCEABLE AS WRITTEN (red-team H-2) ───────
+    //  ── THE INVARIANT WAS NOT ENFORCEABLE AS WRITTEN (review H-2) ───────
     //  It used to cite `plv != 0` as the engine's guard. That is the WEAKEST
-    //  possible reading of "drained": `openCount == 0` forces `longOiEth == 0`,
+    //  possible reading of "emptied": `openCount == 0` forces `longOiEth == 0`,
     //  so `totalEth() == plv` and `plv == 0` is EXACTLY the moment a queued exit
     //  has zero backing — the guard passed precisely when this side was at its
     //  most stale. Measured: an 8 ETH queue survived a rotation and took 100% of
@@ -111,13 +111,13 @@ contract PerpVault is ReentrancyGuard {
     // ── ETH side ──
     uint256 public ethShares;                       // total ETH-side shares
     mapping(address => uint256) public ethShareOf;
-    //  ── THE QUEUE IS UNITS x AN INDEX, NOT A BAG OF NOMINALS (red-team NB) ─
+    //  ── THE QUEUE IS UNITS x AN INDEX, NOT A BAG OF NOMINALS (review NB) ─
     //  A queued exit used to be stored as a wei nominal that {settlePendingEth}
     //  wrote DOWN IN PLACE, per user, against a denominator that still carried
     //  everyone else's full nominal. That made the write-down neither idempotent
     //  nor order-independent: re-aiming it at one address ground his claim toward
     //  zero while every other claimant kept theirs (measured: 80 calls moved
-    //  9.878 of 10 ETH from the victim to the caller, for gas), and even ONE
+    //  9.878 of 10 ETH from the affected user to the caller, for gas), and even ONE
     //  honest call each paid 4.29 / 5.71 depending on who went first.
     //
     //  A claim is now a fixed number of UNITS. A shortfall is recognised ONCE,
@@ -132,7 +132,7 @@ contract PerpVault is ReentrancyGuard {
     uint64  public ethQueueEpoch;                   // bumped when a queue is wiped out
     /// @notice `engine.totalEth()` as of the last vault action. A fall below this
     ///         that the vault did not cause is a realised loss, and the queue
-    ///         bears its share of it (see {_syncEthQueue}, red-team R2A).
+    ///         bears its share of it (see {_syncEthQueue}, review R2A).
     uint256 public ethBackingMark;
     mapping(address => uint256) internal _ethUnitsOf;
     mapping(address => uint64)  internal _ethEpochOf;
@@ -156,7 +156,7 @@ contract PerpVault is ReentrancyGuard {
     mapping(address => uint256) public tokRewardDebt; // 1e18-scaled baseline per user
     mapping(address => uint256) public tokRewardOwed; // settled, claimable ETH per user
 
-    //  ── THE WRITE-OFF EPOCH (red-team T3b) ────────────────────────────────
+    //  ── THE WRITE-OFF EPOCH (review T3b) ────────────────────────────────
     //  A quote rotation zeroes the engine's `tokYieldEth` pot (PerpEngine.sol:1359)
     //  but deliberately does NOT rewind `tokYieldCumulative`. Every entitlement here
     //  is built out of that cumulative, so a staker who was staked across the
@@ -248,7 +248,7 @@ contract PerpVault is ReentrancyGuard {
     /// @notice Does anyone still have value in this vault — live shares on either
     ///         side, or an unclaimed queued exit?
     ///
-    ///  ── THE REPLACEMENT TEST FOR {PerpEngine.setVault} (red-team R-09) ─────
+    ///  ── THE REPLACEMENT TEST FOR {PerpEngine.setVault} (review R-09) ─────
     ///  That guard asked the ENGINE whether its balances were zero
     ///  (`plv != 0 || plvToken != 0 || tokYieldEth != 0`), which conflates
     ///  "someone is owed money" with "a counter is non-zero". Two kinds of
@@ -257,7 +257,7 @@ contract PerpVault is ReentrancyGuard {
     ///    - short-side yield credited while no token shares existed is orphaned
     ///      by design (see the watermark note on {_foldTokYield}), and
     ///      `tokYieldEth` is only ever decremented by paying an attributed
-    ///      claim — so an orphan can never be drained; and
+    ///      claim — so an orphan can never be emptied; and
     ///    - redemption floors, so ordinary yield leaves one wei of `plv` dust
     ///      behind the last staker.
     ///
@@ -284,9 +284,9 @@ contract PerpVault is ReentrancyGuard {
     ///  name rather than vetoing on it — an unclaimable orphan (yield credited at
     ///  zero token shares) would otherwise veto forever.
     ///
-    ///  ── THIS IS NOW ACTUALLY THE CALLER (red-team F-01/F-06) ───────────────
+    ///  ── THIS IS NOW ACTUALLY THE CALLER (review F-01/F-06) ───────────────
     ///  Until then the engine asked {hasStakers} while three comment blocks here
-    ///  and one attack test all said it asked this, and this function had ZERO
+    ///  and one probe test all said it asked this, and this function had ZERO
     ///  production callers. One dust {depositToken} therefore vetoed every quote
     ///  adoption for the life of the generation and took the perp engine down with
     ///  it. {PerpEngine.setVault} deliberately still asks {hasStakers}: re-pointing
@@ -327,7 +327,7 @@ contract PerpVault is ReentrancyGuard {
     function deposit(uint256 amount) public payable nonReentrant returns (uint256 shares) {
         if (amount == 0) revert ZeroAmount();
         _syncEthQueue();   // recognise any loss BEFORE pricing the new shares
-        //  ── NO NEW MONEY INTO AN INSOLVENT QUEUE (red-team T3a) ─────────────
+        //  ── NO NEW MONEY INTO AN INSOLVENT QUEUE (review T3a) ─────────────
         //  {assetsEth} saturates at zero (`:196`), so once `pendingEth` outruns the
         //  engine's backing the share price collapses to the 1-wei OFFSET base and
         //  a fresh depositor mints shares worth ~nothing — while `engine.totalEth()`
@@ -338,9 +338,9 @@ contract PerpVault is ReentrancyGuard {
         //  and must bear its share of the loss. Letting a newcomer's principal pay
         //  it instead inverts that. So refuse until the queue has recognised its own
         //  write-down: {settlePendingEth} banks the haircut for ANY queued address,
-        //  permissionlessly and without paying anyone (red-team R2C — when only the
+        //  permissionlessly and without paying anyone (review R2C — when only the
         //  claimant himself could bank it, one holdout latched this gate shut), and
-        //  {claimPendingEth} banks a zero rather than reverting. Either drains
+        //  {claimPendingEth} banks a zero rather than reverting. Either empties
         //  `pendingEth` and reopens the side. No privilege, no timelock, no stuck vault.
         if (pendingEth() > engine.totalEth()) revert QueueInsolvent();
         //  Read defensively. An engine that predates multi-quote has no
@@ -419,7 +419,7 @@ contract PerpVault is ReentrancyGuard {
 
     /// @dev Write down `owed` if the queue as a whole outruns its backing.
     ///
-    ///  ── A QUEUED EXIT IS A CLAIM, NOT A GUARANTEE (red-team L-3) ──────────
+    ///  ── A QUEUED EXIT IS A CLAIM, NOT A GUARANTEE (review L-3) ──────────
     ///  `withdrawEth` converts at-risk SHARES into a fixed nominal claim that
     ///  leaves the share base, so a queued exit stopped bearing bad-debt risk
     ///  while still being first in line for the money. `assetsEth()` saturates at
@@ -535,7 +535,7 @@ contract PerpVault is ReentrancyGuard {
     /// @dev Recognise, ONCE and for the WHOLE queue, any shortfall between what
     ///      the queue claims and what the engine actually holds.
     ///
-    ///  ── IDEMPOTENT AND ORDER-INDEPENDENT BY CONSTRUCTION (red-team NB) ────
+    ///  ── IDEMPOTENT AND ORDER-INDEPENDENT BY CONSTRUCTION (review NB) ────
     ///  This takes no user argument and touches no per-user state: it scales the
     ///  single index every claim is measured in. Two consequences the previous
     ///  per-user write-down could not deliver:
@@ -550,9 +550,9 @@ contract PerpVault is ReentrancyGuard {
     ///      matter who called what, when, or how often.
     ///
     ///  The pro-rata rule itself is unchanged — see {_haircut}, which is applied
-    ///  to the INDEX here instead of to one victim's balance.
+    ///  to the INDEX here instead of to one affected user's balance.
     ///
-    ///  ── PARI PASSU, NOT SENIOR (red-team R2A) ─────────────────────────────
+    ///  ── PARI PASSU, NOT SENIOR (review R2A) ─────────────────────────────
     ///  The clamp below fires only when the queue outruns the WHOLE backing. For
     ///  any smaller loss it did nothing, and {assetsEth} is the residual
     ///  `totalEth - pendingEth`, so the entire shortfall landed on live shares:
@@ -590,7 +590,7 @@ contract PerpVault is ReentrancyGuard {
         if (newIdx == idx) return;                             // nothing to recognise
         if (newIdx == 0) {
             //  Nothing the engine holds can pay anyone: retire the whole queue so
-            //  it stops blocking {deposit} and {hasStakers} (red-team R2B/R2C).
+            //  it stops blocking {deposit} and {hasStakers} (review R2B/R2C).
             //  The epoch bump invalidates every per-user unit balance in O(1).
             ethQueueUnits = 0;
             ethQueueIndex = QSCALE;
@@ -607,7 +607,7 @@ contract PerpVault is ReentrancyGuard {
 
     /// @notice Permissionlessly recognise the ETH queue's write-down. Pays nobody.
     ///
-    ///  ── ONE HOLDOUT MUST NOT LATCH THE DEPOSIT GATE (red-team R2C) ────────
+    ///  ── ONE HOLDOUT MUST NOT LATCH THE DEPOSIT GATE (review R2C) ────────
     ///  `pendingEth` used to shrink ONLY inside {claimPendingEth}, and only for
     ///  `msg.sender`'s own entry. After a death-settle write-off the queue's
     ///  nominal outran `engine.totalEth()`, so {deposit}'s `QueueInsolvent` guard
@@ -617,7 +617,7 @@ contract PerpVault is ReentrancyGuard {
     ///  life of the engine). Anyone may now turn it. `user` only names a queue
     ///  entry to prune once it is worth nothing; the write-down itself is global,
     ///  so aiming this at an address can neither help nor harm that address
-    ///  (red-team NB — it could, and that was a theft).
+    ///  (review NB — it could, and that was a loss).
     ///
     ///  Deliberately does NOT transfer: a queued contract that reverts on
     ///  receive() would otherwise re-create exactly the latch this closes.
@@ -632,7 +632,7 @@ contract PerpVault is ReentrancyGuard {
     ///  Banks the queue-wide write-down first (see {_syncEthQueue}) rather than
     ///  reverting it away: a worthless claim must be recognised as worthless, or
     ///  `pendingEth` can never reach zero and {deposit} stays shut for good
-    ///  (red-team H-2 / Jb — both of those reverts are now returns).
+    ///  (review H-2 / Jb — both of those reverts are now returns).
     function claimPendingEth() external nonReentrant returns (uint256 paid) {
         if (pendingEthOf(msg.sender) == 0) revert ZeroAmount();
         _syncEthQueue();
@@ -668,7 +668,7 @@ contract PerpVault is ReentrancyGuard {
     ///      accrued pot regardless of size — ordering, not capital, decided the
     ///      payout. The orphaned ETH stays in the engine's segregated
     ///      `tokYieldEth` pot; governance can redirect it (treasury or insurance).
-    ///  ── AND IT DETECTS THE ROTATION WRITE-OFF (red-team T3b) ─────────────
+    ///  ── AND IT DETECTS THE ROTATION WRITE-OFF (review T3b) ─────────────
     ///  `tokYieldEth` moves in exactly three ways: up with `tokYieldCumulative` on
     ///  every credit, down by {totalTokYieldPulled} when THIS vault pulls, and down
     ///  by the rotation write-off. So `pot + pulled < cum` is a write-off and
@@ -688,7 +688,7 @@ contract PerpVault is ReentrancyGuard {
             if (sh == 0) {
                 emit UnattributedYield(cum - last);
             } else {
-                //  ── THE BOUNDARY IS `>=`, NOT `>` (red-team Ja) ───────────
+                //  ── THE BOUNDARY IS `>=`, NOT `>` (review Ja) ───────────
                 //  `cut` is the cumulative level the write-off ate up to. When the
                 //  vault happened to be synced AT the rotation, `last` already sat
                 //  exactly there, so `cut > last` was false, the split never ran,
@@ -760,7 +760,7 @@ contract PerpVault is ReentrancyGuard {
     ///         that, you earn ETH from short-side fees (claim via {claimTokYield}).
     function depositToken(uint256 amount) external nonReentrant returns (uint256 shares) {
         if (amount == 0) revert ZeroAmount();
-        //  ── NO NEW MONEY INTO AN INSOLVENT TOKEN QUEUE (red-team R2B) ──────
+        //  ── NO NEW MONEY INTO AN INSOLVENT TOKEN QUEUE (review R2B) ──────
         //  The ETH side has refused this since T3a (`:274`); the token side did
         //  not, and the asymmetry was not cosmetic. {assetsTok} saturates at zero
         //  (`:241`), so once `pendingTok` outruns the engine's inventory a fresh
@@ -875,7 +875,7 @@ contract PerpVault is ReentrancyGuard {
 
     /// @notice Claim a previously-queued token exit as inventory frees up.
     ///
-    ///  ── THE TOKEN PATH MIRRORS THE ETH PATH (red-team R2B) ────────────────
+    ///  ── THE TOKEN PATH MIRRORS THE ETH PATH (review R2B) ────────────────
     ///  Both branches below used to `revert ZeroAmount()`, which rolled back the
     ///  haircut banked one line up — the exact defect the ETH side had closed and
     ///  never propagated here. Once token backing fell under `pendingTok` the
@@ -937,7 +937,7 @@ contract PerpVault is ReentrancyGuard {
         uint256 shTot = tokShares;
         // Mirrors _syncTokYield exactly: at zero shares the delta is unattributed and
         // is NOT credited to anyone, so the view must not promise it either (H-05).
-        //  ── AND IT MIRRORS THE WRITE-OFF TOO (red-team T3b) ────────────────
+        //  ── AND IT MIRRORS THE WRITE-OFF TOO (review T3b) ────────────────
         //  A view that reported the pre-write-off nominal while {claimTokYield}
         //  paid the post-write-off one would be the same lie the bug was, moved
         //  into the UI. Same detector, same split fold, same epoch line.

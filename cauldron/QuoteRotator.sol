@@ -35,7 +35,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  *  ── Where the price protection comes from ──────────────────────────────────
  *  `minOut` is supplied BY GOVERNANCE when the rotation is scheduled, not read
  *  from a pool at execution time. Reading spot at execution is precisely the
- *  manipulation the bound exists to stop — an attacker pushes the route, the
+ *  manipulation the bound exists to stop — an untrusted caller pushes the route, the
  *  contract computes a low floor from that pushed price, and fills into it. A
  *  human setting the bound from the market when they vote cannot be moved by a
  *  swap in the same block.
@@ -160,7 +160,7 @@ contract QuoteRotator {
 
     /// @notice Pools this contract may route a rotation through, by PoolId.
     ///
-    ///  ── WHY THE VENUE IS CURATED AND NOT JUST SHAPE-CHECKED (red-team) ──
+    ///  ── WHY THE VENUE IS CURATED AND NOT JUST SHAPE-CHECKED (review) ──
     ///  `rotateStep` is permissionless on purpose — anyone may advance a
     ///  rotation the guild already voted for. `_routeMatches` checks that the
     ///  venue trades the right PAIR, and for a while that was the whole check:
@@ -170,9 +170,9 @@ contract QuoteRotator {
     ///
     ///  Two things followed, and a shape check only fixed one of them.
     ///
-    ///  TRUST: an attacker-chosen `hooks` address was invoked by the PoolManager
+    ///  TRUST: an untrusted caller-chosen `hooks` address was invoked by the PoolManager
     ///  inside this contract's own `unlock`. v4's delta accounting stops the
-    ///  direct theft, but arbitrary code ran while the manager was unlocked.
+    ///  direct loss, but arbitrary code ran while the manager was unlocked.
     ///
     ///  EXECUTION QUALITY, which is the one that actually costs money and which
     ///  no shape check can reach: the governed `minRate` is a FLOOR, and the
@@ -389,7 +389,7 @@ contract QuoteRotator {
         if (amountIn == 0) revert BadConfig();
         if (!_allowed(to)) revert NotAllowedQuote();
         if (!_routeMatches(route, from, to)) revert NoRoute();
-        //  ── THE VENUE ALLOWLIST WAS NOT ON THIS PATH (red-team R-01) ────────
+        //  ── THE VENUE ALLOWLIST WAS NOT ON THIS PATH (review R-01) ────────
         //  {allowedVenue} existed, was documented as failing closed, and was
         //  enforced in {rotateStep} (:295) — but NOT here, and this is the
         //  function `RedemptionExt.rotateSliceFrom` actually calls. The only
@@ -399,8 +399,8 @@ contract QuoteRotator {
         //  at any price and pass it as `route`.
         //
         //  Measured, pre-fix: the same slice filled 44,325.89 USDG through the
-        //  curated venue and 99.80 USDG through an attacker's — 99.775% of the
-        //  treasury's money, and the attacker withdrew 5.01 ETH against 0.01 in.
+        //  curated venue and 99.80 USDG through an untrusted caller's — 99.775% of the
+        //  treasury's money, and the untrusted caller withdrew 5.01 ETH against 0.01 in.
         //
         //  Keyed by PoolId, so listing a pair does not list every pool on it.
         if (!allowedVenue[PoolIdLibrary.toId(route)]) revert NoRoute();
@@ -410,7 +410,7 @@ contract QuoteRotator {
         //  calls it, so the caller supplying 0 disarmed the only price guard.
         //  RedemptionExt's own comment claimed "the caller chooses only the
         //  timing — and `minOut` bounds what timing can cost", which is circular:
-        //  a bound the attacker picks is not a bound. The caller may still demand
+        //  a bound the untrusted caller picks is not a bound. The caller may still demand
         //  MORE than the oracle floor (tightening is always safe); it may not
         //  demand less.
         //  COMPUTED BEFORE THE SWAP. The floor depends only on `amountIn`, so a
@@ -424,7 +424,7 @@ contract QuoteRotator {
         //  — was exactly the state in which it silently stopped existing, leaving
         //  this permissionless path guarded by a `minOut` the caller supplies. The
         //  frontend signs a flat 1-unit minimum, so in practice that is no guard at
-        //  all: the same shape as the venue drain, with the venue allowlist as the
+        //  all: the same shape as the venue empty, with the venue allowlist as the
         //  only remaining protection.
         //
         //  The naive repair — zeroing a stale cache entry — is worse, and was
@@ -477,7 +477,7 @@ contract QuoteRotator {
         //  volume accounting — a stale price beats a zero, which would read as "no
         //  trading" and push a live generation toward death — and wrong here, where
         //  a price frozen at whatever it was when the feed died is precisely what an
-        //  attacker wants the floor computed from. `usdPerRawUnit` is the uncached
+        //  untrusted caller wants the floor computed from. `usdPerRawUnit` is the uncached
         //  view and returns 0 the moment the feed stops answering, which the caller
         //  now treats as a refusal rather than as "no floor".
         uint256 inUsd = _usdLive(from, amountIn);
@@ -508,7 +508,7 @@ contract QuoteRotator {
     ///
     ///  The per-call bound this contract's own header promised ("size is bounded
     ///  per call, so repeated arbs cannot quietly re-allocate the treasury behind
-    ///  governance's back") but never enforced (red-team lead). `arbStep` is
+    ///  governance's back") but never enforced (review lead). `arbStep` is
     ///  permissionless, so without this a keeper could shift an unbounded slice of
     ///  the treasury from one quote to another in one call whenever a profitable
     ///  spread exists — value-positive at the oracle, but an ungoverned
@@ -632,7 +632,7 @@ contract QuoteRotator {
         // Per-call notional bound (0 = off). Checked here rather than before the
         // unlock so it reuses the USD figure already computed; an over-cap arb
         // reverts and the swap unwinds atomically.
-        //  ── PER BLOCK, NOT PER CALL (red-team L-4) ──────────────────────────
+        //  ── PER BLOCK, NOT PER CALL (review L-4) ──────────────────────────
         //  Nothing accumulated, so the "$25k per call" bound was really "$25k per
         //  call, unlimited calls" — measured at 12 individually-compliant arbs in
         //  ONE transaction moving $36,000 of treasury against a $25,000 cap, with

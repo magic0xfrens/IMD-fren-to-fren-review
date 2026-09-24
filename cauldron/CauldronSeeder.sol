@@ -154,7 +154,7 @@ contract CauldronSeeder is ISeeder, IUnlockCallback {
     //  sell back through the liquidity the protocol had just donated next to its
     //  position while the treasury's tranche bought at the pushed price. MEASURED on
     //  a real v4 PoolManager with production seed params: the treasury received
-    //  68,793.99 tokens instead of 46,122,162.16 (−99.85%) and the attacker netted
+    //  68,793.99 tokens instead of 46,122,162.16 (−99.85%) and the untrusted caller netted
     //  +12.157 ETH for one block of capital.
     //
     //  The comment on {poke} was true and irrelevant: it defends the SCHEDULE (the
@@ -167,7 +167,7 @@ contract CauldronSeeder is ISeeder, IUnlockCallback {
     //  is already within {MAX_TICK_DEV} of it (see {_syncRef}). Inside ONE block it
     //  therefore still holds a value established in an EARLIER block, and dragging it
     //  D ticks costs D/MAX_TICK_DEV whole BLOCKS of holding a manipulated price
-    //  against every arbitrageur — which is not something a flash loan can buy.
+    //  against every arbitrageur — which is not something a same-transaction loan can buy.
     //
     //  THE TWO HALVES ARE THEN TREATED DIFFERENTLY, because only one of them can be
     //  moved out of harm's way:
@@ -351,7 +351,7 @@ contract CauldronSeeder is ISeeder, IUnlockCallback {
         //  `primeTo` used to be rewritten on EVERY call, including a zero-value one,
         //  and `deployer` is a plain EOA with no timelock and no renounce path — so
         //  once the budget had been funded (by anyone, as a gift to the campaign) that
-        //  EOA could call `fundPrime{value: 0}(attacker)` and redirect the entire
+        //  EOA could call `fundPrime{value: 0}(untrusted caller)` and redirect the entire
         //  token output of an already-funded budget to itself. The NatSpec above
         //  justifies the gate by saying `primeTo` decides where bought tokens land
         //  without noticing it stayed re-settable after funding.
@@ -372,7 +372,7 @@ contract CauldronSeeder is ISeeder, IUnlockCallback {
     ///  GATED ON "NO CAMPAIGN HAS EVER STARTED", NOT ON `!seeding`. A finished
     ///  generation also has `seeding == false`, and its residual ETH is ledger-A
     ///  money owed to the registry through {withdrawAll}/{_teardown}, not to this
-    ///  caller — draining it here would be a theft of the next launch's backing. The
+    ///  caller — emptying it here would be a loss of the next launch's backing. The
     ///  `gen == 0` half is what makes this exit pre-campaign-only: {startSeed} writes
     ///  a non-zero `gen` and never clears it, so this door shuts for good the first
     ///  time a campaign is armed and can never reopen on a live or spent budget.
@@ -780,7 +780,7 @@ contract CauldronSeeder is ISeeder, IUnlockCallback {
     ///      ask band and the "side-correct" ask fallback is by then an ETH band. It is
     ///      then sized with `getLiquidityForAmount1`, the pool settles it in ETH this
     ///      contract does not hold, and `settle{value:}` reverts — permanently halting
-    ///      the stream with no event and no revert anyone sees. Attacker cost: zero.
+    ///      the stream with no event and no revert anyone sees. Untrusted caller cost: zero.
     ///      It is just what a successful launch does.
     ///
     ///      SO AT THE CAP WE EVICT, NOT REUSE. The band furthest from live spot is the

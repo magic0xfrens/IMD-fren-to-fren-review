@@ -1192,7 +1192,7 @@
    "mutability": "view",
    "name": "migrationMandateSpent",
    "observations": [],
-   "reachability": "Unrestricted view with one production consumer: the rotation facet reads it (`migrationMandateSpent` RedemptionExt.sol:658), and only when the slice came from the primary leg. It returns true only when the guild budgeted at least one whole position `BPS_ONE` (TreasuryGovernor.sol:872) AND that budget has been spent out of the generation's own position `movedPrimaryBps` (TreasuryGovernor.sol:872), so secondary-leg slices counted in `movedBps` (TreasuryGovernor.sol:862) can never declare a migration complete. Because slices take a share of CURRENT liquidity, a spent budget does not mean a drained position (DERIVED).",
+   "reachability": "Unrestricted view with one production consumer: the rotation facet reads it (`migrationMandateSpent` RedemptionExt.sol:658), and only when the slice came from the primary leg. It returns true only when the guild budgeted at least one whole position `BPS_ONE` (TreasuryGovernor.sol:872) AND that budget has been spent out of the generation's own position `movedPrimaryBps` (TreasuryGovernor.sol:872), so secondary-leg slices counted in `movedBps` (TreasuryGovernor.sol:862) can never declare a migration complete. Because slices take a share of CURRENT liquidity, a spent budget does not mean a emptied position (DERIVED).",
    "reads": [
     "envelope (line 868)",
     "envelope.maxTotalBps (line 872)",

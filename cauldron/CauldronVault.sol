@@ -73,7 +73,7 @@ contract CauldronVault is ReentrancyGuard {
     ///         to the live balance, so redemptions are accounted for.
     ///
     ///  ── WHY THE ENTITLEMENT CANNOT BE SIZED FROM `address(this).balance`
-    ///     (red-team Z-02) ────────────────────────────────────────────────────
+    ///     (review Z-02) ────────────────────────────────────────────────────
     ///  {close}'s return is fed straight to `PoolOps.crystallizeCollection` as the
     ///  NUMERATOR of `entitled = swept * activeBase / totalETH`
     ///  (CauldronRegistry.sol:1080-1082), and in `seedFunding`'s native branch the
@@ -190,7 +190,7 @@ contract CauldronVault is ReentrancyGuard {
     /// @notice Close the vault on relaunch: stop redemption and sweep remaining
     ///         ETH to the registry for the next launch's liquidity. Registry-only.
     /// @dev The RETURN VALUE IS AN ACCOUNTING FIGURE, NOT A TRANSFER AMOUNT
-    ///      (red-team Z-02). Every wei still leaves for the registry — nothing is
+    ///      (review Z-02). Every wei still leaves for the registry — nothing is
     ///      stranded in a closed vault, and a donation still ends up as protocol
     ///      liquidity. What is REPORTED is only the ether the protocol itself
     ///      deposited, clamped to the live balance so pre-death redemptions are

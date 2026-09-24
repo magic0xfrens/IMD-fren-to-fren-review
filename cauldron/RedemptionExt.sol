@@ -46,7 +46,7 @@ interface ITreasuryGovernor {
     function allowance() external view returns (address quote, uint16 remainingBps);
     function consume(uint16 bps, bool fromPrimary) external;
     /// Did the guild authorise moving the WHOLE position, and is that mandate
-    /// spent? The only thing that may redenominate a generation (red-team R-04).
+    /// spent? The only thing that may redenominate a generation (review R-04).
     function migrationMandateSpent() external view returns (bool);
 }
 
@@ -244,7 +244,7 @@ contract RedemptionExt is CauldronBase {
     /**
      * @notice Point the registry at its rotator and its treasury governor.
      *
-     *  ── THE FORWARDER EXISTED; THIS DID NOT (red-team) ──────────────────
+     *  ── THE FORWARDER EXISTED; THIS DID NOT (review) ──────────────────
      *  `CauldronRegistry.setRotationWiring` has always been present as a thin
      *  `_forwardToExt()` stub, but this facet never implemented the function it
      *  forwards to, and the facet has no fallback. Every call therefore
@@ -276,7 +276,7 @@ contract RedemptionExt is CauldronBase {
     error NoRotationApproved();
 
     /// @dev Liquidity left in the primary position below which it counts as
-    ///      DRAINED for the purpose of redenominating the generation. Not zero:
+    ///      Emptied for the purpose of redenominating the generation. Not zero:
     ///      each `removeAll` leaves sub-wei rounding behind, and a generation
     ///      must not be held un-migrated by a rounding crumb. Absolute rather
     ///      than proportional on purpose — a proportional test would be a share
@@ -332,7 +332,7 @@ contract RedemptionExt is CauldronBase {
         //  is spent). Distinct from `RotationNotWired` above: this one is fixed
         //  by a vote, not by a deployment.
         //
-        //  ── THE REMAINDER IS THE FLAG, NOT THE DESTINATION (red-team R-03) ──
+        //  ── THE REMAINDER IS THE FLAG, NOT THE DESTINATION (review R-03) ──
         //  This tested `toQuote == address(0)`, which is ALSO how a rotation back
         //  to native ether names where it is going. The sentinel for "nothing
         //  approved" was therefore identical to a legitimate destination, and the
@@ -357,7 +357,7 @@ contract RedemptionExt is CauldronBase {
 
         //  ── WHICH LEG DOES THIS SLICE COME FROM? ───────────────────────────
         //  It was always the primary. That made the treasury one-directional:
-        //  every rotation drained the ORIGINAL quote, so a guild could go
+        //  every rotation emptied the ORIGINAL quote, so a guild could go
         //  ETH -> USDG but never USDG -> anything, never rebalance between two
         //  destinations, and never merge a split back together. Reaching
         //  50/30/20 meant successive bites of the original asset and nothing
@@ -462,7 +462,7 @@ contract RedemptionExt is CauldronBase {
         // 3. Redeploy immediately into the destination pair, opening it on the
         //    first slice and topping it up on every later one.
         //
-        //  ── openOrAddPair MINTS, IT NEVER INCREASES (red-team LEG-01) ───────
+        //  ── openOrAddPair MINTS, IT NEVER INCREASES (review LEG-01) ───────
         //  {PoolOps.openOrAddPair}'s header says it "adds to" an existing pair,
         //  and it does — to the POOL. But `_seedActive` (PoolOps.sol:759) issues
         //  `MINT_POSITION` unconditionally, so every slice receives a BRAND NEW
@@ -560,7 +560,7 @@ contract RedemptionExt is CauldronBase {
         //  position on every later slice into the same pair, so appending would
         //  record the same id N times and unwind it N times at teardown.
         //
-        //  ── THE LEG MUST BE RECORDED WITH ITS OWN PAIR (red-team R-02) ──────
+        //  ── THE LEG MUST BE RECORDED WITH ITS OWN PAIR (review R-02) ──────
         //  This passed `route` — the VENUE the quote side was swapped through
         //  (fromQuote/toQuote, e.g. ETH/USDG) — not the pair the liquidity was
         //  actually deployed into (toQuote/token). `recoverLegs` hands that key
@@ -600,7 +600,7 @@ contract RedemptionExt is CauldronBase {
         //  (:1017) and that refuses without a generation change (:977) — so
         //  nothing, privileged or not, could re-point it for the rest of the
         //  generation. It would have kept marking, funding and liquidating
-        //  against the pool this rotation had been draining.
+        //  against the pool this rotation had been emptying.
         //
         //  FLIPPED AT COMPLETION, NOT PER SLICE, for two reasons. A rotation is
         //  sliced, so mid-rotation the pool is genuinely SPLIT and neither asset
@@ -608,7 +608,7 @@ contract RedemptionExt is CauldronBase {
         //  slot: flipping it early would make the next slice try to rotate the
         //  destination into itself.
         //
-        //  ── EXHAUSTION IS NOT COMPLETION (red-team R-04) ────────────────────
+        //  ── EXHAUSTION IS NOT COMPLETION (review R-04) ────────────────────
         //  This used to flip on `allowance() == address(0)` — "the envelope has
         //  nothing left" — and the comment here claimed that made a partial
         //  rotation safe: "30% moved does not redenominate a generation." That
@@ -649,10 +649,10 @@ contract RedemptionExt is CauldronBase {
         //  With this, `movedBps` is once again a sum of shares of one position,
         //  which is the unit `migrationMandateSpent` already assumes.
         //
-        //  Note this deliberately does NOT try to make the flip a full-drain
+        //  Note this deliberately does NOT try to make the flip a full-empty
         //  test. Slices take a share of CURRENT liquidity, so bps compound
         //  rather than sum and an exactly-10,000-bps budget converges on ~68%
-        //  moved; demanding a drained position would make completion
+        //  moved; demanding a emptied position would make completion
         //  unreachable and the whole feature dead. The residual tail is a known,
         //  separately-tracked limitation, not this Critical.
         if (fromPrimary && ITreasuryGovernor(gov).migrationMandateSpent()) {
@@ -664,8 +664,8 @@ contract RedemptionExt is CauldronBase {
             //  not: {PerpEngine.blocksVolumeLink} returns false whenever a mark is
             //  armed, and one is. So the flip routinely landed on an open book;
             //  `syncGeneration` refused it, the engine parked, and the book became
-            //  force-closeable against the pool this rotation had just drained —
-            //  a solvent long paid 0 and the short after it +0.78 ETH (red-team D-1,
+            //  force-closeable against the pool this rotation had just emptied —
+            //  a solvent long paid 0 and the short after it +0.78 ETH (review D-1,
             //  measured in F14c).
             //
             //  Now the engine carries the book instead: every position stays open,
@@ -684,7 +684,7 @@ contract RedemptionExt is CauldronBase {
             //  quote its fee carves match. Left on the old pair, a rotated
             //  generation's fees stopped funding the collection floor entirely —
             //  84.6% of the fee split fell through to the relaunch reserve — and
-            //  the buyback kept waiting for trades on a drained pool. The new
+            //  the buyback kept waiting for trades on a emptied pool. The new
             //  leg is where the liquidity now lives; any buffer still in the old
             //  quote is credited back to its own reserve bucket by the hook.
             if (address(hook) != address(0)) {
@@ -907,7 +907,7 @@ contract RedemptionExt is CauldronBase {
     ///
     ///  PAST GENERATIONS ONLY, and that gate is the reason this is not simply the
     ///  same function. Unwinding a LIVE generation's legs is not a rescue, it is an
-    ///  attack: it pulls the treasury's rotated liquidity out of its pools and
+    ///  probe: it pulls the treasury's rotated liquidity out of its pools and
     ///  parks it idle in the registry, which drops the linked sibling volume and can
     ///  make a healthy generation read as dying. The teardown path needs no such
     ///  gate — it runs on the generation being torn down, by definition — so it has
@@ -1065,7 +1065,7 @@ contract RedemptionExt is CauldronBase {
         //  nothing is stranded that was not stranded already — but they are
         //  booked to `legProceeds` instead of being silently miscounted.
         //
-        //  ── MATCH THE PRIMARY POOL, NOT THE RECORDED QUOTE (red-team R-02) ──
+        //  ── MATCH THE PRIMARY POOL, NOT THE RECORDED QUOTE (review R-02) ──
         //  This read `generationQuote[gen]`, which a completed rotation flips to
         //  the DESTINATION asset while `generationPositionId`/`generationPoolKey`
         //  keep pointing at the pair the generation launched in. (They must: the

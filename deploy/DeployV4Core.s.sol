@@ -47,7 +47,7 @@ contract DeployV4Core is Script {
     address internal constant PERMIT2 = 0x000000000022D473030F116dDEE9F6B43aC78BA3;
 
     /// @dev v4-periphery's own default. Bounds the gas a subscriber may burn
-    ///      when a position unsubscribes, so a hostile subscriber cannot brick
+    ///      when a position unsubscribes, so a untrusted subscriber cannot brick
     ///      the unsubscribe. Nothing in this protocol subscribes, but the
     ///      constructor requires a sane value rather than zero.
     uint256 internal constant UNSUBSCRIBE_GAS_LIMIT = 300_000;

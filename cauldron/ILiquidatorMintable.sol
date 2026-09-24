@@ -10,7 +10,7 @@ pragma solidity ^0.8.26;
 ///  two liquidations land in one block.
 ///
 ///  Packs into three slots:
-///    1. victim (20) + wasLong (1) + leverage (1)
+///    1. affected user (20) + wasLong (1) + leverage (1)
 ///    2. collateralWei (12) + bountyWei (12) + blockNo (8)
 ///    3. entryPrice (16) + liqPrice (16)
 ///

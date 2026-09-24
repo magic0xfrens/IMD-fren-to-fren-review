@@ -46,7 +46,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  *
  *  Holds nothing between calls: every path ends with the balance at zero or the
  *  transaction reverted. There is no owner, no upgrade and no privileged caller,
- *  so the worst an attacker can do with it is swap their own ether.
+ *  so the worst an untrusted caller can do with it is swap their own ether.
  *
  *  ── THE POOL KEY IS UNTRUSTED, DELIBERATELY ───────────────────────────────
  *  `zap` validates only that `currency0` is native. `fee`, `tickSpacing` and —
@@ -59,7 +59,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  *    * v4 conserves deltas, so a hook cannot hand the swapper `currency1`
  *      without being charged for it (`_accountPoolBalanceDelta` gives the hook
  *      the mirror-image debt, which the unlock will not close unpaid);
- *    * `minOut` is checked after settlement, so a hostile hook can only make
+ *    * `minOut` is checked after settlement, so a untrusted hook can only make
  *      the caller's own swap worse, and it reverts when it does.
  *  Add a balance, an allowance or a privileged caller to this contract and that
  *  reasoning stops holding — validate the key at that point.

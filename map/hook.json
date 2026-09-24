@@ -661,7 +661,7 @@
    "mutability": "nonpayable",
    "name": "_maybeLegacyBuyback",
    "observations": [],
-   "reachability": "Private; called from afterSwap on either leg. FIRST, A DRAIN, NOT A RETURN: a buffer whose denomination does not match the live pool's currency0, or that exists while the buyback is unwired (`legacyRegistry` CauldronHook.sol:1183), is zeroed (`legacyBuffer` CauldronHook.sol:1185) and moved into the reserve for the asset it actually is (`_creditFor` CauldronHook.sol:1189) before any threshold test, so a stranded balance still leaves. The trigger is the threshold cached in the live quote's raw units (`legacyThresholdRaw` CauldronHook.sol:1192), falling back to the native-denominated threshold only when no cache exists (`legacyThreshold` CauldronHook.sol:1193). Three more conditions gate the spend: a quote at currency0 (`quoteIsCurrency0` CauldronHook.sol:1205), a wired live pair and the triggering id equal to the live key's id (`live` CauldronHook.sol:1208). The caller's own key is discarded (`key` CauldronHook.sol:1209), so an attacker cannot steer the spend into a book they price; the spend is a gas-capped self-call whose result is ignored (`legacyBuyStep` CauldronHook.sol:1213).",
+   "reachability": "Private; called from afterSwap on either leg. FIRST, A Empty, NOT A RETURN: a buffer whose denomination does not match the live pool's currency0, or that exists while the buyback is unwired (`legacyRegistry` CauldronHook.sol:1183), is zeroed (`legacyBuffer` CauldronHook.sol:1185) and moved into the reserve for the asset it actually is (`_creditFor` CauldronHook.sol:1189) before any threshold test, so a stranded balance still leaves. The trigger is the threshold cached in the live quote's raw units (`legacyThresholdRaw` CauldronHook.sol:1192), falling back to the native-denominated threshold only when no cache exists (`legacyThreshold` CauldronHook.sol:1193). Three more conditions gate the spend: a quote at currency0 (`quoteIsCurrency0` CauldronHook.sol:1205), a wired live pair and the triggering id equal to the live key's id (`live` CauldronHook.sol:1208). The caller's own key is discarded (`key` CauldronHook.sol:1209), so an untrusted caller cannot steer the spend into a book they price; the spend is a gas-capped self-call whose result is ignored (`legacyBuyStep` CauldronHook.sol:1213).",
    "reads": [
     "legacyBuffer (line 1156)",
     "_liveKey (line 1157)",
@@ -675,7 +675,7 @@
    ],
    "semantics": "fresh",
    "signature": "function _maybeLegacyBuyback(PoolId id, PoolKey calldata key) private",
-   "value": "NONE here; the gas-capped self-call to `legacyBuyStep` (line 1213) is what spends the buffer, and the drain branch only moves the figure between counters at `_creditFor` (line 1189)",
+   "value": "NONE here; the gas-capped self-call to `legacyBuyStep` (line 1213) is what spends the buffer, and the empty branch only moves the figure between counters at `_creditFor` (line 1189)",
    "visibility": "private",
    "writes": [
     "legacyBuffer (line 1185)"
@@ -923,7 +923,7 @@
    "mutability": "nonpayable",
    "name": "_creditFor",
    "observations": [],
-   "reachability": "New private helper, reached from `_creditFor` (CauldronHook.sol:1469) for a residual in the CURRENT fee asset and from `_creditFor` (CauldronHook.sol:1189) for a buffer stranded in some OTHER asset after a rotation or an unwiring. The caller names the denomination explicitly at `a` (CauldronHook.sol:1475), which is what lets the stale-buffer drain credit the asset the buffer really holds rather than whatever the current fee happens to be. A zero amount returns at `amount` (CauldronHook.sol:1474). Both destinations have exits (`releaseRelaunchETH` and `releaseRelaunchAsset` on this contract).",
+   "reachability": "New private helper, reached from `_creditFor` (CauldronHook.sol:1469) for a residual in the CURRENT fee asset and from `_creditFor` (CauldronHook.sol:1189) for a buffer stranded in some OTHER asset after a rotation or an unwiring. The caller names the denomination explicitly at `a` (CauldronHook.sol:1475), which is what lets the stale-buffer empty credit the asset the buffer really holds rather than whatever the current fee happens to be. A zero amount returns at `amount` (CauldronHook.sol:1474). Both destinations have exits (`releaseRelaunchETH` and `releaseRelaunchAsset` on this contract).",
    "reads": [
     "relaunchETH (line 1475)",
     "relaunchAsset (line 1476)"
@@ -1257,7 +1257,7 @@
    "mutability": "view",
    "name": "isDead",
    "observations": [],
-   "reachability": "External view, permissionless, and it is the gate the registry's relaunch depends on. An untracked pool is never dead at `trackedPools` (CauldronHook.sol:1881). Volume is summed across the primary and every sibling, so the loop at `sib` (CauldronHook.sol:1888) costs one full 24-bucket sum per sibling and is bounded only by the sibling cap. A pluggable checker is consulted inside try/catch at `checker` (CauldronHook.sol:1893) and a revert falls back to the built-in comparison, so a broken module cannot brick relaunch \u2014 but a WORKING hostile module can return either answer.",
+   "reachability": "External view, permissionless, and it is the gate the registry's relaunch depends on. An untracked pool is never dead at `trackedPools` (CauldronHook.sol:1881). Volume is summed across the primary and every sibling, so the loop at `sib` (CauldronHook.sol:1888) costs one full 24-bucket sum per sibling and is bounded only by the sibling cap. A pluggable checker is consulted inside try/catch at `checker` (CauldronHook.sol:1893) and a revert falls back to the built-in comparison, so a broken module cannot brick relaunch \u2014 but a WORKING untrusted module can return either answer.",
    "reads": [
     "trackedPools (line 1881)",
     "_volumeSiblings (line 1887)",
@@ -1631,7 +1631,7 @@
    "mutability": "nonpayable",
    "name": "_cacheLegacyThreshold",
    "observations": [],
-   "reachability": "Restates the native-denominated buyback threshold in the live quote's raw units. With an oracle and a priceable quote it converts by dollar value (`legacyThresholdRaw` CauldronHook.sol:2174); otherwise by decimals alone, read with a bounded call. An unreadable or absurd decimals value sets the trigger to 1 raw unit (`legacyThresholdRaw` CauldronHook.sol:2182), so the buffer still drains rather than sitting forever; a conversion that rounds to zero is lifted to 1 and an overflow saturates (`legacyThresholdRaw` CauldronHook.sol:2200).",
+   "reachability": "Restates the native-denominated buyback threshold in the live quote's raw units. With an oracle and a priceable quote it converts by dollar value (`legacyThresholdRaw` CauldronHook.sol:2174); otherwise by decimals alone, read with a bounded call. An unreadable or absurd decimals value sets the trigger to 1 raw unit (`legacyThresholdRaw` CauldronHook.sol:2182), so the buffer still empties rather than sitting forever; a conversion that rounds to zero is lifted to 1 and an overflow saturates (`legacyThresholdRaw` CauldronHook.sol:2200).",
    "reads": [
     "quoteOracle (line 2169)",
     "legacyThreshold (line 2171)",
@@ -2015,7 +2015,7 @@
    "mutability": "nonpayable",
    "name": "setQuest",
    "observations": [],
-   "reachability": "Owner or registry, unvalidated. The quest contract is called mid-swap with ignored result at `quest` (CauldronHook.sol:1054), but with NO gas cap \u2014 unlike the seeder and perp calls \u2014 so a hostile quest can burn the swapper's remaining gas.",
+   "reachability": "Owner or registry, unvalidated. The quest contract is called mid-swap with ignored result at `quest` (CauldronHook.sol:1054), but with NO gas cap \u2014 unlike the seeder and perp calls \u2014 so a untrusted quest can burn the swapper's remaining gas.",
    "reads": [
     "registry (line 2355)"
    ],

@@ -79,7 +79,7 @@ contract CauldronGovernor is ICauldronGovernor, Ownable {
     ///         always accepted; any non-zero value must land in
     ///         [MIN_NFT_SUPPLY, MAX_NFT_SUPPLY].
     ///
-    ///  ── WHY THERE HAS TO BE A FLOOR, AND A CALIBRATION MATCH (red-team Z-09) ──
+    ///  ── WHY THERE HAS TO BE A FLOOR, AND A CALIBRATION MATCH (review Z-09) ──
     ///  The bound above was one-sided. `nftSupply = 1` was a valid, winnable
     ///  proposal, and the mint ladder that prices the collection is NOT a function
     ///  of its size: `MintCurvePolicy` carries an IMMUTABLE `base`/`spread`/`knee`
@@ -110,7 +110,7 @@ contract CauldronGovernor is ICauldronGovernor, Ownable {
     ///         returns early on 0) and is always accepted; any non-zero value must
     ///         land in [live / CURVE_BAND, live * CURVE_BAND].
     ///
-    ///  ── THE TWIN OF {MIN_NFT_SUPPLY} (red-team T-2) ─────────────────────────
+    ///  ── THE TWIN OF {MIN_NFT_SUPPLY} (review T-2) ─────────────────────────
     ///  `nftSupply` got both bounds; `volumePerNFT` had NONE. It flows from here
     ///  straight through `CauldronRegistry.sol:1134` into
     ///  `CauldronHook.setNftCurveFrom`, which sets `volumePerNFT = _base` and
@@ -173,7 +173,7 @@ contract CauldronGovernor is ICauldronGovernor, Ownable {
     ///         same reason: these fields are UNTRUSTED input that `relaunch()`
     ///         must replay, so their size is a cost the protocol pays forever.
     ///
-    ///  ── WHY A BOUND IS LOAD-BEARING, NOT COSMETIC (red-team) ────────────
+    ///  ── WHY A BOUND IS LOAD-BEARING, NOT COSMETIC (review) ────────────
     ///  These five strings were the only proposal fields left unbounded, and they
     ///  are the expensive ones. `relaunch()` reads all five back through
     ///  {winner} and RE-STORES three of them in the newborn collection
@@ -272,7 +272,7 @@ contract CauldronGovernor is ICauldronGovernor, Ownable {
     ///      {vote} and promoted by {markConsumed}. Appended after `_leaderVotes`,
     ///      so no existing storage slot moves.
     ///
-    ///  ── WHY A SECOND SLOT, AND NOT A BIGGER SCAN (red-team) ─────────────
+    ///  ── WHY A SECOND SLOT, AND NOT A BIGGER SCAN (review) ─────────────
     ///  {_recomputeLeader} is bounded to the newest {MAX_LEADER_SCAN} proposals,
     ///  which is what keeps rebirth gas O(1) in the proposal count. But the window
     ///  is POSITIONAL: it selects on proposal id, not on whether anyone voted. So
@@ -294,7 +294,7 @@ contract CauldronGovernor is ICauldronGovernor, Ownable {
     ///  runner-up is carried forward explicitly. Spam cannot displace it: both
     ///  slots require votes, and a proposal nobody voted for can never enter
     ///  either. Displacing a mandate now costs actual voting power, which is
-    ///  governance working as intended rather than a griefing vector.
+    ///  governance working as intended rather than a disruption vector.
     uint256 private _runnerId;
     uint256 private _runnerVotes;
 
@@ -328,7 +328,7 @@ contract CauldronGovernor is ICauldronGovernor, Ownable {
     ///  overtakes the leader, `vote` writes the DISPLACED LEADER into the runner
     ///  slot (:356-359) and the previous runner-up is forgotten — it still
     ///  exists, is still settled, is still unconsumed, and nothing remembers it.
-    ///  Two consumptions drain both slots, `markConsumed` falls through to the
+    ///  Two consumptions empty both slots, `markConsumed` falls through to the
     ///  scan, and the scan was the positional window the runner slot was
     ///  introduced to stop depending on. Measured: A(100), B(90), C(150) filed
     ///  and voted, then 64 junk filings for 11.8M gas by one MiFren with no
@@ -371,7 +371,7 @@ contract CauldronGovernor is ICauldronGovernor, Ownable {
 
     /// @notice One-time wiring of the registry that may consume winners.
     /// @dev Owner-gated: an unprotected setter would be front-runnable — an
-    ///      attacker could seize `registry` and grief proposals via markConsumed.
+    ///      untrusted caller could seize `registry` and disrupt proposals via markConsumed.
     function setRegistry(address _registry) external onlyOwner {
         if (registry != address(0)) revert RegistryAlreadySet();
         if (_registry == address(0)) revert EmptyField();
@@ -527,7 +527,7 @@ contract CauldronGovernor is ICauldronGovernor, Ownable {
         // at relaunch. Reject anything the collection could never be deployed with,
         // here at the boundary — a revert deeper in `relaunch()` would roll back
         // `markConsumed` and freeze the machine forever. (Audit C-02.)
-        //  BOTH SIDES, AND BOUND TO THE LADDER THAT WILL PRICE IT (red-team Z-09).
+        //  BOTH SIDES, AND BOUND TO THE LADDER THAT WILL PRICE IT (review Z-09).
         //  See {MIN_NFT_SUPPLY}. `0` keeps its meaning: leave the size unchanged.
         if (nftSupply != 0) {
             if (nftSupply < MIN_NFT_SUPPLY || nftSupply > MAX_NFT_SUPPLY) {
@@ -544,13 +544,13 @@ contract CauldronGovernor is ICauldronGovernor, Ownable {
             uint256 calibrated = _calibratedSupply();
             if (calibrated != 0 && nftSupply != calibrated) revert SupplyOutOfRange();
         }
-        //  AND THE PRICE OF A FREN, NOT JUST HOW MANY THERE ARE (red-team T-2).
+        //  AND THE PRICE OF A FREN, NOT JUST HOW MANY THERE ARE (review T-2).
         //  `volumePerNFT` had no bound at all: 1 wei per fren minted the whole
         //  collection — its dividends and its claim on the generation's floor —
         //  out for less than the gas. See {CURVE_BAND} for why the band is
         //  relative to the live curve rather than an absolute floor in wei.
         //
-        //  WHICH CONFIGURATIONS THIS ACTUALLY PROTECTS (red-team S0xB).
+        //  WHICH CONFIGURATIONS THIS ACTUALLY PROTECTS (review S0xB).
         //  Only the NO-POLICY fallback ladder, `volumePerNFT + k * nftPriceStep`
         //  (CauldronHook.nftPriceAt, :2182). With a {MintCurvePolicy} wired — which
         //  `deploy/DeployLaunchpad.s.sol` does on every deploy — the hook passes
@@ -580,7 +580,7 @@ contract CauldronGovernor is ICauldronGovernor, Ownable {
         //  never be removed, so the common case costs nothing and a registry
         //  that predates the allowlist keeps working unchanged.
         //
-        //  ── WHAT THIS CHECK IS, AND IS NOT (red-team B-05) ──────────────────
+        //  ── WHAT THIS CHECK IS, AND IS NOT (review B-05) ──────────────────
         //  A vetted quote is a quote the treasury considers SAFE TO TRADE. It is
         //  NOT a promise that the next rebirth can be FUNDED in it — that depends
         //  on what the dying generation actually returns, which is unknowable when
@@ -654,7 +654,7 @@ contract CauldronGovernor is ICauldronGovernor, Ownable {
 
         // Weight is the caller's CHECKPOINTED power at the proposal's snapshot
         // block. Transferring MiFrens after the snapshot cannot mint new votes —
-        // the classic "transfer to a fresh wallet and vote again" attack fails.
+        // the classic "transfer to a fresh wallet and vote again" probe fails.
         if (block.number <= p.snapshot) revert SnapshotNotReady();
         uint256 weight = mifrens.getPastVotes(msg.sender, p.snapshot);
         if (weight == 0) revert NoVotingPower();
@@ -688,7 +688,7 @@ contract CauldronGovernor is ICauldronGovernor, Ownable {
     ///      there. See {_bench}. O(BENCH_SLOTS) and only on the first vote that
     ///      reaches an untracked proposal.
     ///
-    ///  ── A SETTLED BREW IS EVICTED LAST (red-team T2c) ──────────────────────
+    ///  ── A SETTLED BREW IS EVICTED LAST (review T2c) ──────────────────────
     ///  This ranked purely on raw `votes`. `_benchRecord` is reached from {vote},
     ///  and {vote} reverts `VotingClosed` past `votingEndsAt` (:652) — so every
     ///  CANDIDATE is still OPEN, and {_recomputeLeader} skips open proposals
@@ -697,7 +697,7 @@ contract CauldronGovernor is ICauldronGovernor, Ownable {
     ///  went false with a real mandate on file, `CauldronRegistry.relaunch`
     ///  reverted `NoProposal()`, the evicted brew could never be re-benched
     ///  because voting had closed on it, and once the junk settled the machine
-    ///  was reborn as the attacker's brew. Gas only, plus out-voting the guild.
+    ///  was reborn as the untrusted caller's brew. Gas only, plus out-voting the guild.
     ///
     ///  The rule is now an ORDER, not a weight: prefer to evict a slot that is
     ///  not a settled, unconsumed candidate over one that is. A settled entry is

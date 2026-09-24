@@ -56,7 +56,7 @@ library GachaLib {
      * @dev Base of an ERC-7201-style namespaced mapping `batchIndex => bool`
      *      recording whether a batch has already spent its ONE expiry re-anchor.
      *
-     *  ── ONE RE-ANCHOR, EVER (red-team R3A) ──────────────────────────────────
+     *  ── ONE RE-ANCHOR, EVER (review R3A) ──────────────────────────────────
      *  The re-anchor above used to be UNCAPPED, and that is a free, unlimited
      *  re-roll of a mint-or-nothing draw: the outcome of a committed batch is
      *  public the moment its commit block is mined, so a player who peeks and
@@ -92,13 +92,13 @@ library GachaLib {
      *      batch's PINNED seed, `blockhash(commitBlock)` copied into storage
      *      while it was still inside the EVM's 256-block horizon.
      *
-     *  ── WHY (red-team T3B) ─────────────────────────────────────────────────
+     *  ── WHY (review T3B) ─────────────────────────────────────────────────
      *  `blockhash` returns zero past 256 blocks. That is an EVM constant, not a
      *  tunable: on a 12-second chain it is ~51 minutes, on Robinhood Chain —
      *  measured at 0.1012 s/block — it is 25.9 SECONDS, and the second expiry
      *  that forfeits the batch lands at 51.8 seconds. An honest player who pays
      *  for a 9,000-bps draw and hits a slow RPC loses the whole stake, with no
-     *  attacker involved.
+     *  untrusted caller involved.
      *
      *  Pinning fixes that WITHOUT handing anyone a second draw. The pinned value
      *  is the ORIGINAL commit block's hash — the very seed the player could

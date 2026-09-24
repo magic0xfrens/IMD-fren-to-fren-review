@@ -10,8 +10,8 @@ Status values: `OPEN`, `PATCHED-UNVERIFIED`, `FIXED`, `CANDIDATE`, `ACCEPTED-LOW
 | ROT-01 | High (conditional on missing oracle and adverse venue price) | `QuoteRotator.swapOnce` | Unset oracle bypassed the independent price floor. Guard restored; latest focused local integration and X2c checks pass, broader lifecycle acceptance pending. | PATCHED-UNVERIFIED |
 | ROT-02 | Medium | `RedemptionExt.rotateSliceFrom`, `_recordLeg` | Returning to the launch quote creates a second treasury position; the next migration credits the depleted original position instead of the larger returned treasury. | FIXED |
 | CORE-02 | Low | `DeployRenderer.s.sol` | `BATCH=0` makes the post-deployment upload loop non-terminating. | OPEN |
-| HOOK-02 | Low (governance-selected hostile metadata) | `CauldronHook._cacheLegacyThreshold` | Unbounded metadata gas consumption can exhaust a bounded setter call; 200k fails atomically, 2M succeeds in the local reproduction. | OPEN |
-| NFT-02 | Low (protocol-controlled callback dependency) | `MiFrensDividend._castSpell` | Fee collection before activation permits a malicious wired registry to double-count a share; historical Z-13, not a passing reentrancy defense. | OPEN |
+| HOOK-02 | Low (governance-selected untrusted metadata) | `CauldronHook._cacheLegacyThreshold` | Unbounded metadata gas consumption can exhaust a bounded setter call; 200k fails atomically, 2M succeeds in the local reproduction. | OPEN |
+| NFT-02 | Low (protocol-controlled callback dependency) | `MiFrensDividend._castSpell` | Fee collection before activation permits a untrusted wired registry to double-count a share; historical Z-13, not a passing reentrancy defense. | OPEN |
 | PERP-02 | Medium | `PerpVault._syncTokYield` | A delayed write-off sync double-counts still-backed yield and masks a later write-off, letting stale rewards consume another staker's new yield. | FIXED |
 | UI-01 | Medium | `useTreasuryRotation` | Native-return allowance is misclassified as idle by the zero-address destination. | FIXED |
 | UI-02 | Medium | `TreasuryRotation` | Venue route uses generation denomination instead of the selected source leg. | FIXED |
@@ -31,7 +31,7 @@ out.length >= 32` skipped all status checks for reverted/empty responses.
 `PreSweepFailureClosedTest` session 42206 executed against production local V4
 and hook code: both refusal assertions failed, while the real-engine trade
 control passed (1 pass / 2 fail / 0 skip). The injected engine failures are
-fixture assumptions, not attacker capabilities. No victim loss or production
+fixture assumptions, not untrusted caller capabilities. No affected user loss or production
 gas-only trigger has been established. The patch rejects failed/short responses
 only before a trade; post-trade cleanup remains best-effort. Session 29833 is
 the post-edit validation handle: terminal 18 pass / 1 fail / 0 skip, including
@@ -82,7 +82,7 @@ Continuation: `REVIEW_HOOK_THRESHOLD_ACCEPTANCE.md` records 9/9 passing tests
 (seven new plus two inherited), including 512 metadata fuzz cases, decimal
 scaling/saturation, configuration refresh and denomination cache transitions.
 Current-source artifact is 23,762 bytes; cache field is appended at slot 69.
-Hostile metadata resource use, actual native-pool execution and baseline layout
+Untrusted metadata resource use, actual native-pool execution and baseline layout
 parity are not established by those tests; acceptance remains incomplete.
 
 ## PERP-01 — partial rebook erased economic obligations
@@ -95,7 +95,7 @@ The deterministic local V4 partial-close test now passes against production Pool
 
 VERIFIED at the production rotator boundary: `swapOnce` rejected a zero floor only when `quoteOracle != address(0)`. `RedemptionExt.rotateSliceFrom` is permissionless and forwards caller-selected `minOut`, so registry-only forwarding does not make that minimum trustworthy. An allowlisted pool can still offer an adverse execution price.
 
-The local integration test uses the real V4 PoolManager, a curated native/quote pool at 1:1 with 10 units of liquidity, and the production rotator. A 5-unit trade with `minOut=1` unexpectedly succeeded with an unset oracle (the rejection assertion failed). The same trade with a fresh independent 1:1 oracle reverted for slippage; a small trade succeeded and conserved input/output balances. The fixture models registry allowlisting/forwarding; a full registry lifecycle exploit has not yet been reproduced.
+The local integration test uses the real V4 PoolManager, a curated native/quote pool at 1:1 with 10 units of liquidity, and the production rotator. A 5-unit trade with `minOut=1` unexpectedly succeeded with an unset oracle (the rejection assertion failed). The same trade with a fresh independent 1:1 oracle reverted for slippage; a small trade succeeded and conserved input/output balances. The fixture models registry allowlisting/forwarding; a full registry lifecycle failure case has not yet been reproduced.
 
 The patch requires `floor != 0` regardless of oracle configuration. This intentionally pauses this path until independent pricing is configured/restored. The older X2c regression's explicit no-oracle bypass expectation was changed to require rejection; it was an unsafe policy expectation, not a valid compatibility invariant. Owner-planned `rotateStep` retains its separately governed rate bound. Post-patch focused regression passed (43 tests across six suites, including all four real V4 rotation tests and three X2c tests). Both rotation deployment paths contain `setArbParams(address(oracle), ...)` wiring; deployed configuration is not attested. Broader lifecycle/full-suite acceptance remains pending.
 
@@ -108,7 +108,7 @@ VERIFIED against a local production V4 PoolManager, PositionManager, Permit2, re
 - The return creates a second native position (`legCount == 2` versus the expected single foreign leg plus consolidated launch active position).
 - A subsequent 2,500-bps slice from the larger returned native position moves 2.892015795849702371 quote tokens but leaves primary mandate allowance at 10,000 rather than 7,500.
 
-Root cause: `_recordLeg` only upserts `generationLegs`, while the launch active position is tracked separately in `generationPositionId`. The `fromPrimary` expression selects the launch active position whenever the current denomination equals the launch quote. The duplicate is therefore real treasury value but counted as secondary rebalancing. Impact demonstrated is governance progress misaccounting; no theft or protocol-wide insolvency is claimed.
+Root cause: `_recordLeg` only upserts `generationLegs`, while the launch active position is tracked separately in `generationPositionId`. The `fromPrimary` expression selects the launch active position whenever the current denomination equals the launch quote. The duplicate is therefore real treasury value but counted as secondary rebalancing. Impact demonstrated is governance progress misaccounting; no loss or protocol-wide insolvency is claimed.
 
 The local patch consolidates both the existing destination leg and the launch active position when rotating back to the launch quote, stores the replacement in `generationPositionId`, and removes a duplicate leg reference if present. It leaves the reserve position and generation pool key unchanged. The registry's `setRedemptionExt` is one-shot: an already-wired deployment cannot simply adopt this new facet. This is a fresh-source remediation, not an upgrade path or attestation that existing duplicate positions have been repaired. Any deployed recovery requires a separately reviewed, authorized migration plan.
 
@@ -122,7 +122,7 @@ Four post-patch local lifecycle tests now pass: round-trip consolidation, subseq
 
 The partial branch returns before the ordinary short `_ownerFloor` check. The narrow remedy calls `_ownerFloor(ownerSlippage, 0, minOut)` before rebooking: nonzero minimum atomically rejects this zero-output result; zero minimum still permits partial progress. Liquidations/death and normal-long/full-short behavior are unchanged. Independent source review confirmed the boundary. Post-patch focused run: **22 passed, 0 failed, 0 skipped** across six suites, including both new assertions, existing partial funding/backing checks, isolated rebook fuzzing and local cascade/exact-output controls. Some inherited XL1 cases execute in both derived suites; they are not distinct properties. Full-scope acceptance remains open.
 
-Do not interpret this patch as redefining every minimum as final net payout: existing normal-long checks compare gross sale proceeds, and complete-short checks compare residual before funding. The separate question of unbanded owner-close spending against socialized backing remains an unconfirmed reachability/economics hypothesis; this regression does not establish a production drain.
+Do not interpret this patch as redefining every minimum as final net payout: existing normal-long checks compare gross sale proceeds, and complete-short checks compare residual before funding. The separate question of unbanded owner-close spending against socialized backing remains an unconfirmed reachability/economics hypothesis; this regression does not establish a production empty.
 
 ### PERP-02 — repeated write-offs resurrect stale reward claims
 

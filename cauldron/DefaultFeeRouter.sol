@@ -25,7 +25,7 @@ contract DefaultFeeRouter is IFeeRouter {
     {
         toGuild = (guild != address(0) && guildBps > 0) ? (feeAmount * guildBps) / BPS : 0;
         uint256 rem = feeAmount - toGuild;
-        //  ── NO VAULT TEST (red-team Z-11) ───────────────────────────────────
+        //  ── NO VAULT TEST (review Z-11) ───────────────────────────────────
         //  `CauldronHook.sol:1383` — the built-in split this router exists to
         //  reproduce — does NOT test `vault`, because under the shipped FULL-UNIFY
         //  configuration the floor share is not an ETH transfer at all: both

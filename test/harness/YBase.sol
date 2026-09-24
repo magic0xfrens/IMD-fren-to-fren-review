@@ -26,7 +26,7 @@ import {PerpEngine} from "../../cauldron/PerpEngine.sol";
 import {ICauldronGovernor, BrewSpec, MetadataMode} from "../../cauldron/ICauldron.sol";
 
 /**
- * @title YBase — FINAL red-team harness (pass 3)
+ * @title YBase — FINAL review harness (pass 3)
  * @notice Brings up a live Cauldron on a Uniswap-v4 fork and adds the two
  *         primitives the earlier harnesses lacked, which is exactly why the
  *         remaining leads could never be reproduced:
@@ -57,8 +57,8 @@ abstract contract YBase is Test, IUnlockCallback {
     YMockMiFrens internal frens;
 
     address internal trader = address(0x7EADE7);
-    address internal attacker = address(0xA77ACC);
-    address internal victim = address(0x717C71);
+    address internal outsider = address(0xA77ACC);
+    address internal holder = address(0x717C71);
 
     uint160 internal constant MIN_LIMIT = 4295128740;
     uint160 internal constant MAX_LIMIT = 1461446703485210103287273052203988822378723970342 - 1;
@@ -141,7 +141,7 @@ abstract contract YBase is Test, IUnlockCallback {
         if (genesisFrens > 0) {
             frens = new YMockMiFrens();
             frens.setRegistry(address(registry));
-            for (uint256 i = 1; i <= genesisFrens; i++) frens.mint(victim, i);
+            for (uint256 i = 1; i <= genesisFrens; i++) frens.mint(holder, i);
             // 20% of supply reserved as the OG redemption floor.
             registry.setGenesisBonus(address(frens), 2000, genesisFrens);
         }
@@ -150,8 +150,8 @@ abstract contract YBase is Test, IUnlockCallback {
         (token,) = registry.summon{value: seedEth}();
 
         vm.deal(trader, 1_000 ether);
-        vm.deal(attacker, 100_000 ether);
-        vm.deal(victim, 1_000 ether);
+        vm.deal(outsider, 100_000 ether);
+        vm.deal(holder, 1_000 ether);
     }
 
     /// @dev Stand up the perp engine on the live generation and fund both sides.
@@ -241,7 +241,7 @@ abstract contract YBase is Test, IUnlockCallback {
         ethSpent = uint256(uint128(-a0));
     }
 
-    /// A buy that stops at `limit` — the shape a griefer would use: huge nominal,
+    /// A buy that stops at `limit` — the shape a disruptor would use: huge nominal,
     /// limit at spot, so almost nothing fills.
     function _buyWithLimit(uint256 ethIn, uint160 limit, address to) internal returns (uint256 got) {
         bytes memory r = pm.unlock(

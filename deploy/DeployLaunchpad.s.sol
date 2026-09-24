@@ -288,7 +288,7 @@ contract DeployLaunchpad is Script {
         //  CALLS `setDeathThreshold` with an oracle, or the two drift apart.
         address quoteOracle = vm.envOr("QUOTE_ORACLE", address(0));
         //  ── DEPLOY_QUOTES BRINGS ITS OWN ORACLE, AND IT MUST REACH THE HOOK ──
-        //  (red-team rotation totality, 2026-09-23). This path used to create its
+        //  (review rotation totality, 2026-09-23). This path used to create its
         //  QuoteOracle inside `_deployRotationStack`, long after the wiring below
         //  had read `quoteOracle` from the environment — so it reached the ROTATOR
         //  (rotation priced and ran) and nothing else. The hook kept measuring
@@ -661,7 +661,7 @@ contract DeployLaunchpad is Script {
         // can still top up before mint-out. Send 2-3Ξ via registry.fundPrimeBuy().
         registry.setPrimeFunder(vm.envOr("PRIME_FUNDER", deployer));
         // GUARDIAN VETO: a pure-safety role that can CANCEL an armed emergency /
-        // migration during its timelock window (can only block, never steal). Set
+        // migration during its timelock window (can only block, never take). Set
         // once here (owner, pre-handoff); thereafter only the timelock can change
         // it. Default deployer on testnet; pass a Safe multisig for mainnet.
         registry.setGuardian(vm.envOr("GUARDIAN", deployer));

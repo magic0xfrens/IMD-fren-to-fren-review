@@ -144,7 +144,7 @@
    "mutability": "nonpayable",
    "name": "rotateSlice",
    "observations": [],
-   "reachability": "A three-argument stub whose whole body is `_forwardToExt` CauldronRegistry.sol:247, which delegatecalls the facet with the untouched calldata. It lands on `rotateSlice` RedemptionExt.sol:296, which immediately tail-calls `rotateSliceFrom` RedemptionExt.sol:301 with fromLeg hard-coded to 0, so this entry can only ever drain the primary pool. The registry side is ungated; the facet side requires `quoteRotator` RedemptionExt.sol:319 and `treasuryGovernor` RedemptionExt.sol:328 to be wired and the guild's envelope to have room at `remaining` RedemptionExt.sol:344.",
+   "reachability": "A three-argument stub whose whole body is `_forwardToExt` CauldronRegistry.sol:247, which delegatecalls the facet with the untouched calldata. It lands on `rotateSlice` RedemptionExt.sol:296, which immediately tail-calls `rotateSliceFrom` RedemptionExt.sol:301 with fromLeg hard-coded to 0, so this entry can only ever empty the primary pool. The registry side is ungated; the facet side requires `quoteRotator` RedemptionExt.sol:319 and `treasuryGovernor` RedemptionExt.sol:328 to be wired and the guild's envelope to have room at `remaining` RedemptionExt.sol:344.",
    "reads": [
     "redemptionExt (line 1513)"
    ],
@@ -2611,7 +2611,7 @@
    "mutability": "nonpayable",
    "name": "mintLiquidatorWithStats",
    "observations": [],
-   "reachability": "Declaration only. The implementation at `mintLiquidatorWithStats` CauldronCollection.sol:402 forwards to `_mintLiquidator` CauldronCollection.sol:397, where the single caller check lives. Badge ids come from a separate range at `LIQUIDATOR_ID_BASE` CauldronCollection.sol:394, so the art tranche's counters are untouched, and the stats write is skipped entirely for a zero victim at `victim` CauldronCollection.sol:415.",
+   "reachability": "Declaration only. The implementation at `mintLiquidatorWithStats` CauldronCollection.sol:402 forwards to `_mintLiquidator` CauldronCollection.sol:397, where the single caller check lives. Badge ids come from a separate range at `LIQUIDATOR_ID_BASE` CauldronCollection.sol:394, so the art tranche's counters are untouched, and the stats write is skipped entirely for a zero affected user at `affected user` CauldronCollection.sol:415.",
    "reads": [],
    "semantics": "fresh",
    "signature": "function mintLiquidatorWithStats(address to, LiqStats calldata s) external returns (uint256 tokenId)",
@@ -2677,7 +2677,7 @@
    "mutability": "view",
    "name": "surtaxBps",
    "observations": [],
-   "reachability": "Declaration of the anti-sniper surtax rule. The hook consults it only when wired, through the linked library, inside a try/catch at `surtaxBps` SurtaxLib.sol:46, with the hook passing its own configured peak and window at `MAX_SNIPE_BPS` CauldronHook.sol:1656 so a simple module can reuse them. The module is installed by the owner or the registry at `surtaxPolicy` CauldronHook.sol:2223. It returns a number and never custodies funds, so a malicious module's blast radius is the fee rate it reports (DERIVED).",
+   "reachability": "Declaration of the anti-sniper surtax rule. The hook consults it only when wired, through the linked library, inside a try/catch at `surtaxBps` SurtaxLib.sol:46, with the hook passing its own configured peak and window at `MAX_SNIPE_BPS` CauldronHook.sol:1656 so a simple module can reuse them. The module is installed by the owner or the registry at `surtaxPolicy` CauldronHook.sol:2223. It returns a number and never custodies funds, so a untrusted module's blast radius is the fee rate it reports (DERIVED).",
    "reads": [],
    "semantics": "fresh",
    "signature": "function surtaxBps(PoolId id, uint256 initBlock, uint256 maxBps, uint256 windowBlocks) external view returns (uint256 bps)",

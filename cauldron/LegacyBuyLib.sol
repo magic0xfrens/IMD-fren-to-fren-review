@@ -57,7 +57,7 @@ library LegacyBuyLib {
     /// @dev How far the price reference may travel per BLOCK, in ticks. Same value
     ///      the progressive seeder uses (CauldronSeeder.MAX_TICK_DEV). ~1050 ticks
     ///      is a 10% price move, so the reference tracks an honest market inside
-    ///      one or two blocks while an attacker who wants it D ticks away must hold
+    ///      one or two blocks while an untrusted caller who wants it D ticks away must hold
     ///      a manipulated price for D/1000 whole blocks against every arbitrageur.
     int24 internal constant MAX_TICK_DEV = 1000;
 
@@ -85,7 +85,7 @@ library LegacyBuyLib {
      * @dev Marks a reference that was BORN in the block currently being recorded,
      *      i.e. taken raw from whatever tick the triggering swap had just set.
      *
-     *  ── WHY A BIT AND NOT JUST `seeded` (red-team S0xA, High) ────────────────
+     *  ── WHY A BIT AND NOT JUST `seeded` (review S0xA, High) ────────────────
      *  The bootstrap defer used to be "the CALL that writes the sentinel returns
      *  `seeded` and refuses". That is one call, not one block, and the buyback is
      *  invoked TWICE inside a single `afterSwap` — `CauldronHook.sol:799` and
@@ -94,7 +94,7 @@ library LegacyBuyLib {
      *  `refBlock == block.number` branch, report `seeded == false`, and spend the
      *  whole buffer against a price the same transaction had just invented.
      *  Measured on the pre-fix code: an honest fill of 5,139,999 tokens for 0.547
-     *  ETH became 612,853 tokens for 1.000 ETH — -88.1%, attacker +0.552 ETH,
+     *  ETH became 612,853 tokens for 1.000 ETH — -88.1%, untrusted caller +0.552 ETH,
      *  which is byte-identical to the sandwich this guard was written to stop.
      *  It recurs on every pool, so every relaunch re-armed it.
      *
@@ -149,7 +149,7 @@ library LegacyBuyLib {
 
         //  A REAL PRICE BOUND, NOT `MIN_SQRT_LIMIT`. The limit used to be the
         //  absolute minimum tick price, i.e. "fill at any price at all": a book
-        //  drained or skewed inside the same transaction could take the whole
+        //  emptied or skewed inside the same transaction could take the whole
         //  buffer for dust. Bound the move to a fixed fraction of the live sqrt
         //  price — if it binds, the pool consumes less than `amt` and the
         //  remainder rolls back into the buffer (already handled by the caller).
@@ -157,7 +157,7 @@ library LegacyBuyLib {
         (uint160 sp, int24 tick,,) = poolManager.getSlot0(pid);
 
         //  ...AND THE FRACTION MUST BE OF A PRICE THE CALLER DID NOT CHOOSE
-        //  (red-team T-1, the twin of the seeder's Z-17). The bound above was
+        //  (review T-1, the twin of the seeder's Z-17). The bound above was
         //  measured from `getSlot0` — the tick the TRIGGERING swap had just
         //  produced, because `_maybeLegacyBuyback` runs in `afterSwap` inside a
         //  stranger's transaction. A bound taken off a manipulated price is a
@@ -166,8 +166,8 @@ library LegacyBuyLib {
         //  hole the protocol's own buy just dug. Measured on a real v4
         //  PoolManager with a 10 ETH / 100M-token book and a 1 ETH buffer: the
         //  collection's floor received 612,853.96 tokens instead of
-        //  5,139,999.99 (-88.1%) while the attacker netted +0.552 ETH on one
-        //  block of flash-loanable capital, repeatable every time the buffer
+        //  5,139,999.99 (-88.1%) while the untrusted caller netted +0.552 ETH on one
+        //  block of borrowable within one transaction capital, repeatable every time the buffer
         //  refills past `legacyThreshold`.
         //
         //  So the limit is now the TIGHTER of the self-impact bound and the same
@@ -194,11 +194,11 @@ library LegacyBuyLib {
         //  is nothing to settle.
         //
         //  THE FIRST BUYBACK ON A POOL ONLY SEEDS THE REFERENCE — it does not
-        //  spend. Otherwise the bootstrap sample IS the attack: whoever fires the
+        //  spend. Otherwise the bootstrap sample IS the probe: whoever fires the
         //  very first buyback on a generation picks the tick the reference is born
         //  at, and gets exactly the sandwich this bound exists to stop. Measured:
         //  with a bootstrap-and-buy the sandwich still filled at -88.1% and still
-        //  paid the attacker +0.552 ETH. Deferring costs one buffered buyback by
+        //  paid the untrusted caller +0.552 ETH. Deferring costs one buffered buyback by
         //  one block on a brand-new pool and nothing else.
         (int24 ref, bool seeded) = _syncRef(pid, tick);
         if (seeded) return (0, 0);
@@ -291,7 +291,7 @@ library LegacyBuyLib {
      *           block, which is the whole point — a sandwich is atomic and cannot
      *           reach back.
      *        2. AT MOST `MAX_TICK_DEV` TICKS PER BLOCK. An honest market drags it
-     *           along within a block or two; an attacker who wants it D ticks away
+     *           along within a block or two; an untrusted caller who wants it D ticks away
      *           must hold a manipulated price for D/1000 whole blocks, exposed to
      *           every arbitrageur for each of them.
      *

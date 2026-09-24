@@ -48,7 +48,7 @@ interface IRegistryAdmin {
  *      the registry's `setRotationWiring` is the only way to point at one.
  *
  *   2. A VENUE. `QuoteRotator.rotateStep`/`swapOnce` route through a caller
- *      supplied pool, and the venue allowlist added after the red-team pass
+ *      supplied pool, and the venue allowlist added after the review pass
  *      FAILS CLOSED: an uncurated venue reverts `NoRoute`. The allowlist is
  *      keyed by PoolId, so `fee`, `tickSpacing` and `hooks` are all pinned —
  *      listing a pair does not list every pool on that pair.
@@ -412,7 +412,7 @@ contract VenueSeeder {
      *  floor is oracle-derived, so a slice only clears it if the venue can
      *  absorb the trade without moving price much, which means real capital —
      *  and this session has already spent a day recovering 12.25 ETH stranded by
-     *  exactly this shape of contract. A pot with no drain is not a cheaper pot,
+     *  exactly this shape of contract. A pot with no empty is not a cheaper pot,
      *  it is a slower loss.
      *
      *  `key` is passed in rather than stored: reconstructing it costs a storage

@@ -109,7 +109,7 @@ contract CollectionLedger {
     ///         supply is FROZEN (the brew died) and every one of those NFTs has been
     ///         recycled into the treasury.
     ///
-    ///  ── WHY THIS IS A DEAD END, NOT MERELY AN EMPTY ONE (red-team Z-19) ──────
+    ///  ── WHY THIS IS A DEAD END, NOT MERELY AN EMPTY ONE (review Z-19) ──────
     ///  `outstanding == 0` makes {redeem} revert `NothingOutstanding` (:119) and
     ///  makes {floorPerNFT} zero, which makes `PoolOps.buyCollection`'s
     ///  `require(paid > 0, "no floor")` (PoolOps.sol:1455-1456) unsatisfiable — so
@@ -128,7 +128,7 @@ contract CollectionLedger {
     ///         registry. Works before OR after death. Grows the floor for every
     ///         outstanding NFT.
     ///
-    ///  ── A DEAD-END GENERATION IS NOT CREDITED (red-team Z-19) ───────────────
+    ///  ── A DEAD-END GENERATION IS NOT CREDITED (review Z-19) ───────────────
     ///  `entitledTokens` and `totalEntitled` used to grow UNCONDITIONALLY, so a
     ///  royalty or buyback arriving after a generation was fully retired was booked
     ///  to a bucket with no claimant — and `totalEntitled` is the figure the
@@ -204,7 +204,7 @@ contract CollectionLedger {
                 emit EntitlementReleased(gen, released);
             }
         }
-        //  THE SAME DEAD END, ONE CALL EARLIER (red-team Z-19, twin). A generation
+        //  THE SAME DEAD END, ONE CALL EARLIER (review Z-19, twin). A generation
         //  whose every NFT was already recycled before it died freezes at
         //  `outstanding == 0`, so a final `extraEntitled` folded in here would be as
         //  unclaimable as a later {credit} — and this call CANNOT revert: it runs

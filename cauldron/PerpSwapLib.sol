@@ -133,7 +133,7 @@ library PerpSwapLib {
      *         1e18-scaled. {PerpEngine._q} multiplies its wei-written thresholds by
      *         this, so `_q(25 ether)` means "25 ether WORTH of `q`".
      *
-     *  ── A UNIT COUNT IS NOT A VALUE (red-team F-03) ────────────────────────
+     *  ── A UNIT COUNT IS NOT A VALUE (review F-03) ────────────────────────
      *  The engine used `unitOf` here, which answers a different question: it turned
      *  "25 ether of pool depth" into 25e6 raw units of a 6-decimal stable — $25 —
      *  and with it switched off the leverage tiering, the dust filter and the
@@ -147,7 +147,7 @@ library PerpSwapLib {
      *
      * @param oracle {QuoteOracle}, or zero when none is wired.
      * @return f Never 0 — an unpriceable quote falls back to its unit count, and a
-     *         unit count below 1e6 (a degenerate or hostile `decimals()`, including
+     *         unit count below 1e6 (a degenerate or untrusted `decimals()`, including
      *         0, which would drive every threshold to exactly zero) falls back to
      *         1e18. The fallback is STRICTER than the truth for a cheap quote, which
      *         is the safe direction for a protection: it can only over-apply, and
@@ -309,7 +309,7 @@ library PerpSwapLib {
         //  spot would fill NOTHING yet project an enormous move — liquidating every
         //  position on one side for the price of gas. The limit is a hard bound
         //  the PoolManager enforces, so clamping to it keeps the projection a real
-        //  bound rather than a griefing lever. Only honoured when the limit sits
+        //  bound rather than a disruption lever. Only honoured when the limit sits
         //  on the trade's side of spot; a limit on the wrong side makes the swap
         //  itself revert (`PriceLimitAlreadyExceeded`), taking any pre-sweep
         //  liquidations with it, so it is simply ignored here.
@@ -484,7 +484,7 @@ library PerpSwapLib {
     ///  Reporting rather than reverting is load-bearing, not stylistic: a
     ///  blacklistable token (true of most tokenized equities) can make ONE
     ///  recipient permanently unpayable, and a non-standard token returns false
-    ///  rather than reverting. Callers that must not be griefed by either
+    ///  rather than reverting. Callers that must not be disrupted by either
     ///  ({PerpEngine._payOut}, {PerpEngine.retirePayout}) need the boolean;
     ///  callers that should abort ({PerpEngine._safeTransfer}) revert on it.
     function tryTransferFrom(address token, address from, uint256 amount) external returns (bool) {
@@ -550,7 +550,7 @@ library PerpSwapLib {
         //  (`SafeCastOverflow`) or asks for more value than the caller holds. Both
         //  make the position UNCLOSABLE at every privilege level. A finite limit
         //  turns that into a PARTIAL fill, which the caller can repeat.
-        //  See {PerpEngine._buyUpTo}. (red-team LIQ-02)
+        //  See {PerpEngine._buyUpTo}. (review LIQ-02)
         uint160 limit = r.limit != 0 ? r.limit : (z ? MIN_LIMIT : SQRT_MAX - 1);
 
         int256 spec;
@@ -684,7 +684,7 @@ library PerpSwapLib {
     /**
      * @notice The DEAD-PATH PRICE BAND, as a sqrt-price limit.
      *
-     *  ── WHY A LIMIT AND NOT A REVERT (red-team T3d x LIQ-02) ───────────────
+     *  ── WHY A LIMIT AND NOT A REVERT (review T3d x LIQ-02) ───────────────
      *  The first cut of the band REVERTED when a forced close realised a price
      *  more than 10% off the engine's TWAP mark. That closed T3d (a stranger
      *  force-closing a SOLVENT position at any price for the keeper cut) but
@@ -804,10 +804,10 @@ library PerpSwapLib {
      *         the registry calls at a rotation's flip; DELEGATECALLed, so
      *         `address(this)` is the engine and this code runs on its storage.
      *
-     *  ── WHY (red-team D-1) ────────────────────────────────────────────────
+     *  ── WHY (review D-1) ────────────────────────────────────────────────
      *  The engine used to refuse a new quote while any position was open, so the
      *  flip PARKED it and made the book force-closeable — against the old pool,
-     *  which the rotation had just drained of ~97% of its liquidity. Measured
+     *  which the rotation had just emptied of ~97% of its liquidity. Measured
      *  (F14c): a solvent long force-sold into that depth was paid 0 and the short
      *  that closed after it made +0.78 ETH; insurance covered the gap. Carrying
      *  the book removes the forced sale entirely: positions keep living on the
