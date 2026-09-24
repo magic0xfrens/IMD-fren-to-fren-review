@@ -1,3 +1,4 @@
 # Every Fren Review job the swarm has run, all rounds. One IMD job id per line; `#` starts a note.
 # node tools/aggregate.mjs rebuilds LEDGER.md and ledger.json from these.
 7b9c907d-99b9-405b-8491-6088c77d4cc9  # 2026-09-24 deep review, foci perp-book value-flow hook-deltas rotation; order 6d2f3179-55f5-47a7-a6ae-a608a2f03a18
+00fde9c0-9ddd-4bae-ac0f-89a58d003858  # 2026-09-24 deep review of perp-engine; order caaf197a-f280-4934-abb9-6010f705e819
