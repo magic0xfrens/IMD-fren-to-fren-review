@@ -1,8 +1,8 @@
 {
   "source": "https://github.com/magic0xfrens/Magic-Internet-Frens",
-  "commit": "d36cfb747f396f7f3ab8e3afb2cd82e4c052015e",
+  "commit": "25e46e73a224c057bb7b349673ba14c00e73f154",
   "round": 2,
-  "exported_at": "2026-09-24T02:30:19+00:00",
+  "exported_at": "2026-09-24T02:56:16+00:00",
   "overlay": [],
   "submodules": {
     "lib/openzeppelin-contracts": "5fd1781b1454fd1ef8e722282f86f9293cacf256",
