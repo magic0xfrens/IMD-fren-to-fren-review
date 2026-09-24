@@ -1,4 +1,4 @@
-# Fren Review export of magic0xfrens/Magic-Internet-Frens@6f70ad6a7697.
+# Fren Review export of magic0xfrens/Magic-Internet-Frens@65becaa5be2e.
 # The DEFAULT profile is the source repo's `cauldron` profile, so a plain `forge build` works.
 # `render` builds the on-chain art (art cluster): FOUNDRY_PROFILE=render forge build.
 
