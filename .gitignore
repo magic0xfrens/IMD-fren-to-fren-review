@@ -4,3 +4,4 @@ broadcast/
 test/scratch/
 .imd-findings.json
 .imd-responses.json
+node_modules/
